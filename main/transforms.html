@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.transforms &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.transforms &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>torchaudio.transforms &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -438,7 +436,7 @@
 <h1>torchaudio.transforms<a class="headerlink" href="#torchaudio-transforms" title="Permalink to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio.transforms</span></code> module contains common audio processings and feature extractions. The following diagram shows the relationship between some of the available transforms.</p>
 <img alt="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png" src="https://download.pytorch.org/torchaudio/tutorial-assets/torchaudio_feature_extractions.png" />
-<p>Transforms are implemented using <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></a>. Common ways to build a processing pipeline are to define custom Module class or chain Modules together using <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html#torch.nn.Sequential" title="(in PyTorch v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code></a>, then move it to a target device and data type.</p>
+<p>Transforms are implemented using <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></a>. Common ways to build a processing pipeline are to define custom Module class or chain Modules together using <a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Sequential.html#torch.nn.Sequential" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Sequential</span></code></a>, then move it to a target device and data type.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define custom feature extraction pipeline.</span>
 <span class="c1">#</span>
 <span class="c1"># 1. Resample audio</span>
@@ -446,8 +444,8 @@
 <span class="c1"># 3. Apply augmentations</span>
 <span class="c1"># 4. Convert to mel-scale</span>
 <span class="c1">#</span>
-<span class="k">class</span> <span class="nc">MyPipeline</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MyPipeline</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_freq</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span>
         <span class="n">resample_freq</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span>
@@ -469,7 +467,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mel_scale</span> <span class="o">=</span> <span class="n">MelScale</span><span class="p">(</span>
             <span class="n">n_mels</span><span class="o">=</span><span class="n">n_mel</span><span class="p">,</span> <span class="n">sample_rate</span><span class="o">=</span><span class="n">resample_freq</span><span class="p">,</span> <span class="n">n_stft</span><span class="o">=</span><span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="c1"># Resample the input</span>
         <span class="n">resampled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>
 
@@ -502,6 +500,10 @@
 </div></div><section id="utility">
 <h2>Utility<a class="headerlink" href="#utility" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.transforms.AmplitudeToDB.html#torchaudio.transforms.AmplitudeToDB" title="torchaudio.transforms.AmplitudeToDB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AmplitudeToDB</span></code></a></p></td>
 <td><p>Turn a tensor from the power/amplitude scale to the decibel scale.</p></td>
@@ -551,6 +553,10 @@
 <section id="feature-extractions">
 <h2>Feature Extractions<a class="headerlink" href="#feature-extractions" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.transforms.Spectrogram.html#torchaudio.transforms.Spectrogram" title="torchaudio.transforms.Spectrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spectrogram</span></code></a></p></td>
 <td><p>Create a spectrogram from a audio signal.</p></td>
@@ -598,6 +604,10 @@
 <h2>Augmentations<a class="headerlink" href="#augmentations" title="Permalink to this heading">¶</a></h2>
 <p>The following transforms implement popular augmentation techniques known as <em>SpecAugment</em> <span id="id2">[<a class="reference internal" href="references.html#id6" title="Daniel S. Park, William Chan, Yu Zhang, Chung-Cheng Chiu, Barret Zoph, Ekin D. Cubuk, and Quoc V. Le. Specaugment: a simple data augmentation method for automatic speech recognition. Interspeech 2019, Sep 2019. URL: http://dx.doi.org/10.21437/Interspeech.2019-2680, doi:10.21437/interspeech.2019-2680.">Park <em>et al.</em>, 2019</a>]</span>.</p>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.transforms.FrequencyMasking.html#torchaudio.transforms.FrequencyMasking" title="torchaudio.transforms.FrequencyMasking"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FrequencyMasking</span></code></a></p></td>
 <td><p>Apply masking to a spectrogram in the frequency domain.</p></td>
@@ -614,9 +624,13 @@
 <section id="loss">
 <h2>Loss<a class="headerlink" href="#loss" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.transforms.RNNTLoss.html#torchaudio.transforms.RNNTLoss" title="torchaudio.transforms.RNNTLoss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RNNTLoss</span></code></a></p></td>
-<td><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em> <span id="id3">[<a class="reference internal" href="references.html#id18" title="Alex Graves. Sequence transduction with recurrent neural networks. 2012. arXiv:1211.3711.">Graves, 2012</a>]</span>.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 </tbody>
 </table>
@@ -624,6 +638,10 @@
 <section id="multi-channel">
 <h2>Multi-channel<a class="headerlink" href="#multi-channel" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD" title="torchaudio.transforms.PSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PSD</span></code></a></p></td>
 <td><p>Compute cross-channel power spectral density (PSD) matrix.</p></td>
@@ -632,10 +650,10 @@
 <td><p>Minimum Variance Distortionless Response (MVDR) module that performs MVDR beamforming with Time-Frequency masks.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.transforms.RTFMVDR.html#torchaudio.transforms.RTFMVDR" title="torchaudio.transforms.RTFMVDR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RTFMVDR</span></code></a></p></td>
-<td><p>Minimum Variance Distortionless Response (<em>MVDR</em> <span id="id4">[<a class="reference internal" href="references.html#id34" title="Jack Capon. High-resolution frequency-wavenumber spectrum analysis. Proceedings of the IEEE, 57(8):1408–1418, 1969.">Capon, 1969</a>]</span>) module based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</p></td>
+<td><p>Minimum Variance Distortionless Response (<em>MVDR</em> <span id="id3">[<a class="reference internal" href="references.html#id34" title="Jack Capon. High-resolution frequency-wavenumber spectrum analysis. Proceedings of the IEEE, 57(8):1408–1418, 1969.">Capon, 1969</a>]</span>) module based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.transforms.SoudenMVDR.html#torchaudio.transforms.SoudenMVDR" title="torchaudio.transforms.SoudenMVDR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SoudenMVDR</span></code></a></p></td>
-<td><p>Minimum Variance Distortionless Response (<em>MVDR</em> <span id="id5">[<a class="reference internal" href="references.html#id34" title="Jack Capon. High-resolution frequency-wavenumber spectrum analysis. Proceedings of the IEEE, 57(8):1408–1418, 1969.">Capon, 1969</a>]</span>) module based on the method proposed by <em>Souden et, al.</em> <span id="id6">[<a class="reference internal" href="references.html#id28" title="Mehrez Souden, Jacob Benesty, and Sofiene Affes. On optimal frequency-domain multichannel linear filtering for noise reduction. In IEEE Transactions on audio, speech, and language processing, volume 18, 260–276. IEEE, 2009.">Souden <em>et al.</em>, 2009</a>]</span>.</p></td>
+<td><p>Minimum Variance Distortionless Response (<em>MVDR</em> <span id="id4">[<a class="reference internal" href="references.html#id34" title="Jack Capon. High-resolution frequency-wavenumber spectrum analysis. Proceedings of the IEEE, 57(8):1408–1418, 1969.">Capon, 1969</a>]</span>) module based on the method proposed by <em>Souden et, al.</em> <span id="id5">[<a class="reference internal" href="references.html#id28" title="Mehrez Souden, Jacob Benesty, and Sofiene Affes. On optimal frequency-domain multichannel linear filtering for noise reduction. In IEEE Transactions on audio, speech, and language processing, volume 18, 260–276. IEEE, 2009.">Souden <em>et al.</em>, 2009</a>]</span>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -666,7 +684,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -715,9 +733,6 @@
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

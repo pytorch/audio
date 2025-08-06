@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.pipelines._wav2vec2.impl &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.pipelines._wav2vec2.impl &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.pipelines._wav2vec2.impl &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,19 +428,19 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.pipelines._wav2vec2.impl</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Module</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">aligner</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">aligner</span><span class="p">,</span> <span class="n">utils</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># type: ignore</span>
 
 
 <div class="viewcode-block" id="Wav2Vec2Bundle"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Wav2Vec2Bundle</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Wav2Vec2Bundle</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained :py:class:`~torchaudio.models.Wav2Vec2Model`.</span>
 
 <span class="sd">    This class provides interfaces for instantiating the pretrained model along with</span>
@@ -479,18 +477,18 @@
     <span class="n">_model_type</span><span class="p">:</span> <span class="nb">str</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample rate of the audio that the model is trained on.</span>
 
 <span class="sd">        :type: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span>
 
-    <span class="k">def</span> <span class="nf">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">):</span>
         <span class="c1"># Note: This method is overridden in ASR bundle</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Wav2Vec2Bundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span><span class="p">:</span>
+<div class="viewcode-block" id="Wav2Vec2Bundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2Bundle.html#torchaudio.pipelines.Wav2Vec2Bundle.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the model and load the pretrained weight.</span>
 
 <span class="sd">        The weight file is downloaded from the internet and cached with</span>
@@ -530,7 +528,7 @@
 
 
 <div class="viewcode-block" id="Wav2Vec2ASRBundle"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2ASRBundle.html#torchaudio.pipelines.Wav2Vec2ASRBundle">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Wav2Vec2ASRBundle</span><span class="p">(</span><span class="n">Wav2Vec2Bundle</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Wav2Vec2ASRBundle</span><span class="p">(</span><span class="n">Wav2Vec2Bundle</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained</span>
 <span class="sd">    :py:class:`~torchaudio.models.Wav2Vec2Model`.</span>
 
@@ -573,7 +571,7 @@
     <span class="n">_labels</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="n">_remove_aux_axis</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Wav2Vec2ASRBundle.get_labels"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2ASRBundle.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span>
+<div class="viewcode-block" id="Wav2Vec2ASRBundle.get_labels"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2ASRBundle.html#torchaudio.pipelines.Wav2Vec2ASRBundle.get_labels">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_labels</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">blank</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span>
@@ -597,7 +595,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">blank</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_aux_axis</span><span class="p">)</span></div>
 
 
@@ -1953,7 +1951,7 @@
 
 
 <div class="viewcode-block" id="Wav2Vec2FABundle"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Wav2Vec2FABundle</span><span class="p">(</span><span class="n">Wav2Vec2ASRBundle</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Wav2Vec2FABundle</span><span class="p">(</span><span class="n">Wav2Vec2ASRBundle</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained :py:class:`~torchaudio.models.Wav2Vec2Model` for forced alignment.</span>
 
 <span class="sd">    This class provides interfaces for instantiating the pretrained model along with</span>
@@ -1988,13 +1986,13 @@
 <span class="sd">        &gt;&gt;&gt;</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
-    <span class="k">class</span> <span class="nc">Tokenizer</span><span class="p">(</span><span class="n">aligner</span><span class="o">.</span><span class="n">ITokenizer</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Tokenizer</span><span class="p">(</span><span class="n">aligner</span><span class="o">.</span><span class="n">ITokenizer</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Interface of the tokenizer&quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">Aligner</span><span class="p">(</span><span class="n">aligner</span><span class="o">.</span><span class="n">IAligner</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Aligner</span><span class="p">(</span><span class="n">aligner</span><span class="o">.</span><span class="n">IAligner</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Interface of the aligner&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Wav2Vec2FABundle.get_labels"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">star</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<div class="viewcode-block" id="Wav2Vec2FABundle.get_labels"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_labels">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">star</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the labels corresponding to the feature dimension of emission.</span>
 
 <span class="sd">        The first is blank token, and it is customizable.</span>
@@ -2018,7 +2016,7 @@
         <span class="n">labels</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_labels</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="n">blank</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">labels</span> <span class="k">if</span> <span class="n">star</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="o">*</span><span class="n">labels</span><span class="p">,</span> <span class="n">star</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Wav2Vec2FABundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">with_star</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span><span class="p">:</span>
+<div class="viewcode-block" id="Wav2Vec2FABundle.get_model"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">with_star</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the model and load the pretrained weight.</span>
 
 <span class="sd">        The weight file is downloaded from the internet and cached with</span>
@@ -2047,7 +2045,7 @@
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">model</span></div>
 
-<div class="viewcode-block" id="Wav2Vec2FABundle.get_dict"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">star</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<div class="viewcode-block" id="Wav2Vec2FABundle.get_dict"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">star</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">blank</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the mapping from token to index (in emission feature dim)</span>
 
 <span class="sd">        Args:</span>
@@ -2068,7 +2066,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_labels</span><span class="p">(</span><span class="n">star</span><span class="o">=</span><span class="n">star</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="n">blank</span><span class="p">))}</span></div>
 
-<div class="viewcode-block" id="Wav2Vec2FABundle.get_tokenizer"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_tokenizer">[docs]</a>    <span class="k">def</span> <span class="nf">get_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tokenizer</span><span class="p">:</span>
+<div class="viewcode-block" id="Wav2Vec2FABundle.get_tokenizer"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_tokenizer">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tokenizer</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate a Tokenizer.</span>
 
 <span class="sd">        Returns:</span>
@@ -2076,7 +2074,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">aligner</span><span class="o">.</span><span class="n">Tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_dict</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="Wav2Vec2FABundle.get_aligner"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_aligner">[docs]</a>    <span class="k">def</span> <span class="nf">get_aligner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aligner</span><span class="p">:</span>
+<div class="viewcode-block" id="Wav2Vec2FABundle.get_aligner"><a class="viewcode-back" href="../../../../generated/torchaudio.pipelines.Wav2Vec2FABundle.html#torchaudio.pipelines.Wav2Vec2FABundle.get_aligner">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_aligner</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Aligner</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate an Aligner.</span>
 
 <span class="sd">        Returns:</span>
@@ -2145,7 +2143,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -2184,9 +2182,6 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
   

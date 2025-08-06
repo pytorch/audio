@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>HIFIGAN_VOCODER_V3_LJSPEECH &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>HIFIGAN_VOCODER_V3_LJSPEECH &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -399,7 +397,7 @@
         
       <li>HIFIGAN_VOCODER_V3_LJSPEECH &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -444,8 +442,14 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH">
 <span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.pipelines.</span></span><span class="sig-name descname"><span class="pre">HIFIGAN_VOCODER_V3_LJSPEECH</span></span><a class="headerlink" href="#torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH" title="Permalink to this definition">¶</a></dt>
-<dd><p>HiFiGAN Vocoder pipeline, trained on <em>The LJ Speech Dataset</em>
-<span id="id1">[<a class="reference internal" href="../references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span>.</p>
+<dd><p>[DEPRECATED]</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This object is deprecated deprecated from version 2.8. It will be removed in the 2.9 release.
+This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
+<dl>
+<dt>HiFiGAN Vocoder pipeline, trained on <em>The LJ Speech Dataset</em></dt><dd><p><span id="id1">[<a class="reference internal" href="../references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span>.</p>
 <p>This pipeine can be used with an external component which generates mel spectrograms from text, for example,
 Tacotron2 - see examples in <a class="reference internal" href="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a>.
 Although this works with the existing Tacotron2 bundles, for the best results one needs to retrain Tacotron2
@@ -458,6 +462,8 @@ HiFiGAN implementation uses a custom method of generating mel spectrograms from 
 with the original paper <span id="id2">[<a class="reference internal" href="../references.html#id57" title="Jungil Kong, Jaehyeon Kim, and Jaekyoung Bae. Hifi-gan: generative adversarial networks for efficient and high fidelity speech synthesis. In H. Larochelle, M. Ranzato, R. Hadsell, M.F. Balcan, and H. Lin, editors, Advances in Neural Information Processing Systems, volume 33, 17022–17033. Curran Associates, Inc., 2020. URL: https://proceedings.neurips.cc/paper/2020/file/c5d736809766d46260d816d8dbc9eb44-Paper.pdf.">Kong <em>et al.</em>, 2020</a>]</span> under <a class="reference external" href="https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/LICENSE">MIT License</a>. See links to
 pre-trained models on <a class="reference external" href="https://github.com/jik876/hifi-gan#pretrained-model">GitHub</a>.</p>
 <p>Please refer to <a class="reference internal" href="torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a> for usage instructions.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -487,7 +493,7 @@ pre-trained models on <a class="reference external" href="https://github.com/jik
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -529,9 +535,6 @@ pre-trained models on <a class="reference external" href="https://github.com/jik
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
      
 
   

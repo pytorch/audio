@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>TACOTRON2_WAVERNN_CHAR_LJSPEECH &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>TACOTRON2_WAVERNN_CHAR_LJSPEECH &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -397,7 +395,7 @@
         
       <li>TACOTRON2_WAVERNN_CHAR_LJSPEECH &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -442,7 +440,7 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH">
 <span class="sig-prename descclassname"><span class="pre">torchaudio.pipelines.</span></span><span class="sig-name descname"><span class="pre">TACOTRON2_WAVERNN_CHAR_LJSPEECH</span></span><a class="headerlink" href="#torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH" title="Permalink to this definition">¶</a></dt>
-<dd><p>Character-based TTS pipeline with <a class="reference internal" href="torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> trained on <em>LJSpeech</em> <span id="id1">[<a class="reference internal" href="../references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs and <a class="reference internal" href="torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaveRNN</span></code></a> vocoder trained on 8 bits depth waveform of <em>LJSpeech</em> <span id="id2">[<a class="reference internal" href="../references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 10,000 epochs.</p>
+<dd><p>Character-based TTS pipeline with <a class="reference internal" href="torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2" title="torchaudio.models.Tacotron2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tacotron2</span></code></a> trained on <em>LJSpeech</em> <span id="id1">[<a class="reference internal" href="../references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 1,500 epochs and <a class="reference internal" href="torchaudio.models.WaveRNN.html#torchaudio.models.WaveRNN" title="torchaudio.models.WaveRNN"><code class="xref py py-class docutils literal notranslate"><span class="pre">WaveRNN</span></code></a> vocoder trained on 8 bits depth waveform of <em>LJSpeech</em> <span id="id2">[<a class="reference internal" href="../references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> for 10,000 epochs.</p>
 <p>The text processor encodes the input texts character-by-character.</p>
 <p>You can find the training script <a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/pipeline_tacotron2">here</a>.
 The following parameters were used; <code class="docutils literal notranslate"><span class="pre">win_length=1100</span></code>, <code class="docutils literal notranslate"><span class="pre">hop_length=275</span></code>, <code class="docutils literal notranslate"><span class="pre">n_fft=2048</span></code>,
@@ -492,7 +490,7 @@ The following parameters were used; <code class="docutils literal notranslate"><
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -534,9 +532,6 @@ The following parameters were used; <code class="docutils literal notranslate"><
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
      
 
   

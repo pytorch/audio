@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ConformerWav2Vec2PretrainModel &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>ConformerWav2Vec2PretrainModel &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -399,7 +397,7 @@
         
       <li>ConformerWav2Vec2PretrainModel &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -442,22 +440,30 @@
 <h1>ConformerWav2Vec2PretrainModel<a class="headerlink" href="#conformerwav2vec2pretrainmodel" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.prototype.models.ConformerWav2Vec2PretrainModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.models.</span></span><span class="sig-name descname"><span class="pre">ConformerWav2Vec2PretrainModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wav2vec2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.wav2vec2.model.Wav2Vec2Model"><span class="pre">Wav2Vec2Model</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_generator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.5)"><span class="pre">Module</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_sampler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.5)"><span class="pre">Module</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/prototype/models/_conformer_wav2vec2.html#ConformerWav2Vec2PretrainModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Conformer Wav2Vec2 pre-train model for training from scratch.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To build the model, please use one of the factory functions,
-<a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_base.html#torchaudio.prototype.models.conformer_wav2vec2_base" title="torchaudio.prototype.models.conformer_wav2vec2_base"><code class="xref py py-func docutils literal notranslate"><span class="pre">conformer_wav2vec2_base()</span></code></a> or <code class="xref py py-func docutils literal notranslate"><span class="pre">conformer_wav2vec2_large()</span></code></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.models.</span></span><span class="sig-name descname"><span class="pre">ConformerWav2Vec2PretrainModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wav2vec2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model" title="torchaudio.models.wav2vec2.model.Wav2Vec2Model"><span class="pre">Wav2Vec2Model</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_generator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.7)"><span class="pre">Module</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_sampler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.7)"><span class="pre">Module</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/prototype/models/_conformer_wav2vec2.html#ConformerWav2Vec2PretrainModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is deprecated from version 2.8. It will be removed in the 2.9 release.
+This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wav2vec2</strong> (<em>nn.Module</em>) – Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.</p></li>
-<li><p><strong>mask_generator</strong> (<em>nn.Module</em>) – Mask generator that generates the mask for masked prediction during training.</p></li>
-<li><p><strong>negative_sampler</strong> (<em>nn.Module</em>) – Negative sampler to apply after masking.</p></li>
-</ul>
+<p>Conformer Wav2Vec2 pre-train model for training from scratch.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Note:</dt><dd><p>To build the model, please use one of the factory functions,
+<a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_base.html#torchaudio.prototype.models.conformer_wav2vec2_base" title="torchaudio.prototype.models.conformer_wav2vec2_base"><code class="xref py py-func docutils literal notranslate"><span class="pre">conformer_wav2vec2_base()</span></code></a> or <code class="xref py py-func docutils literal notranslate"><span class="pre">conformer_wav2vec2_large()</span></code></p>
+</dd>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>wav2vec2 (nn.Module):</dt><dd><p>Conformer based Wav2Vec2 model, including feature extractor and conformer encoder components.</p>
+</dd>
+<dt>mask_generator (nn.Module):</dt><dd><p>Mask generator that generates the mask for masked prediction during training.</p>
+</dd>
+<dt>negative_sampler (nn.Module):</dt><dd><p>Negative sampler to apply after masking.</p>
 </dd>
 </dl>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 </section>
@@ -468,16 +474,16 @@
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward">
-<span class="sig-prename descclassname"><span class="pre">ConformerWav2Vec2PretrainModel.</span></span><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/models/_conformer_wav2vec2.html#ConformerWav2Vec2PretrainModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ConformerWav2Vec2PretrainModel.</span></span><span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/models/_conformer_wav2vec2.html#ConformerWav2Vec2PretrainModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.models.ConformerWav2Vec2PretrainModel.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>features</strong> (<em>Tensor</em>) – Tensor of audio features of shape <cite>(batch, frame, dim)</cite>.</p></li>
 <li><p><strong>audio_lengths</strong> (<em>Tensor</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Tensor of valid length of each valid auidio in the batch.
 shape: <cite>(batch, )</cite> (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
 <dt>Tensor</dt><dd><p>The masked sequences of probability distribution of shape <cite>(batch, frame dim)</cite>.</p>
 </dd>
@@ -495,7 +501,7 @@ valid length in time axis is returns.</p>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>(Tensor, Optional[Tensor], Tensor, Tensor, Tensor, Tensor)</p>
 </dd>
 </dl>
@@ -507,15 +513,19 @@ valid length in time axis is returns.</p>
 <section id="factory-functions">
 <h1>Factory Functions<a class="headerlink" href="#factory-functions" title="Permalink to this heading">¶</a></h1>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_pretrain_model.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_model" title="torchaudio.prototype.models.conformer_wav2vec2_pretrain_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conformer_wav2vec2_pretrain_model</span></code></a></p></td>
-<td><p>Build a custom Conformer Wav2Vec2 Model for pre-training</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_pretrain_base.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_base" title="torchaudio.prototype.models.conformer_wav2vec2_pretrain_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conformer_wav2vec2_pretrain_base</span></code></a></p></td>
-<td><p>Build Conformer Wav2Vec2 Model for pre-training with &quot;small&quot; architecture from <em>Conformer-Based Self-Supervised Learning for Non-Speech Audio Tasks</em> <span id="id1">[<a class="reference internal" href="../references.html#id54" title="Sangeeta Srivastava, Yun Wang, Andros Tjandra, Anurag Kumar, Chunxi Liu, Kritika Singh, and Yatharth Saraf. Conformer-based self-supervised learning for non-speech audio tasks. In ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 8862-8866. 2022. doi:10.1109/ICASSP43922.2022.9746490.">Srivastava <em>et al.</em>, 2022</a>]</span></p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="torchaudio.prototype.models.conformer_wav2vec2_pretrain_large.html#torchaudio.prototype.models.conformer_wav2vec2_pretrain_large" title="torchaudio.prototype.models.conformer_wav2vec2_pretrain_large"><code class="xref py py-obj docutils literal notranslate"><span class="pre">conformer_wav2vec2_pretrain_large</span></code></a></p></td>
-<td><p>Build Conformer Wav2Vec2 Model for pre-training with &quot;large&quot; architecture from <em>Conformer-Based Slef-Supervised Learning for Non-Speech Audio Tasks</em> <span id="id2">[<a class="reference internal" href="../references.html#id54" title="Sangeeta Srivastava, Yun Wang, Andros Tjandra, Anurag Kumar, Chunxi Liu, Kritika Singh, and Yatharth Saraf. Conformer-based self-supervised learning for non-speech audio tasks. In ICASSP 2022 - 2022 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 8862-8866. 2022. doi:10.1109/ICASSP43922.2022.9746490.">Srivastava <em>et al.</em>, 2022</a>]</span></p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 </tbody>
 </table>
@@ -545,7 +555,7 @@ valid length in time axis is returns.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -592,9 +602,6 @@ valid length in time axis is returns.</p>
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
      
 
   

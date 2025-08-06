@@ -76,8 +76,8 @@ Preparation
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
     cuda
 
 
@@ -103,7 +103,9 @@ Preparation
 
  .. code-block:: none
 
-      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 38.9MB/s]
+    /pytorch/audio/examples/tutorials/speech_recognition_pipeline_tutorial.py:56: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      SPEECH_FILE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+      0%|          | 0.00/106k [00:00<?, ?B/s]    100%|##########| 106k/106k [00:00<00:00, 37.4MB/s]
 
 
 
@@ -188,7 +190,7 @@ fetch the pre-trained weights and load it into the model.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ls960.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ls960.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]     15%|#4        | 52.6M/360M [00:00<00:00, 550MB/s]     30%|###       | 109M/360M [00:00<00:00, 572MB/s]      45%|####5     | 163M/360M [00:00<00:00, 520MB/s]     59%|#####9    | 213M/360M [00:00<00:00, 399MB/s]     75%|#######5  | 270M/360M [00:00<00:00, 456MB/s]     91%|######### | 327M/360M [00:00<00:00, 497MB/s]    100%|##########| 360M/360M [00:00<00:00, 494MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]     14%|#3        | 48.6M/360M [00:00<00:00, 507MB/s]     27%|##6       | 97.0M/360M [00:00<00:00, 469MB/s]     40%|####      | 145M/360M [00:00<00:00, 483MB/s]      53%|#####3    | 191M/360M [00:00<00:00, 419MB/s]     64%|######4   | 232M/360M [00:00<00:00, 398MB/s]     75%|#######5  | 271M/360M [00:00<00:00, 390MB/s]     86%|########6 | 310M/360M [00:00<00:00, 397MB/s]     97%|#########6| 349M/360M [00:00<00:00, 379MB/s]    100%|##########| 360M/360M [00:00<00:00, 407MB/s]
     <class 'torchaudio.models.wav2vec2.model.Wav2Vec2Model'>
 
 
@@ -259,6 +261,15 @@ we can use :py:func:`torchaudio.functional.resample` for resampling.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
@@ -547,7 +558,7 @@ a model and getting the emission is as short as two lines.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.590 seconds)
+   **Total running time of the script:** ( 0 minutes  4.907 seconds)
 
 
 .. _sphx_glr_download_tutorials_speech_recognition_pipeline_tutorial.py:

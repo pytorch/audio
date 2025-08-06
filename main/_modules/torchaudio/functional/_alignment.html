@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional._alignment &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.functional._alignment &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.functional._alignment &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,18 +428,18 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.functional._alignment</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchaudio._extension</span> <span class="kn">import</span> <span class="n">fail_if_no_align</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._extension</span><span class="w"> </span><span class="kn">import</span> <span class="n">fail_if_no_align</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
 
 
 <div class="viewcode-block" id="forced_align"><a class="viewcode-back" href="../../../generated/torchaudio.functional.forced_align.html#torchaudio.functional.forced_align">[docs]</a><span class="nd">@fail_if_no_align</span>
-<span class="k">def</span> <span class="nf">forced_align</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">forced_align</span><span class="p">(</span>
     <span class="n">log_probs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">targets</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">input_lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -506,7 +504,7 @@
 
 
 <div class="viewcode-block" id="TokenSpan"><a class="viewcode-back" href="../../../generated/torchaudio.functional.TokenSpan.html#torchaudio.functional.TokenSpan">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TokenSpan</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TokenSpan</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;TokenSpan()</span>
 <span class="sd">    Token with time stamps and score. Returned by :py:func:`merge_tokens`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -520,12 +518,12 @@
     <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The score of the this token.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the time span&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span></div>
 
 
-<div class="viewcode-block" id="merge_tokens"><a class="viewcode-back" href="../../../generated/torchaudio.functional.merge_tokens.html#torchaudio.functional.merge_tokens">[docs]</a><span class="k">def</span> <span class="nf">merge_tokens</span><span class="p">(</span><span class="n">tokens</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TokenSpan</span><span class="p">]:</span>
+<div class="viewcode-block" id="merge_tokens"><a class="viewcode-back" href="../../../generated/torchaudio.functional.merge_tokens.html#torchaudio.functional.merge_tokens">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">merge_tokens</span><span class="p">(</span><span class="n">tokens</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">scores</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">TokenSpan</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes repeated tokens and blank tokens from the given CTC token sequence.</span>
 
 <span class="sd">    Args:</span>
@@ -574,7 +572,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -613,9 +611,6 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../_static/katex_autorenderer.js"></script>
      
 
   

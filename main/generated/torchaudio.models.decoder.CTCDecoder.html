@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CTCDecoder &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>CTCDecoder &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -397,7 +395,7 @@
         
       <li>CTCDecoder &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -463,7 +461,7 @@
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CTCDecoder.__call__">
-<span class="sig-prename descclassname"><span class="pre">CTCDecoder.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FloatTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis" title="torchaudio.models.decoder._ctc_decoder.CTCHypothesis"><span class="pre">CTCHypothesis</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder.__call__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">CTCDecoder.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emissions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">FloatTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis" title="torchaudio.models.decoder._ctc_decoder.CTCHypothesis"><span class="pre">CTCHypothesis</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Performs batched offline decoding.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -471,7 +469,7 @@
 please refer to <a class="reference internal" href="#torchaudio.models.decoder.CTCDecoder.decode_step" title="torchaudio.models.decoder.CTCDecoder.decode_step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">decode_step()</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>emissions</strong> (<em>torch.FloatTensor</em>) – CPU tensor of shape <cite>(batch, frame, num_tokens)</cite> storing sequences of
 probability distribution over labels; output of acoustic model.</p></li>
@@ -479,10 +477,10 @@ probability distribution over labels; output of acoustic model.</p></li>
 in time axis of the output Tensor in each batch.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of sorted best hypotheses for each audio sequence in the batch.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[List[<a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis" title="torchaudio.models.decoder.CTCHypothesis">CTCHypothesis</a>]]</p>
 </dd>
 </dl>
@@ -537,7 +535,7 @@ It is not necessary when performing batch decoding with <a class="reference inte
 It is not necessary when performing batch decoding with <a class="reference internal" href="#torchaudio.models.decoder.CTCDecoder.__call__" title="torchaudio.models.decoder.CTCDecoder.__call__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__call__()</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>emissions</strong> (<em>torch.FloatTensor</em>) – CPU tensor of shape <cite>(frame, num_tokens)</cite> storing sequences of
 probability distribution over labels; output of acoustic model.</p>
 </dd>
@@ -563,10 +561,10 @@ probability distribution over labels; output of acoustic model.</p>
 <span class="sig-prename descclassname"><span class="pre">CTCDecoder.</span></span><span class="sig-name descname"><span class="pre">get_final_hypothesis</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis" title="torchaudio.models.decoder._ctc_decoder.CTCHypothesis"><span class="pre">CTCHypothesis</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder.get_final_hypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder.get_final_hypothesis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the final hypothesis</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>List of sorted best hypotheses.</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dt class="field-even">Return type</dt>
 <dd class="field-even"><p>List[<a class="reference internal" href="#torchaudio.models.decoder.CTCHypothesis" title="torchaudio.models.decoder.CTCHypothesis">CTCHypothesis</a>]</p>
 </dd>
 </dl>
@@ -587,13 +585,13 @@ It is not necessary when performing batch decoding with <a class="reference inte
 <span class="sig-prename descclassname"><span class="pre">CTCDecoder.</span></span><span class="sig-name descname"><span class="pre">idxs_to_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LongTensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoder.idxs_to_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoder.idxs_to_tokens" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map raw token IDs into corresponding tokens</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>idxs</strong> (<em>LongTensor</em>) – raw token IDs generated from decoder</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>tokens corresponding to the input IDs</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List</p>
 </dd>
 </dl>
@@ -666,13 +664,13 @@ decoding without a lexicon, it will be blank. Please refer to <a class="referenc
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_with_nothing</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM.start" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize or reset the language model.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>start_with_nothing</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – whether or not to start sentence with sil token.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>starting state</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState">CTCDecoderLMState</a></p>
 </dd>
 </dl>
@@ -683,13 +681,13 @@ decoding without a lexicon, it will be blank. Please refer to <a class="referenc
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">usr_token_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM.score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM.score" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate the language model based on the current LM state and new word.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>state</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><em>CTCDecoderLMState</em></a>) – current LM state</p></li>
 <li><p><strong>usr_token_idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – index of the word</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
 <dt>(CTCDecoderLMState, float)</dt><dd><dl class="simple">
 <dt>CTCDecoderLMState:</dt><dd><p>new LM state</p>
@@ -709,10 +707,10 @@ decoding without a lexicon, it will be blank. Please refer to <a class="referenc
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">finish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLM.finish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLM.finish" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate end for language model based on current LM state.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>state</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><em>CTCDecoderLMState</em></a>) – current LM state</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p><dl class="simple">
 <dt>(CTCDecoderLMState, float)</dt><dd><dl class="simple">
 <dt>CTCDecoderLMState:</dt><dd><p>new LM state</p>
@@ -754,13 +752,13 @@ decoding without a lexicon, it will be blank. Please refer to <a class="referenc
 <dd><p>Returns child corresponding to usr_index, or creates and returns a new state if input index
 is not found.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>usr_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – index corresponding to child state</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>child state corresponding to usr_index</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState">CTCDecoderLMState</a></p>
 </dd>
 </dl>
@@ -771,13 +769,13 @@ is not found.</p>
 <span class="sig-name descname"><span class="pre">compare</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder._ctc_decoder.CTCDecoderLMState"><span class="pre">CTCDecoderLMState</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_ctc_decoder.html#CTCDecoderLMState.compare"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CTCDecoderLMState.compare" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare two language model states.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>state</strong> (<a class="reference internal" href="#torchaudio.models.decoder.CTCDecoderLMState" title="torchaudio.models.decoder.CTCDecoderLMState"><em>CTCDecoderLMState</em></a>) – LM state to compare against</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>0 if the states are the same, -1 if self is less, +1 if self is greater.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a></p>
 </dd>
 </dl>
@@ -812,7 +810,7 @@ is not found.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -869,9 +867,6 @@ is not found.</p>
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
      
 
   

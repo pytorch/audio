@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.models.decoder._cuda_ctc_decoder &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.models.decoder._cuda_ctc_decoder &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.models.decoder._cuda_ctc_decoder &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,23 +428,23 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.decoder._cuda_ctc_decoder</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchaudio</span>
 
 <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">_load_lib</span><span class="p">(</span><span class="s2">&quot;libctc_prefix_decoder&quot;</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">torchaudio.lib.pybind11_prefixctc</span> <span class="k">as</span> <span class="nn">cuctc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchaudio.lib.pybind11_prefixctc</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cuctc</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;CUCTCHypothesis&quot;</span><span class="p">,</span> <span class="s2">&quot;CUCTCDecoder&quot;</span><span class="p">,</span> <span class="s2">&quot;cuda_ctc_decoder&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_vocab_list</span><span class="p">(</span><span class="n">vocab_file</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_vocab_list</span><span class="p">(</span><span class="n">vocab_file</span><span class="p">):</span>
     <span class="n">vocab</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">vocab_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
@@ -455,7 +453,7 @@
     <span class="k">return</span> <span class="n">vocab</span>
 
 
-<div class="viewcode-block" id="CUCTCHypothesis"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCHypothesis">[docs]</a><span class="k">class</span> <span class="nc">CUCTCHypothesis</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<div class="viewcode-block" id="CUCTCHypothesis"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCHypothesis">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CUCTCHypothesis</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Represents hypothesis generated by CUCTC beam search decoder :class:`CUCTCDecoder`.&quot;&quot;&quot;</span>
     <span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Predicted sequence of token IDs. Shape `(L, )`, where `L` is the length of the output sequence&quot;&quot;&quot;</span>
@@ -471,7 +469,7 @@
 <span class="n">_DEFAULT_BLANK_SKIP_THREASHOLD</span> <span class="o">=</span> <span class="mf">0.95</span>
 
 
-<div class="viewcode-block" id="CUCTCDecoder"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCDecoder">[docs]</a><span class="k">class</span> <span class="nc">CUCTCDecoder</span><span class="p">:</span>
+<div class="viewcode-block" id="CUCTCDecoder"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCDecoder">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CUCTCDecoder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CUDA CTC beam search decoder.</span>
 
 <span class="sd">    .. devices:: CUDA</span>
@@ -480,7 +478,7 @@
 <span class="sd">        To build the decoder, please use the factory function :func:`cuda_ctc_decoder`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">vocab_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">blank_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -518,11 +516,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">blank_skip_threshold</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">blank_skip_threshold</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">beam_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">beam_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocab_list</span><span class="p">))</span>  <span class="c1"># beam size must be smaller than vocab size</span>
 
-    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">cuctc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cuctc</span><span class="o">.</span><span class="n">prefixCTC_free</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">internal_data</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CUCTCDecoder.__call__"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCDecoder.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_prob</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">encoder_out_lens</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+<div class="viewcode-block" id="CUCTCDecoder.__call__"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.CUCTCDecoder.html#torchaudio.models.decoder.CUCTCDecoder.__call__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_prob</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">encoder_out_lens</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            log_prob (torch.FloatTensor): GPU tensor of shape `(batch, frame, num_tokens)` storing sequences of</span>
@@ -586,7 +584,7 @@
         <span class="k">return</span> <span class="n">hypos</span></div></div>
 
 
-<div class="viewcode-block" id="cuda_ctc_decoder"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.cuda_ctc_decoder.html#torchaudio.models.decoder.cuda_ctc_decoder">[docs]</a><span class="k">def</span> <span class="nf">cuda_ctc_decoder</span><span class="p">(</span>
+<div class="viewcode-block" id="cuda_ctc_decoder"><a class="viewcode-back" href="../../../../generated/torchaudio.models.decoder.cuda_ctc_decoder.html#torchaudio.models.decoder.cuda_ctc_decoder">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">cuda_ctc_decoder</span><span class="p">(</span>
     <span class="n">tokens</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">nbest</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">beam_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
@@ -633,7 +631,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -672,9 +670,6 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
   

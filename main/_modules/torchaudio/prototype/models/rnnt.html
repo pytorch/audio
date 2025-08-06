@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.models.rnnt &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.prototype.models.rnnt &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.prototype.models.rnnt &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,19 +428,21 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.prototype.models.rnnt</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">Conformer</span><span class="p">,</span> <span class="n">RNNT</span>
-<span class="kn">from</span> <span class="nn">torchaudio.models.rnnt</span> <span class="kn">import</span> <span class="n">_Joiner</span><span class="p">,</span> <span class="n">_Predictor</span><span class="p">,</span> <span class="n">_TimeReduction</span><span class="p">,</span> <span class="n">_Transcriber</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Conformer</span><span class="p">,</span> <span class="n">RNNT</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.models.rnnt</span><span class="w"> </span><span class="kn">import</span> <span class="n">_Joiner</span><span class="p">,</span> <span class="n">_Predictor</span><span class="p">,</span> <span class="n">_TimeReduction</span><span class="p">,</span> <span class="n">_Transcriber</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._internal.module_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dropping_support</span>
 
 
 <span class="n">TrieNode</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="s2">&quot;TrieNode&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span>
 
 
-<span class="k">class</span> <span class="nc">_ConformerEncoder</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">_Transcriber</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ConformerEncoder</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">_Transcriber</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -471,7 +471,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">conformer_input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">output_dim</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="n">time_reduction_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reduction</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
         <span class="n">input_linear_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_linear</span><span class="p">(</span><span class="n">time_reduction_out</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conformer</span><span class="p">(</span><span class="n">input_linear_out</span><span class="p">,</span> <span class="n">time_reduction_lengths</span><span class="p">)</span>
@@ -479,7 +479,7 @@
         <span class="n">layer_norm_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_norm</span><span class="p">(</span><span class="n">output_linear_out</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">layer_norm_out</span><span class="p">,</span> <span class="n">lengths</span>
 
-    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -488,7 +488,7 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Conformer does not support streaming inference.&quot;</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_JoinerBiasing</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_JoinerBiasing</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recurrent neural network transducer (RNN-T) joint network.</span>
 
 <span class="sd">    Args:</span>
@@ -502,7 +502,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -525,7 +525,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported activation </span><span class="si">{</span><span class="n">activation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source_encodings</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -575,7 +575,7 @@
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">activation_out</span>
 
 
-<span class="k">class</span> <span class="nc">RNNTBiasing</span><span class="p">(</span><span class="n">RNNT</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RNNTBiasing</span><span class="p">(</span><span class="n">RNNT</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;torchaudio.models.RNNT()</span>
 
 <span class="sd">    Recurrent neural network transducer (RNN-T) model.</span>
@@ -599,7 +599,7 @@
 <span class="sd">        DBaverage (bool): If true, instead of TCPGen, use DBRNNT for biasing</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">transcriber</span><span class="p">:</span> <span class="n">_Transcriber</span><span class="p">,</span>
         <span class="n">predictor</span><span class="p">:</span> <span class="n">_Predictor</span><span class="p">,</span>
@@ -640,7 +640,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">dropout_tcpgen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_tcpgen</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tcpsche</span> <span class="o">=</span> <span class="n">tcpsche</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sources</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -743,7 +743,7 @@
 
         <span class="k">return</span> <span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">target_lengths</span><span class="p">,</span> <span class="n">predictor_state</span><span class="p">,</span> <span class="n">tcpgen_dist</span><span class="p">,</span> <span class="n">p_gen</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_tcpgen_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tcpgen_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">):</span>
         <span class="c1"># Make use of the predictor embedding matrix</span>
         <span class="n">keyvalues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">predictor</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ooKBemb</span><span class="o">.</span><span class="n">weight</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">keyvalues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_tcpgen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Kproj</span><span class="p">(</span><span class="n">keyvalues</span><span class="p">))</span>
@@ -757,7 +757,7 @@
         <span class="n">hptr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ntui,ij-&gt;ntuj&quot;</span><span class="p">,</span> <span class="n">tcpgendist</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">keyvalues</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
         <span class="k">return</span> <span class="n">hptr</span><span class="p">,</span> <span class="n">tcpgendist</span>
 
-    <span class="k">def</span> <span class="nf">forward_tcpgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">,</span> <span class="n">source_encodings</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward_tcpgen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">,</span> <span class="n">source_encodings</span><span class="p">):</span>
         <span class="n">tcpgen_dist</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBaverage</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepbiasing</span><span class="p">:</span>
             <span class="n">hptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">biasingemb</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">ptrdist_mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">())</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
@@ -769,7 +769,7 @@
             <span class="n">hptr</span><span class="p">,</span> <span class="n">tcpgen_dist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tcpgen_distribution</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">ptrdist_mask</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">hptr</span><span class="p">,</span> <span class="n">tcpgen_dist</span>
 
-    <span class="k">def</span> <span class="nf">get_tcpgen_step_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yseqs</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tcpgen_step_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yseqs</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
         <span class="n">seqlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">batch_masks</span> <span class="o">=</span> <span class="n">yseqs</span><span class="o">.</span><span class="n">new_ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">),</span> <span class="n">seqlen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">p_gen_masks</span> <span class="o">=</span> <span class="p">[]</span>
@@ -804,7 +804,7 @@
         <span class="n">p_gen_masks</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">p_gen_masks</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">yseqs</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">batch_masks</span><span class="p">,</span> <span class="n">p_gen_masks</span>
 
-    <span class="k">def</span> <span class="nf">get_tcpgen_step_masks_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yseqs</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tcpgen_step_masks_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yseqs</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
         <span class="c1"># Implemented for prefix-based wordpieces, not tested yet</span>
         <span class="n">seqlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="n">batch_masks</span> <span class="o">=</span> <span class="n">yseqs</span><span class="o">.</span><span class="n">new_ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yseqs</span><span class="p">),</span> <span class="n">seqlen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">char_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -843,7 +843,7 @@
 
         <span class="k">return</span> <span class="n">batch_masks</span><span class="p">,</span> <span class="n">p_gen_masks</span>
 
-    <span class="k">def</span> <span class="nf">get_tcpgen_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">trie</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tcpgen_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vy</span><span class="p">,</span> <span class="n">trie</span><span class="p">,</span> <span class="n">resettrie</span><span class="p">):</span>
         <span class="n">new_tree</span> <span class="o">=</span> <span class="n">trie</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">vy</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blank_idx</span><span class="p">]:</span>
             <span class="n">new_tree</span> <span class="o">=</span> <span class="n">resettrie</span>
@@ -858,7 +858,7 @@
             <span class="n">new_tree</span> <span class="o">=</span> <span class="n">new_tree</span><span class="p">[</span><span class="n">vy</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">new_tree</span>
 
-    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">join</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source_encodings</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">source_lengths</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -904,7 +904,8 @@
         <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">source_lengths</span><span class="p">,</span> <span class="n">jointer_activation</span>
 
 
-<div class="viewcode-block" id="conformer_rnnt_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_rnnt_model.html#torchaudio.prototype.models.conformer_rnnt_model">[docs]</a><span class="k">def</span> <span class="nf">conformer_rnnt_model</span><span class="p">(</span>
+<div class="viewcode-block" id="conformer_rnnt_model"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_rnnt_model.html#torchaudio.prototype.models.conformer_rnnt_model">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conformer_rnnt_model</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">encoding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -976,7 +977,8 @@
     <span class="k">return</span> <span class="n">RNNT</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">predictor</span><span class="p">,</span> <span class="n">joiner</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="conformer_rnnt_base"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_rnnt_base.html#torchaudio.prototype.models.conformer_rnnt_base">[docs]</a><span class="k">def</span> <span class="nf">conformer_rnnt_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RNNT</span><span class="p">:</span>
+<div class="viewcode-block" id="conformer_rnnt_base"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.models.conformer_rnnt_base.html#torchaudio.prototype.models.conformer_rnnt_base">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conformer_rnnt_base</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RNNT</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds basic version of Conformer RNN-T model.</span>
 
 <span class="sd">    Returns:</span>
@@ -1004,7 +1006,8 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">conformer_rnnt_biasing</span><span class="p">(</span>
+<span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conformer_rnnt_biasing</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">encoding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1109,7 +1112,8 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">conformer_rnnt_biasing_base</span><span class="p">(</span><span class="n">charlist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">biasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RNNT</span><span class="p">:</span>
+<span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conformer_rnnt_biasing_base</span><span class="p">(</span><span class="n">charlist</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">biasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RNNT</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Builds basic version of Conformer RNN-T model with TCPGen.</span>
 
 <span class="sd">    Returns:</span>
@@ -1157,7 +1161,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -1196,9 +1200,6 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
   

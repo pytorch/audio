@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Building on Windows &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>Building on Windows &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -397,7 +395,7 @@
         
       <li>Building on Windows &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -447,8 +445,8 @@
 <p>Please follow the instruction at <a class="reference external" href="https://visualstudio.microsoft.com/downloads/">https://visualstudio.microsoft.com/downloads/</a>, and make sure to install C++ development tools.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The official binary distribution are compiled with MSVC 2019.
-The following section uses path from MSVC 2019 Community Edition.</p>
+<p>The official binary distribution are compiled with MSVC 2022.
+The following section uses path from MSVC 2022 Community Edition.</p>
 </div>
 </section>
 <section id="conda">
@@ -493,7 +491,7 @@ We also use Bash for the sake of similar experience to Linux/macOS.</p>
 To enable the toolset, one can use <code class="docutils literal notranslate"><span class="pre">vcvarsall.bat</span></code> or <code class="docutils literal notranslate"><span class="pre">vcvars64.bat</span></code> file, which
 are found under Visual Studio’s installation folder, under <code class="docutils literal notranslate"><span class="pre">VC\Auxiliary\Build\</span></code>.
 More information are available at <a class="reference external" href="https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160#use-vcvarsallbat-to-set-a-64-bit-hosted-build-architecture">https://docs.microsoft.com/en-us/cpp/build/how-to-enable-a-64-bit-visual-cpp-toolset-on-the-command-line?view=msvc-160#use-vcvarsallbat-to-set-a-64-bit-hosted-build-architecture</a></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">call</span> <span class="s2">&quot;C:\Program Files (x86)\Microsoft Visual Studio</span><span class="se">\201</span><span class="s2">9\Community\VC\Auxiliary\Build</span><span class="se">\v</span><span class="s2">cvarsall.bat&quot;</span> <span class="n">x64</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">call</span> <span class="s2">&quot;C:\Program Files (x86)\Microsoft Visual Studio</span><span class="se">\202</span><span class="s2">2\Community\VC\Auxiliary\Build</span><span class="se">\v</span><span class="s2">cvarsall.bat&quot;</span> <span class="n">x64</span>
 </pre></div>
 </div>
 <p>Please makes sure that <code class="docutils literal notranslate"><span class="pre">cl</span></code> command is recognized.</p>
@@ -511,15 +509,6 @@ More information are available at <a class="reference external" href="https://do
 <section id="install-pytorch">
 <h2>3. Install PyTorch<a class="headerlink" href="#install-pytorch" title="Permalink to this heading">¶</a></h2>
 <p>Please refer to <a class="reference external" href="https://pytorch.org/get-started/locally/">https://pytorch.org/get-started/locally/</a> for the up-to-date way to install PyTorch.</p>
-<p>The following command installs the nightly build version of PyTorch.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># CPU-only</span>
-<span class="n">conda</span> <span class="n">install</span> <span class="n">pytorch</span> <span class="n">cpuonly</span> <span class="o">-</span><span class="n">c</span> <span class="n">pytorch</span><span class="o">-</span><span class="n">nightly</span>
-
-<span class="c1"># With CUDA support</span>
-<span class="n">conda</span> <span class="n">install</span> <span class="n">pytorch</span> <span class="n">pytorch</span><span class="o">-</span><span class="n">cuda</span><span class="o">=</span><span class="mf">11.7</span> <span class="o">-</span><span class="n">c</span> <span class="n">pytorch</span><span class="o">-</span><span class="n">nightly</span> <span class="o">-</span><span class="n">c</span> <span class="n">nvidia</span>
-</pre></div>
-</div>
-<p>When installing CUDA-enabled version, it also install CUDA toolkit.</p>
 </section>
 <section id="optional-cudnn">
 <h2>4. [Optional] cuDNN<a class="headerlink" href="#optional-cudnn" title="Permalink to this heading">¶</a></h2>
@@ -656,7 +645,7 @@ msys2-runtime 3.4.3-5
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -719,9 +708,6 @@ msys2-runtime 3.4.3-5
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

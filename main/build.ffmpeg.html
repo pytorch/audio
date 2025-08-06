@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Enabling GPU video decoder/encoder &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>Enabling GPU video decoder/encoder &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>Enabling GPU video decoder/encoder &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -826,7 +824,7 @@ video:34502kB audio:3234kB subtitle:0kB other streams:0kB global headers:0kB mux
 <p>There are utility functions to query the capability of FFmpeg in <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#module-torchaudio.utils.ffmpeg_utils" title="torchaudio.utils.ffmpeg_utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torchaudio.utils.ffmpeg_utils</span></code></a>.</p>
 <p>You can first use <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_decoders" title="torchaudio.utils.ffmpeg_utils.get_video_decoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_decoders()</span></code></a> and <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_video_encoders" title="torchaudio.utils.ffmpeg_utils.get_video_encoders"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_video_encoders()</span></code></a> to check if GPU decoders and encoders (such as <code class="docutils literal notranslate"><span class="pre">h264_cuvid</span></code> and <code class="docutils literal notranslate"><span class="pre">h264_nvenc</span></code>) are listed.</p>
 <p>It is often the case where there are multiple FFmpeg installations in the system, and TorchAudio is loading one different than expected. In such cases, use of <code class="docutils literal notranslate"><span class="pre">ffmpeg</span></code> to check the installation does not help. You can use functions like <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_build_config" title="torchaudio.utils.ffmpeg_utils.get_build_config"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_build_config()</span></code></a> and <a class="reference internal" href="generated/torchaudio.utils.ffmpeg_utils.html#torchaudio.utils.ffmpeg_utils.get_versions" title="torchaudio.utils.ffmpeg_utils.get_versions"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_versions()</span></code></a> to get information about FFmpeg libraries TorchAudio loaded.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">torchaudio.utils</span> <span class="kn">import</span> <span class="n">ffmpeg_utils</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">ffmpeg_utils</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Library versions:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">ffmpeg_utils</span><span class="o">.</span><span class="n">get_versions</span><span class="p">())</span>
@@ -884,7 +882,7 @@ Encoders:
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -940,9 +938,6 @@ Encoders:
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

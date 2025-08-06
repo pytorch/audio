@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.datasets &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.datasets &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>torchaudio.datasets &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -436,10 +434,10 @@
               
   <span class="target" id="module-torchaudio.datasets"></span><section id="torchaudio-datasets">
 <h1>torchaudio.datasets<a class="headerlink" href="#torchaudio-datasets" title="Permalink to this heading">¶</a></h1>
-<p>All datasets are subclasses of <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a>
+<p>All datasets are subclasses of <a class="reference external" href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.Dataset" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.Dataset</span></code></a>
 and have <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> and <code class="docutils literal notranslate"><span class="pre">__len__</span></code> methods implemented.</p>
-<p>Hence, they can all be passed to a <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch v2.5)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code></a>
-which can load multiple samples parallelly using <a class="reference external" href="https://pytorch.org/docs/stable/multiprocessing.html#module-torch.multiprocessing" title="(in PyTorch v2.5)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torch.multiprocessing</span></code></a> workers.
+<p>Hence, they can all be passed to a <a class="reference external" href="https://docs.pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader" title="(in PyTorch v2.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">torch.utils.data.DataLoader</span></code></a>
+which can load multiple samples parallelly using <a class="reference external" href="https://docs.pytorch.org/docs/stable/multiprocessing.html#module-torch.multiprocessing" title="(in PyTorch v2.7)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">torch.multiprocessing</span></code></a> workers.
 For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yesno_data</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">YESNO</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">data_loader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
@@ -450,6 +448,10 @@ For example:</p>
 </pre></div>
 </div>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.CMUARCTIC.html#torchaudio.datasets.CMUARCTIC" title="torchaudio.datasets.CMUARCTIC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CMUARCTIC</span></code></a></p></td>
 <td><p><em>CMU ARCTIC</em> <span id="id1">[<a class="reference internal" href="references.html#id36" title="John Kominek, Alan W Black, and Ver Ver. Cmu arctic databases for speech synthesis. Technical Report, 2003.">Kominek <em>et al.</em>, 2003</a>]</span> dataset.</p></td>
@@ -479,13 +481,13 @@ For example:</p>
 <td><p><em>LibriSpeech</em> <span id="id9">[<a class="reference internal" href="references.html#id13" title="Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur. Librispeech: an asr corpus based on public domain audio books. In 2015 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), volume, 5206-5210. 2015. doi:10.1109/ICASSP.2015.7178964.">Panayotov <em>et al.</em>, 2015</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LibriLightLimited.html#torchaudio.datasets.LibriLightLimited" title="torchaudio.datasets.LibriLightLimited"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LibriLightLimited</span></code></a></p></td>
-<td><p>Subset of Libri-light <span id="id10">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. \url https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span> dataset, which was used in HuBERT <span id="id11">[<a class="reference internal" href="references.html#id16" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for supervised fine-tuning.</p></td>
+<td><p>Subset of Libri-light <span id="id10">[<a class="reference internal" href="references.html#id12" title="J. Kahn, M. Rivière, W. Zheng, E. Kharitonov, Q. Xu, P. E. Mazaré, J. Karadayi, V. Liptchinsky, R. Collobert, C. Fuegen, T. Likhomanenko, G. Synnaeve, A. Joulin, A. Mohamed, and E. Dupoux. Libri-light: a benchmark for asr with limited or no supervision. In ICASSP 2020 - 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 7669-7673. 2020. https://github.com/facebookresearch/libri-light.">Kahn <em>et al.</em>, 2020</a>]</span> dataset, which was used in HuBERT <span id="id11">[<a class="reference internal" href="references.html#id16" title="Wei-Ning Hsu, Benjamin Bolte, Yao-Hung Hubert Tsai, Kushal Lakhotia, Ruslan Salakhutdinov, and Abdelrahman Mohamed. Hubert: self-supervised speech representation learning by masked prediction of hidden units. 2021. arXiv:2106.07447.">Hsu <em>et al.</em>, 2021</a>]</span> for supervised fine-tuning.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LIBRITTS.html#torchaudio.datasets.LIBRITTS" title="torchaudio.datasets.LIBRITTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LIBRITTS</span></code></a></p></td>
 <td><p><em>LibriTTS</em> <span id="id12">[<a class="reference internal" href="references.html#id38" title="Heiga Zen, Viet-Trung Dang, Robert A. J. Clark, Yu Zhang, Ron J. Weiss, Ye Jia, Z. Chen, and Yonghui Wu. Libritts: a corpus derived from librispeech for text-to-speech. ArXiv, 2019.">Zen <em>et al.</em>, 2019</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.datasets.LJSPEECH.html#torchaudio.datasets.LJSPEECH" title="torchaudio.datasets.LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LJSPEECH</span></code></a></p></td>
-<td><p><em>LJSpeech-1.1</em> <span id="id13">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> dataset.</p></td>
+<td><p><em>LJSpeech-1.1</em> <span id="id13">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span> dataset.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.datasets.MUSDB_HQ.html#torchaudio.datasets.MUSDB_HQ" title="torchaudio.datasets.MUSDB_HQ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MUSDB_HQ</span></code></a></p></td>
 <td><p><em>MUSDB_HQ</em> <span id="id14">[<a class="reference internal" href="references.html#id47" title="Zafar Rafii, Antoine Liutkus, Fabian-Robert Stöter, Stylianos Ioannis Mimilakis, and Rachel Bittner. MUSDB18-HQ - an uncompressed version of musdb18. December 2019. URL: https://doi.org/10.5281/zenodo.3338373, doi:10.5281/zenodo.3338373.">Rafii <em>et al.</em>, 2019</a>]</span> dataset.</p></td>
@@ -542,7 +544,7 @@ For example:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -584,9 +586,6 @@ For example:</p>
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.functional._dsp &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.prototype.functional._dsp &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.prototype.functional._dsp &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,15 +428,17 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.prototype.functional._dsp</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-<span class="kn">from</span> <span class="nn">torchaudio.functional</span> <span class="kn">import</span> <span class="n">fftconvolve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">fftconvolve</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._internal.module_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dropping_support</span>
 
 
-<div class="viewcode-block" id="oscillator_bank"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.oscillator_bank.html#torchaudio.prototype.functional.oscillator_bank">[docs]</a><span class="k">def</span> <span class="nf">oscillator_bank</span><span class="p">(</span>
+<div class="viewcode-block" id="oscillator_bank"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.oscillator_bank.html#torchaudio.prototype.functional.oscillator_bank">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">oscillator_bank</span><span class="p">(</span>
     <span class="n">frequencies</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">amplitudes</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -513,7 +513,8 @@
     <span class="k">return</span> <span class="n">waveform</span></div>
 
 
-<div class="viewcode-block" id="adsr_envelope"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.adsr_envelope.html#torchaudio.prototype.functional.adsr_envelope">[docs]</a><span class="k">def</span> <span class="nf">adsr_envelope</span><span class="p">(</span>
+<div class="viewcode-block" id="adsr_envelope"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.adsr_envelope.html#torchaudio.prototype.functional.adsr_envelope">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">adsr_envelope</span><span class="p">(</span>
     <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">attack</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -614,7 +615,8 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="extend_pitch"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.extend_pitch.html#torchaudio.prototype.functional.extend_pitch">[docs]</a><span class="k">def</span> <span class="nf">extend_pitch</span><span class="p">(</span>
+<div class="viewcode-block" id="extend_pitch"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.extend_pitch.html#torchaudio.prototype.functional.extend_pitch">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extend_pitch</span><span class="p">(</span>
     <span class="n">base</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">pattern</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span>
 <span class="p">):</span>
@@ -681,7 +683,8 @@
     <span class="k">return</span> <span class="n">h_freq</span></div>
 
 
-<div class="viewcode-block" id="sinc_impulse_response"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.sinc_impulse_response.html#torchaudio.prototype.functional.sinc_impulse_response">[docs]</a><span class="k">def</span> <span class="nf">sinc_impulse_response</span><span class="p">(</span><span class="n">cutoff</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">513</span><span class="p">,</span> <span class="n">high_pass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="sinc_impulse_response"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.sinc_impulse_response.html#torchaudio.prototype.functional.sinc_impulse_response">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sinc_impulse_response</span><span class="p">(</span><span class="n">cutoff</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">513</span><span class="p">,</span> <span class="n">high_pass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create windowed-sinc impulse response for given cutoff frequencies.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -720,7 +723,8 @@
     <span class="k">return</span> <span class="n">filt</span></div>
 
 
-<div class="viewcode-block" id="frequency_impulse_response"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.frequency_impulse_response.html#torchaudio.prototype.functional.frequency_impulse_response">[docs]</a><span class="k">def</span> <span class="nf">frequency_impulse_response</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">):</span>
+<div class="viewcode-block" id="frequency_impulse_response"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.frequency_impulse_response.html#torchaudio.prototype.functional.frequency_impulse_response">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">frequency_impulse_response</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create filter from desired frequency response</span>
 
 <span class="sd">    Args:</span>
@@ -740,7 +744,7 @@
     <span class="k">return</span> <span class="n">ir</span> <span class="o">*</span> <span class="n">window</span></div>
 
 
-<span class="k">def</span> <span class="nf">_overlap_and_add</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_overlap_and_add</span><span class="p">(</span><span class="n">waveform</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
     <span class="n">num_frames</span><span class="p">,</span> <span class="n">frame_size</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
     <span class="n">numel</span> <span class="o">=</span> <span class="p">(</span><span class="n">num_frames</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">stride</span> <span class="o">+</span> <span class="n">frame_size</span>
     <span class="n">buffer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">waveform</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">numel</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">waveform</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
@@ -751,7 +755,8 @@
     <span class="k">return</span> <span class="n">buffer</span>
 
 
-<div class="viewcode-block" id="filter_waveform"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.filter_waveform.html#torchaudio.prototype.functional.filter_waveform">[docs]</a><span class="k">def</span> <span class="nf">filter_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">kernels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">delay_compensation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="filter_waveform"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.functional.filter_waveform.html#torchaudio.prototype.functional.filter_waveform">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_waveform</span><span class="p">(</span><span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">kernels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">delay_compensation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Applies filters along time axis of the given waveform.</span>
 
 <span class="sd">    This function applies the given filters along time axis in the following manner:</span>
@@ -836,7 +841,8 @@
     <span class="k">return</span> <span class="n">result</span></div>
 
 
-<span class="k">def</span> <span class="nf">exp_sigmoid</span><span class="p">(</span>
+<span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exp_sigmoid</span><span class="p">(</span>
     <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">exponent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span> <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-7</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Exponential Sigmoid pointwise nonlinearity.</span>
@@ -879,7 +885,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -918,9 +924,6 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
   

@@ -94,7 +94,7 @@ Optional Dependencies
      TorchAudio is tested on libsox 14.4.2. (And it is unlikely that other
      versions would work.)
 
-* `SoundFile <https://pysoundfile.readthedocs.io/>`__
+* `SoundFile <https://pypi.org/project/PySoundFile/>`__
 
   Required to use ``backend="soundfile"`` in `I/O functions <./torchaudio.html#i-o>`__.
 
@@ -127,6 +127,39 @@ Please refer to the following table for the matching versions.
    * - ``PyTorch``
      - ``TorchAudio``
      - ``Python``
+   * - ``2.6``
+     - ``2.6.0``
+     - ``>=3.9``, ``<=3.13``
+   * - ``2.5``
+     - ``2.5.0``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.4.1``
+     - ``2.4.1``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.4``
+     - ``2.4.0``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.3.1``
+     - ``2.3.1``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.3.0``
+     - ``2.3.0``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.2.2``
+     - ``2.2.2``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.2.1``
+     - ``2.2.1``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.2``
+     - ``2.2.0``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.1.2``
+     - ``2.1.2``
+     - ``>=3.8``, ``<=3.11``
+   * - ``2.1.1``
+     - ``2.1.1``
+     - ``>=3.8``, ``<=3.11``
    * - ``2.1.0``
      - ``2.1.0``
      - ``>=3.8``, ``<=3.11``

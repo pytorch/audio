@@ -46,8 +46,8 @@ available datasets.
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
@@ -106,7 +106,7 @@ Here, we show how to use the
 
  .. code-block:: none
 
-      0%|          | 0.00/4.49M [00:00<?, ?B/s]      3%|2         | 128k/4.49M [00:00<00:08, 514kB/s]     11%|#1        | 512k/4.49M [00:00<00:03, 1.39MB/s]     39%|###9      | 1.75M/4.49M [00:00<00:00, 4.44MB/s]     81%|########  | 3.62M/4.49M [00:00<00:00, 8.03MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 6.89MB/s]
+      0%|          | 0.00/4.49M [00:00<?, ?B/s]      3%|2         | 128k/4.49M [00:00<00:08, 553kB/s]     11%|#1        | 512k/4.49M [00:00<00:02, 1.49MB/s]     42%|####1     | 1.88M/4.49M [00:00<00:00, 4.61MB/s]    100%|##########| 4.49M/4.49M [00:00<00:00, 7.39MB/s]
 
 
 
@@ -128,6 +128,15 @@ Here, we show how to use the
    :srcset: /tutorials/images/sphx_glr_audio_datasets_tutorial_001.png
    :class: sphx-glr-single-img
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 .. raw:: html
@@ -161,6 +170,15 @@ Here, we show how to use the
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
+
 
 .. raw:: html
 
@@ -192,6 +210,15 @@ Here, we show how to use the
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
+
 
 .. raw:: html
 
@@ -209,7 +236,7 @@ Here, we show how to use the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.737 seconds)
+   **Total running time of the script:** ( 0 minutes  1.799 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_datasets_tutorial.py:

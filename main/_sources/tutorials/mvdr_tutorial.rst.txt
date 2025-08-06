@@ -71,8 +71,8 @@ Steps:
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
@@ -156,8 +156,12 @@ which was generated with:
 
  .. code-block:: none
 
-      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 86.6MB/s]
-      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 67.7MB/s]
+    /pytorch/audio/examples/tutorials/mvdr_tutorial.py:91: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      SAMPLE_CLEAN = download_asset("tutorial-assets/mvdr/clean_speech.wav")
+      0%|          | 0.00/0.98M [00:00<?, ?B/s]    100%|##########| 0.98M/0.98M [00:00<00:00, 236MB/s]
+    /pytorch/audio/examples/tutorials/mvdr_tutorial.py:92: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      SAMPLE_NOISE = download_asset("tutorial-assets/mvdr/noise.wav")
+      0%|          | 0.00/1.95M [00:00<?, ?B/s]    100%|##########| 1.95M/1.95M [00:00<00:00, 230MB/s]
 
 
 
@@ -271,6 +275,15 @@ which was generated with:
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
+
 
 
 
@@ -367,7 +380,11 @@ We also evaluate the intelligibility of the speech with the Short-Time Objective
 
  .. code-block:: none
 
-    SDR score: 4.140362181778018
+    /pytorch/audio/examples/tutorials/mvdr_tutorial.py:153: FutureWarning: mir_eval.separation.bss_eval_sources
+            Deprecated as of mir_eval version 0.8.
+            It will be removed in mir_eval version 0.9.
+      ) = mir_eval.separation.bss_eval_sources(reference.numpy(), estimate.numpy(), False)
+    SDR score: 4.14036218177802
     Si-SNR score: 4.104058905536078
     PESQ score: 2.0084526538848877
     STOI score: 0.7724339398714715
@@ -664,10 +681,14 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    SDR score: 17.946234447508765
-    Si-SNR score: 12.215202612266587
+    /pytorch/audio/examples/tutorials/mvdr_tutorial.py:153: FutureWarning: mir_eval.separation.bss_eval_sources
+            Deprecated as of mir_eval version 0.8.
+            It will be removed in mir_eval version 0.9.
+      ) = mir_eval.separation.bss_eval_sources(reference.numpy(), estimate.numpy(), False)
+    SDR score: 17.94623444750873
+    Si-SNR score: 12.21520261226658
     PESQ score: 3.3447437286376953
-    STOI score: 0.8712864479161743
+    STOI score: 0.8712864479161742
 
 
 .. raw:: html
@@ -786,10 +807,14 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    SDR score: 11.880210635280273
-    Si-SNR score: 10.714419996128061
+    /pytorch/audio/examples/tutorials/mvdr_tutorial.py:153: FutureWarning: mir_eval.separation.bss_eval_sources
+            Deprecated as of mir_eval version 0.8.
+            It will be removed in mir_eval version 0.9.
+      ) = mir_eval.separation.bss_eval_sources(reference.numpy(), estimate.numpy(), False)
+    SDR score: 11.880210635280285
+    Si-SNR score: 10.714419996128075
     PESQ score: 3.083890914916992
-    STOI score: 0.8261544910053075
+    STOI score: 0.8261544910053076
 
 
 .. raw:: html
@@ -833,10 +858,14 @@ We can then obtain the enhanced waveform by passing this output to the
 
  .. code-block:: none
 
-    SDR score: 15.424590276934103
-    Si-SNR score: 13.035440892133451
+    /pytorch/audio/examples/tutorials/mvdr_tutorial.py:153: FutureWarning: mir_eval.separation.bss_eval_sources
+            Deprecated as of mir_eval version 0.8.
+            It will be removed in mir_eval version 0.9.
+      ) = mir_eval.separation.bss_eval_sources(reference.numpy(), estimate.numpy(), False)
+    SDR score: 15.42459027693396
+    Si-SNR score: 13.035440892133302
     PESQ score: 3.487997531890869
-    STOI score: 0.8798278461896808
+    STOI score: 0.8798278461896831
 
 
 .. raw:: html
@@ -855,7 +884,7 @@ We can then obtain the enhanced waveform by passing this output to the
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.956 seconds)
+   **Total running time of the script:** ( 0 minutes  1.851 seconds)
 
 
 .. _sphx_glr_download_tutorials_mvdr_tutorial.py:

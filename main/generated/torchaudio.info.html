@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.info &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.info &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -397,7 +395,7 @@
         
       <li>torchaudio.info &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -441,28 +439,34 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="torchaudio.info">
 <span class="sig-prename descclassname"><span class="pre">torchaudio.</span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.13)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.BinaryIO" title="(in Python v3.13)"><span class="pre">BinaryIO</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.13)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.13)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#torchaudio.AudioMetaData" title="torchaudio._backend.common.AudioMetaData"><span class="pre">AudioMetaData</span></a></span></span><a class="headerlink" href="#torchaudio.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get signal information of an audio file.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>When the input type is file-like object, this function cannot
+<dd><p>DEPRECATED</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function has been deprecated. It will be removed from 2.9 release.
+This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
+<p>Get signal information of an audio file.</p>
+<blockquote>
+<div><dl>
+<dt>Note:</dt><dd><p>When the input type is file-like object, this function cannot
 get the correct length (<code class="docutils literal notranslate"><span class="pre">num_samples</span></code>) for certain formats,
 such as <code class="docutils literal notranslate"><span class="pre">vorbis</span></code>.
 In this case, the value of <code class="docutils literal notranslate"><span class="pre">num_samples</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>uri</strong> (<em>path-like object</em><em> or </em><em>file-like object</em>) – <p>Source of audio data. The following types are accepted:</p>
-<ul>
+</dd>
+<dt>Args:</dt><dd><dl>
+<dt>uri (path-like object or file-like object):</dt><dd><p>Source of audio data. The following types are accepted:</p>
+<ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">path-like</span></code>: File path or URL.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">file-like</span></code>: Object with <code class="docutils literal notranslate"><span class="pre">read(size:</span> <span class="pre">int)</span> <span class="pre">-&gt;</span> <span class="pre">bytes</span></code> method,
 which returns byte string of at most <code class="docutils literal notranslate"><span class="pre">size</span></code> length.</p></li>
 </ul>
-</p></li>
-<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, interpreted as hint that may allow backend to override the detected format.
-(Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>buffer_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Size of buffer to use when processing file-like objects, in bytes. (Default: <code class="docutils literal notranslate"><span class="pre">4096</span></code>)</p></li>
-<li><p><strong>backend</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – <p>I/O backend to use.
+</dd>
+<dt>format (str or None, optional):</dt><dd><p>If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, interpreted as hint that may allow backend to override the detected format.
+(Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p>
+</dd>
+<dt>buffer_size (int, optional):</dt><dd><p>Size of buffer to use when processing file-like objects, in bytes. (Default: <code class="docutils literal notranslate"><span class="pre">4096</span></code>)</p>
+</dd>
+<dt>backend (str or None, optional):</dt><dd><p>I/O backend to use.
 If <code class="docutils literal notranslate"><span class="pre">None</span></code>, function selects backend given input and available backends.
 Otherwise, must be one of [<code class="docutils literal notranslate"><span class="pre">&quot;ffmpeg&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sox&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;soundfile&quot;</span></code>],
 with the corresponding backend available.
@@ -471,13 +475,13 @@ with the corresponding backend available.
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="../torchaudio.html#backend"><span class="std std-ref">Backend and Dispatcher</span></a></p>
 </div>
-</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>AudioMetaData</p>
 </dd>
 </dl>
+</dd>
+<dt>Returns:</dt><dd><p>AudioMetaData</p>
+</dd>
+</dl>
+</div></blockquote>
 <dl>
 <dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">info</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Audio I/O" src="../_images/sphx_glr_audio_io_tutorial_thumb.png" />
 <p><a class="reference internal" href="../tutorials/audio_io_tutorial.html#sphx-glr-tutorials-audio-io-tutorial-py"><span class="std std-ref">Audio I/O</span></a></p>
@@ -492,20 +496,35 @@ with the corresponding backend available.
 <h3>AudioMetaData<a class="headerlink" href="#audiometadata" title="Permalink to this heading">¶</a></h3>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.AudioMetaData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.</span></span><span class="sig-name descname"><span class="pre">AudioMetaData</span></span><a class="reference internal" href="../_modules/torchaudio/_backend/common.html#AudioMetaData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.AudioMetaData" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return type of <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code> function.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Sample rate</p></li>
-<li><p><strong>num_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The number of frames</p></li>
-<li><p><strong>num_channels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The number of channels</p></li>
-<li><p><strong>bits_per_sample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The number of bits per sample. This is 0 for lossy formats,
-or when it cannot be accurately inferred.</p></li>
-<li><p><strong>encoding</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – <p>Audio encoding
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.</span></span><span class="sig-name descname"><span class="pre">AudioMetaData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_frames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits_per_sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/_backend/common.html#AudioMetaData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.AudioMetaData" title="Permalink to this definition">¶</a></dt>
+<dd><p>DEPRECATED</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is deprecated from version 2.8. It will be removed in the 2.9 release.
+This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
+<p>AudioMetaData()</p>
+<blockquote>
+<div><p>Return type of <code class="docutils literal notranslate"><span class="pre">torchaudio.info</span></code> function.</p>
+<dl class="field-list">
+<dt class="field-odd">ivar int sample_rate</dt>
+<dd class="field-odd"><p>Sample rate</p>
+</dd>
+<dt class="field-even">ivar int num_frames</dt>
+<dd class="field-even"><p>The number of frames</p>
+</dd>
+<dt class="field-odd">ivar int num_channels</dt>
+<dd class="field-odd"><p>The number of channels</p>
+</dd>
+<dt class="field-even">ivar int bits_per_sample</dt>
+<dd class="field-even"><p>The number of bits per sample. This is 0 for lossy formats,
+or when it cannot be accurately inferred.</p>
+</dd>
+<dt class="field-odd">ivar str encoding</dt>
+<dd class="field-odd"><p>Audio encoding
 The values encoding can take are one of the following:</p>
 <blockquote>
-<div><ul>
+<div><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">PCM_S</span></code>: Signed integer linear PCM</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">PCM_U</span></code>: Unsigned integer linear PCM</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">PCM_F</span></code>: Floating point linear PCM</p></li>
@@ -521,10 +540,9 @@ The values encoding can take are one of the following:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">UNKNOWN</span></code> : None of above</p></li>
 </ul>
 </div></blockquote>
-</p></li>
-</ul>
 </dd>
 </dl>
+</div></blockquote>
 <dl>
 <dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">AudioMetaData</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Moto Hira &lt;moto@meta.com&gt;`__"><img alt="Audio I/O" src="../_images/sphx_glr_audio_io_tutorial_thumb.png" />
 <p><a class="reference internal" href="../tutorials/audio_io_tutorial.html#sphx-glr-tutorials-audio-io-tutorial-py"><span class="std std-ref">Audio I/O</span></a></p>
@@ -561,7 +579,7 @@ The values encoding can take are one of the following:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -609,9 +627,6 @@ The values encoding can take are one of the following:</p>
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
      
 
   

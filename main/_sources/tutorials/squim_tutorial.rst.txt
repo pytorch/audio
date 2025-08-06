@@ -97,8 +97,8 @@ through MOS using non-matching references.” Interspeech, 2022.
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
@@ -225,7 +225,11 @@ plot data, pystoi, pesq for computing reference metrics.
 
  .. code-block:: none
 
-      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 17.6MB/s]
+    /pytorch/audio/examples/tutorials/squim_tutorial.py:153: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      SAMPLE_SPEECH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+    /pytorch/audio/examples/tutorials/squim_tutorial.py:154: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo.wav")
+      0%|          | 0.00/156k [00:00<?, ?B/s]    100%|##########| 156k/156k [00:00<00:00, 67.6MB/s]
 
 
 
@@ -243,6 +247,15 @@ plot data, pystoi, pesq for computing reference metrics.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
@@ -574,7 +587,9 @@ Get the pre-trained ``SquimObjective``\ model.
 
  .. code-block:: none
 
-      0%|          | 0.00/28.2M [00:00<?, ?B/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 383MB/s]
+    /pytorch/audio/src/torchaudio/pipelines/_squim_pipeline.py:53: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      path = torchaudio.utils.download_asset(f"models/{self._path}")
+      0%|          | 0.00/28.2M [00:00<?, ?B/s]    100%|##########| 28.2M/28.2M [00:00<00:00, 325MB/s]
 
 
 
@@ -704,7 +719,9 @@ Get the pre-trained ``SquimSubjective`` model.
 
  .. code-block:: none
 
-      0%|          | 0.00/360M [00:00<?, ?B/s]     10%|9         | 35.2M/360M [00:00<00:00, 369MB/s]     20%|#9        | 70.5M/360M [00:00<00:00, 351MB/s]     29%|##8       | 104M/360M [00:00<00:00, 339MB/s]      39%|###9      | 141M/360M [00:00<00:00, 355MB/s]     51%|#####     | 183M/360M [00:00<00:00, 385MB/s]     63%|######2   | 226M/360M [00:00<00:00, 409MB/s]     75%|#######4  | 270M/360M [00:00<00:00, 425MB/s]     87%|########7 | 314M/360M [00:00<00:00, 436MB/s]     99%|#########9| 358M/360M [00:00<00:00, 444MB/s]    100%|##########| 360M/360M [00:00<00:00, 409MB/s]
+    /pytorch/audio/src/torchaudio/pipelines/_squim_pipeline.py:128: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      path = torchaudio.utils.download_asset(f"models/{self._path}")
+      0%|          | 0.00/360M [00:00<?, ?B/s]     12%|#2        | 45.0M/360M [00:00<00:00, 472MB/s]     25%|##4       | 90.0M/360M [00:00<00:00, 463MB/s]     37%|###7      | 134M/360M [00:00<00:00, 440MB/s]      49%|####8     | 176M/360M [00:00<00:00, 415MB/s]     60%|######    | 216M/360M [00:00<00:00, 412MB/s]     72%|#######2  | 261M/360M [00:00<00:00, 431MB/s]     85%|########5 | 307M/360M [00:00<00:00, 448MB/s]     97%|#########7| 350M/360M [00:00<00:00, 439MB/s]    100%|##########| 360M/360M [00:00<00:00, 436MB/s]
 
 
 
@@ -729,6 +746,17 @@ Load a non-matching reference (NMR)
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/squim_tutorial.py:329: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      NMR_SPEECH = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
@@ -782,7 +810,7 @@ Compute MOS metric for distorted speech with -5dB SNR
 
  .. code-block:: none
 
-    Estimated MOS for distorted speech at -5dB is MOS: 3.291804075241089
+    Estimated MOS for distorted speech at -5dB is MOS: 3.2918038368225098
 
 
 
@@ -831,7 +859,7 @@ represents the corresponding ground truth.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.495 seconds)
+   **Total running time of the script:** ( 0 minutes  6.264 seconds)
 
 
 .. _sphx_glr_download_tutorials_squim_tutorial.py:

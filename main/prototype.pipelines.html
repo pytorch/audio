@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.pipelines &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.prototype.pipelines &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -397,7 +395,7 @@
         
       <li>torchaudio.prototype.pipelines &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -438,18 +436,28 @@
               
   <section id="module-torchaudio.prototype.pipelines">
 <span id="torchaudio-prototype-pipelines"></span><h1>torchaudio.prototype.pipelines<a class="headerlink" href="#module-torchaudio.prototype.pipelines" title="Permalink to this heading">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Starting with version 2.8, we are refactoring TorchAudio to transition it
+into a maintenance phase. As a result, the <code class="docutils literal notranslate"><span class="pre">prototype</span></code> module is
+deprecated in 2.8 and will be removed in 2.9.</p>
+</div>
 <p>The pipelines subpackage contains APIs to models with pretrained weights and relevant utilities.</p>
 <section id="rnn-t-streaming-non-streaming-asr">
 <h2>RNN-T Streaming/Non-Streaming ASR<a class="headerlink" href="#rnn-t-streaming-non-streaming-asr" title="Permalink to this heading">¶</a></h2>
 <section id="pretrained-models">
 <h3>Pretrained Models<a class="headerlink" href="#pretrained-models" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC.html#torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC" title="torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_MUSTC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EMFORMER_RNNT_BASE_MUSTC</span></code></a></p></td>
-<td><p>Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.</p></td>
+<td><p>[DEPRECATED]</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3.html#torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3" title="torchaudio.prototype.pipelines.EMFORMER_RNNT_BASE_TEDLIUM3"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EMFORMER_RNNT_BASE_TEDLIUM3</span></code></a></p></td>
-<td><p>Pre-trained Emformer-RNNT-based ASR pipeline capable of performing both streaming and non-streaming inference.</p></td>
+<td><p>[DEPRECATED]</p></td>
 </tr>
 </tbody>
 </table>
@@ -461,9 +469,13 @@
 <h3>Interface<a class="headerlink" href="#interface" title="Permalink to this heading">¶</a></h3>
 <p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a> defines HiFiGAN Vocoder pipeline capable of transforming mel spectrograms into waveforms.</p>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle" title="torchaudio.prototype.pipelines.HiFiGANVocoderBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HiFiGANVocoderBundle</span></code></a></p></td>
-<td><p>Data class that bundles associated information to use pretrained <a class="reference internal" href="generated/torchaudio.prototype.models.HiFiGANVocoder.html#torchaudio.prototype.models.HiFiGANVocoder" title="torchaudio.prototype.models.HiFiGANVocoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">HiFiGANVocoder</span></code></a>.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 </tbody>
 </table>
@@ -471,9 +483,13 @@
 <section id="id1">
 <h3>Pretrained Models<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH.html#torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH" title="torchaudio.prototype.pipelines.HIFIGAN_VOCODER_V3_LJSPEECH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HIFIGAN_VOCODER_V3_LJSPEECH</span></code></a></p></td>
-<td><p>HiFiGAN Vocoder pipeline, trained on <em>The LJ Speech Dataset</em> <span id="id2">[<a class="reference internal" href="references.html#id7" title="Keith Ito and Linda Johnson. The lj speech dataset. \url https://keithito.com/LJ-Speech-Dataset/, 2017.">Ito and Johnson, 2017</a>]</span>.</p></td>
+<td><p>[DEPRECATED]</p></td>
 </tr>
 </tbody>
 </table>
@@ -481,28 +497,36 @@
 </section>
 <section id="vggish">
 <h2>VGGish<a class="headerlink" href="#vggish" title="Permalink to this heading">¶</a></h2>
-<section id="id3">
-<h3>Interface<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<section id="id2">
+<h3>Interface<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle" title="torchaudio.prototype.pipelines.VGGishBundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGishBundle</span></code></a></p></td>
-<td><p>VGGish <span id="id4">[<a class="reference internal" href="references.html#id70" title="Shawn Hershey, Sourish Chaudhuri, Daniel P. W. Ellis, Jort F. Gemmeke, Aren Jansen, Channing Moore, Manoj Plakal, Devin Platt, Rif A. Saurous, Bryan Seybold, Malcolm Slaney, Ron Weiss, and Kevin Wilson. Cnn architectures for large-scale audio classification. In International Conference on Acoustics, Speech and Signal Processing (ICASSP). 2017. URL: https://arxiv.org/abs/1609.09430.">Hershey <em>et al.</em>, 2017</a>]</span> inference pipeline ported from <a class="reference external" href="https://github.com/harritaylor/torchvggish">torchvggish</a> and <a class="reference external" href="https://github.com/tensorflow/models/tree/master/research/audioset">tensorflow-models</a>.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.VGGish.html#torchaudio.prototype.pipelines.VGGishBundle.VGGish" title="torchaudio.prototype.pipelines.VGGishBundle.VGGish"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGishBundle.VGGish</span></code></a></p></td>
-<td><p>Implementation of VGGish model <span id="id5">[<a class="reference internal" href="references.html#id70" title="Shawn Hershey, Sourish Chaudhuri, Daniel P. W. Ellis, Jort F. Gemmeke, Aren Jansen, Channing Moore, Manoj Plakal, Devin Platt, Rif A. Saurous, Bryan Seybold, Malcolm Slaney, Ron Weiss, and Kevin Wilson. Cnn architectures for large-scale audio classification. In International Conference on Acoustics, Speech and Signal Processing (ICASSP). 2017. URL: https://arxiv.org/abs/1609.09430.">Hershey <em>et al.</em>, 2017</a>]</span>.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.VGGishInputProcessor.html#torchaudio.prototype.pipelines.VGGishBundle.VGGishInputProcessor" title="torchaudio.prototype.pipelines.VGGishBundle.VGGishInputProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGishBundle.VGGishInputProcessor</span></code></a></p></td>
-<td><p>Converts raw waveforms to batches of examples to use as inputs to VGGish.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="id6">
-<h3>Pretrained Models<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<section id="id3">
+<h3>Pretrained Models<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGISH.html#torchaudio.prototype.pipelines.VGGISH" title="torchaudio.prototype.pipelines.VGGISH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VGGISH</span></code></a></p></td>
-<td><p>Pre-trained VGGish <span id="id7">[<a class="reference internal" href="references.html#id70" title="Shawn Hershey, Sourish Chaudhuri, Daniel P. W. Ellis, Jort F. Gemmeke, Aren Jansen, Channing Moore, Manoj Plakal, Devin Platt, Rif A. Saurous, Bryan Seybold, Malcolm Slaney, Ron Weiss, and Kevin Wilson. Cnn architectures for large-scale audio classification. In International Conference on Acoustics, Speech and Signal Processing (ICASSP). 2017. URL: https://arxiv.org/abs/1609.09430.">Hershey <em>et al.</em>, 2017</a>]</span> inference pipeline ported from <a class="reference external" href="https://github.com/harritaylor/torchvggish">torchvggish</a> and <a class="reference external" href="https://github.com/tensorflow/models/tree/master/research/audioset">tensorflow-models</a>.</p></td>
+<td><p>[DEPRECATED]</p></td>
 </tr>
 </tbody>
 </table>
@@ -534,7 +558,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -566,8 +590,8 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#vggish">VGGish</a><ul>
-<li><a class="reference internal" href="#id3">Interface</a></li>
-<li><a class="reference internal" href="#id6">Pretrained Models</a></li>
+<li><a class="reference internal" href="#id2">Interface</a></li>
+<li><a class="reference internal" href="#id3">Pretrained Models</a></li>
 </ul>
 </li>
 </ul>
@@ -592,9 +616,6 @@
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

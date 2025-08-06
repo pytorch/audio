@@ -15,8 +15,8 @@ Please follow the instruction at https://visualstudio.microsoft.com/downloads/, 
 
 .. note::
 
-   The official binary distribution are compiled with MSVC 2019.
-   The following section uses path from MSVC 2019 Community Edition.
+   The official binary distribution are compiled with MSVC 2022.
+   The following section uses path from MSVC 2022 Community Edition.
 
 Conda
 ~~~~~
@@ -66,7 +66,7 @@ The following combination is known to work.
 
    .. code-block::
 
-      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
 
    Please makes sure that ``cl`` command is recognized.
 
@@ -86,20 +86,7 @@ The following combination is known to work.
 
 3. Install PyTorch
 ------------------
-
 Please refer to https://pytorch.org/get-started/locally/ for the up-to-date way to install PyTorch.
-
-The following command installs the nightly build version of PyTorch.
-
-.. code-block::
-
-   # CPU-only
-   conda install pytorch cpuonly -c pytorch-nightly
-
-   # With CUDA support
-   conda install pytorch pytorch-cuda=11.7 -c pytorch-nightly -c nvidia
-
-When installing CUDA-enabled version, it also install CUDA toolkit.
 
 4. [Optional] cuDNN
 -------------------
@@ -159,7 +146,7 @@ To build single version FFmpeg extension, FFmpeg binaries must be provided by us
    conda install -c conda-forge ffmpeg
    FFMPEG_ROOT=${CONDA_PREFIX}/Library python setup.py develop
 
-   
+
 [Optional] Building FFmpeg from source
 --------------------------------------
 

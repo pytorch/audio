@@ -86,8 +86,8 @@ working with
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
@@ -141,7 +141,7 @@ tutorial <./speech_recognition_pipeline_tutorial.html>`__.
  .. code-block:: none
 
     Downloading: "https://download.pytorch.org/torchaudio/models/wav2vec2_fairseq_base_ls960_asr_ll10m.pth" to /root/.cache/torch/hub/checkpoints/wav2vec2_fairseq_base_ls960_asr_ll10m.pth
-      0%|          | 0.00/360M [00:00<?, ?B/s]      1%|          | 3.00M/360M [00:00<00:11, 31.4MB/s]      2%|1         | 6.00M/360M [00:00<00:24, 15.4MB/s]      2%|2         | 9.00M/360M [00:00<00:32, 11.2MB/s]      3%|3         | 11.2M/360M [00:01<00:38, 9.44MB/s]      4%|3         | 13.5M/360M [00:01<00:35, 10.3MB/s]      4%|4         | 15.2M/360M [00:01<00:35, 10.3MB/s]      5%|4         | 16.4M/360M [00:01<00:42, 8.47MB/s]      9%|8         | 30.9M/360M [00:01<00:13, 25.7MB/s]      9%|9         | 33.4M/360M [00:02<00:17, 20.1MB/s]     13%|#3        | 46.9M/360M [00:02<00:10, 30.6MB/s]     14%|#3        | 49.9M/360M [00:02<00:13, 24.4MB/s]     17%|#7        | 62.9M/360M [00:03<00:10, 29.5MB/s]     18%|#8        | 65.6M/360M [00:03<00:11, 27.1MB/s]     22%|##2       | 80.0M/360M [00:03<00:07, 38.8MB/s]     27%|##6       | 95.8M/360M [00:03<00:06, 46.0MB/s]     28%|##7       | 100M/360M [00:04<00:08, 33.3MB/s]      29%|##8       | 104M/360M [00:04<00:07, 34.0MB/s]     31%|###       | 111M/360M [00:04<00:06, 40.2MB/s]     32%|###2      | 116M/360M [00:04<00:08, 31.4MB/s]     35%|###5      | 127M/360M [00:04<00:05, 44.7MB/s]     37%|###6      | 132M/360M [00:04<00:06, 36.4MB/s]     40%|###9      | 144M/360M [00:05<00:05, 40.9MB/s]     41%|####1     | 148M/360M [00:05<00:06, 36.5MB/s]     42%|####2     | 153M/360M [00:05<00:05, 36.5MB/s]     44%|####4     | 160M/360M [00:05<00:06, 32.3MB/s]     49%|####8     | 175M/360M [00:06<00:04, 40.2MB/s]     50%|####9     | 179M/360M [00:06<00:06, 31.6MB/s]     53%|#####3    | 192M/360M [00:06<00:04, 42.2MB/s]     55%|#####4    | 196M/360M [00:06<00:04, 40.1MB/s]     58%|#####7    | 208M/360M [00:07<00:03, 41.6MB/s]     62%|######1   | 223M/360M [00:07<00:02, 55.4MB/s]     64%|######3   | 229M/360M [00:07<00:03, 37.7MB/s]     67%|######6   | 240M/360M [00:07<00:03, 41.2MB/s]     69%|######9   | 249M/360M [00:08<00:03, 31.9MB/s]     71%|#######1  | 256M/360M [00:08<00:03, 34.8MB/s]     72%|#######2  | 260M/360M [00:08<00:03, 31.4MB/s]     75%|#######5  | 271M/360M [00:08<00:02, 43.4MB/s]     77%|#######6  | 276M/360M [00:08<00:02, 35.5MB/s]     80%|#######9  | 287M/360M [00:09<00:01, 47.1MB/s]     81%|########1 | 293M/360M [00:09<00:01, 39.1MB/s]     84%|########4 | 303M/360M [00:09<00:01, 42.1MB/s]     85%|########5 | 308M/360M [00:09<00:01, 37.6MB/s]     89%|########8 | 320M/360M [00:10<00:01, 39.5MB/s]     91%|#########1| 329M/360M [00:10<00:00, 47.3MB/s]     93%|#########2| 335M/360M [00:10<00:00, 41.4MB/s]     94%|#########4| 340M/360M [00:10<00:00, 32.0MB/s]     97%|#########7| 351M/360M [00:10<00:00, 41.8MB/s]     99%|#########8| 356M/360M [00:11<00:00, 32.7MB/s]    100%|##########| 360M/360M [00:11<00:00, 34.0MB/s]
+      0%|          | 0.00/360M [00:00<?, ?B/s]     15%|#4        | 52.9M/360M [00:00<00:00, 553MB/s]     29%|##9       | 106M/360M [00:00<00:00, 540MB/s]      44%|####3     | 157M/360M [00:00<00:00, 497MB/s]     57%|#####6    | 205M/360M [00:00<00:00, 493MB/s]     70%|#######   | 252M/360M [00:00<00:00, 430MB/s]     83%|########2 | 299M/360M [00:00<00:00, 447MB/s]     96%|#########6| 346M/360M [00:00<00:00, 461MB/s]    100%|##########| 360M/360M [00:00<00:00, 469MB/s]
 
 
 
@@ -164,6 +164,13 @@ We will load a sample from the LibriSpeech test-other dataset.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/asr_inference_with_ctc_decoder_tutorial.py:88: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
 
 .. raw:: html
@@ -202,6 +209,15 @@ The transcript corresponding to this audio file is
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
@@ -406,9 +422,15 @@ model can be large
 
  .. code-block:: none
 
-      0%|          | 0.00/4.97M [00:00<?, ?B/s]     85%|########5 | 4.25M/4.97M [00:00<00:00, 22.5MB/s]    100%|##########| 4.97M/4.97M [00:00<00:00, 25.6MB/s]
-      0%|          | 0.00/57.0 [00:00<?, ?B/s]    100%|##########| 57.0/57.0 [00:00<00:00, 121kB/s]
-      0%|          | 0.00/2.91G [00:00<?, ?B/s]      1%|1         | 41.9M/2.91G [00:00<00:07, 436MB/s]      3%|3         | 91.2M/2.91G [00:00<00:06, 484MB/s]      5%|4         | 138M/2.91G [00:00<00:06, 478MB/s]       6%|6         | 183M/2.91G [00:00<00:06, 464MB/s]      8%|7         | 228M/2.91G [00:00<00:06, 444MB/s]      9%|9         | 272M/2.91G [00:00<00:06, 450MB/s]     11%|#         | 315M/2.91G [00:00<00:06, 438MB/s]     12%|#1        | 357M/2.91G [00:00<00:06, 430MB/s]     13%|#3        | 398M/2.91G [00:00<00:06, 427MB/s]     15%|#4        | 439M/2.91G [00:01<00:06, 425MB/s]     16%|#6        | 480M/2.91G [00:01<00:06, 416MB/s]     18%|#7        | 524M/2.91G [00:01<00:05, 430MB/s]     19%|#9        | 566M/2.91G [00:01<00:05, 435MB/s]     20%|##        | 608M/2.91G [00:01<00:05, 432MB/s]     22%|##1       | 652M/2.91G [00:01<00:05, 442MB/s]     23%|##3       | 695M/2.91G [00:01<00:05, 440MB/s]     25%|##4       | 739M/2.91G [00:01<00:05, 447MB/s]     27%|##6       | 791M/2.91G [00:01<00:04, 477MB/s]     28%|##8       | 841M/2.91G [00:01<00:04, 490MB/s]     30%|##9       | 888M/2.91G [00:02<00:04, 487MB/s]     31%|###1      | 936M/2.91G [00:02<00:04, 491MB/s]     33%|###3      | 988M/2.91G [00:02<00:04, 506MB/s]     35%|###4      | 1.01G/2.91G [00:02<00:04, 501MB/s]     36%|###6      | 1.06G/2.91G [00:02<00:04, 472MB/s]     38%|###7      | 1.10G/2.91G [00:02<00:04, 460MB/s]     39%|###9      | 1.15G/2.91G [00:02<00:04, 456MB/s]     41%|####      | 1.19G/2.91G [00:02<00:04, 445MB/s]     42%|####2     | 1.23G/2.91G [00:02<00:04, 440MB/s]     44%|####3     | 1.27G/2.91G [00:03<00:04, 424MB/s]     45%|####5     | 1.32G/2.91G [00:03<00:03, 438MB/s]     47%|####6     | 1.36G/2.91G [00:03<00:03, 452MB/s]     48%|####8     | 1.40G/2.91G [00:03<00:03, 442MB/s]     50%|####9     | 1.45G/2.91G [00:03<00:03, 444MB/s]     51%|#####1    | 1.49G/2.91G [00:03<00:03, 460MB/s]     53%|#####2    | 1.53G/2.91G [00:03<00:03, 455MB/s]     54%|#####4    | 1.58G/2.91G [00:03<00:03, 448MB/s]     56%|#####5    | 1.62G/2.91G [00:03<00:03, 449MB/s]     57%|#####7    | 1.66G/2.91G [00:03<00:03, 415MB/s]     58%|#####8    | 1.70G/2.91G [00:04<00:03, 406MB/s]     60%|#####9    | 1.74G/2.91G [00:04<00:03, 364MB/s]     61%|######1   | 1.78G/2.91G [00:04<00:03, 387MB/s]     63%|######2   | 1.82G/2.91G [00:04<00:02, 400MB/s]     64%|######4   | 1.86G/2.91G [00:04<00:02, 416MB/s]     66%|######5   | 1.91G/2.91G [00:04<00:02, 443MB/s]     67%|######7   | 1.95G/2.91G [00:04<00:02, 443MB/s]     69%|######8   | 2.00G/2.91G [00:04<00:02, 464MB/s]     70%|#######   | 2.05G/2.91G [00:04<00:01, 482MB/s]     72%|#######2  | 2.10G/2.91G [00:05<00:01, 476MB/s]     74%|#######3  | 2.14G/2.91G [00:05<00:01, 485MB/s]     75%|#######5  | 2.19G/2.91G [00:05<00:01, 478MB/s]     77%|#######6  | 2.24G/2.91G [00:05<00:01, 489MB/s]     78%|#######8  | 2.28G/2.91G [00:05<00:01, 480MB/s]     80%|########  | 2.33G/2.91G [00:05<00:01, 485MB/s]     82%|########1 | 2.38G/2.91G [00:05<00:01, 489MB/s]     83%|########3 | 2.42G/2.91G [00:05<00:01, 490MB/s]     85%|########4 | 2.47G/2.91G [00:05<00:01, 438MB/s]     86%|########6 | 2.52G/2.91G [00:05<00:00, 458MB/s]     88%|########7 | 2.56G/2.91G [00:06<00:00, 452MB/s]     90%|########9 | 2.61G/2.91G [00:06<00:00, 465MB/s]     91%|#########1| 2.65G/2.91G [00:06<00:00, 429MB/s]     93%|#########2| 2.70G/2.91G [00:06<00:00, 448MB/s]     94%|#########4| 2.74G/2.91G [00:06<00:00, 455MB/s]     96%|#########5| 2.78G/2.91G [00:06<00:00, 454MB/s]     97%|#########7| 2.83G/2.91G [00:06<00:00, 446MB/s]     99%|#########8| 2.87G/2.91G [00:06<00:00, 463MB/s]    100%|##########| 2.91G/2.91G [00:06<00:00, 452MB/s]
+    /pytorch/audio/src/torchaudio/models/decoder/_ctc_decoder.py:557: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      lexicon_file = download_asset(files.lexicon)
+      0%|          | 0.00/4.97M [00:00<?, ?B/s]    100%|##########| 4.97M/4.97M [00:00<00:00, 316MB/s]
+    /pytorch/audio/src/torchaudio/models/decoder/_ctc_decoder.py:558: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      tokens_file = download_asset(files.tokens)
+      0%|          | 0.00/57.0 [00:00<?, ?B/s]    100%|##########| 57.0/57.0 [00:00<00:00, 115kB/s]
+    /pytorch/audio/src/torchaudio/models/decoder/_ctc_decoder.py:560: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      lm_file = download_asset(files.lm)
+      0%|          | 0.00/2.91G [00:00<?, ?B/s]      1%|1         | 39.8M/2.91G [00:00<00:07, 416MB/s]      3%|2         | 81.5M/2.91G [00:00<00:07, 428MB/s]      4%|4         | 122M/2.91G [00:00<00:07, 399MB/s]       5%|5         | 161M/2.91G [00:00<00:09, 312MB/s]      7%|6         | 203M/2.91G [00:00<00:08, 352MB/s]      8%|8         | 251M/2.91G [00:00<00:07, 396MB/s]     10%|9         | 294M/2.91G [00:00<00:06, 411MB/s]     11%|#1        | 338M/2.91G [00:00<00:06, 426MB/s]     13%|#2        | 380M/2.91G [00:00<00:06, 430MB/s]     14%|#4        | 422M/2.91G [00:01<00:06, 434MB/s]     16%|#5        | 474M/2.91G [00:01<00:05, 465MB/s]     17%|#7        | 519M/2.91G [00:01<00:05, 468MB/s]     19%|#8        | 564M/2.91G [00:01<00:05, 468MB/s]     20%|##        | 609M/2.91G [00:01<00:05, 465MB/s]     22%|##1       | 655M/2.91G [00:01<00:05, 471MB/s]     24%|##3       | 702M/2.91G [00:01<00:05, 478MB/s]     25%|##5       | 748M/2.91G [00:01<00:05, 440MB/s]     27%|##6       | 794M/2.91G [00:01<00:05, 452MB/s]     28%|##8       | 839M/2.91G [00:02<00:04, 456MB/s]     30%|##9       | 883M/2.91G [00:02<00:04, 448MB/s]     31%|###1      | 926M/2.91G [00:02<00:04, 442MB/s]     32%|###2      | 968M/2.91G [00:02<00:05, 411MB/s]     34%|###3      | 0.98G/2.91G [00:02<00:05, 398MB/s]     35%|###5      | 1.02G/2.91G [00:02<00:06, 336MB/s]     36%|###6      | 1.06G/2.91G [00:02<00:05, 354MB/s]     38%|###7      | 1.09G/2.91G [00:02<00:05, 358MB/s]     39%|###8      | 1.13G/2.91G [00:02<00:05, 368MB/s]     40%|####      | 1.17G/2.91G [00:03<00:04, 384MB/s]     42%|####1     | 1.21G/2.91G [00:03<00:04, 395MB/s]     43%|####2     | 1.25G/2.91G [00:03<00:04, 403MB/s]     44%|####4     | 1.29G/2.91G [00:03<00:04, 410MB/s]     46%|####5     | 1.33G/2.91G [00:03<00:04, 412MB/s]     47%|####6     | 1.37G/2.91G [00:03<00:04, 414MB/s]     48%|####8     | 1.41G/2.91G [00:03<00:03, 415MB/s]     50%|####9     | 1.45G/2.91G [00:03<00:03, 416MB/s]     51%|#####     | 1.48G/2.91G [00:03<00:03, 398MB/s]     52%|#####2    | 1.52G/2.91G [00:03<00:03, 385MB/s]     54%|#####3    | 1.57G/2.91G [00:04<00:03, 413MB/s]     55%|#####5    | 1.61G/2.91G [00:04<00:03, 399MB/s]     57%|#####6    | 1.64G/2.91G [00:04<00:03, 406MB/s]     58%|#####7    | 1.68G/2.91G [00:04<00:03, 411MB/s]     59%|#####9    | 1.72G/2.91G [00:04<00:03, 416MB/s]     61%|######    | 1.76G/2.91G [00:04<00:03, 377MB/s]     62%|######1   | 1.80G/2.91G [00:04<00:03, 379MB/s]     63%|######3   | 1.84G/2.91G [00:04<00:02, 392MB/s]     65%|######4   | 1.88G/2.91G [00:04<00:02, 400MB/s]     66%|######6   | 1.92G/2.91G [00:05<00:02, 422MB/s]     68%|######7   | 1.97G/2.91G [00:05<00:02, 437MB/s]     69%|######9   | 2.01G/2.91G [00:05<00:02, 450MB/s]     71%|#######   | 2.05G/2.91G [00:05<00:02, 440MB/s]     72%|#######1  | 2.09G/2.91G [00:05<00:01, 438MB/s]     73%|#######3  | 2.14G/2.91G [00:05<00:01, 423MB/s]     75%|#######5  | 2.19G/2.91G [00:05<00:01, 456MB/s]     77%|#######6  | 2.23G/2.91G [00:05<00:01, 476MB/s]     78%|#######8  | 2.28G/2.91G [00:05<00:01, 457MB/s]     80%|#######9  | 2.32G/2.91G [00:05<00:01, 450MB/s]     81%|########1 | 2.36G/2.91G [00:06<00:01, 452MB/s]     83%|########2 | 2.41G/2.91G [00:06<00:01, 457MB/s]     84%|########4 | 2.45G/2.91G [00:06<00:01, 336MB/s]     86%|########6 | 2.50G/2.91G [00:06<00:01, 392MB/s]     88%|########7 | 2.55G/2.91G [00:06<00:00, 416MB/s]     89%|########9 | 2.59G/2.91G [00:06<00:00, 431MB/s]     91%|######### | 2.64G/2.91G [00:06<00:00, 432MB/s]     92%|#########2| 2.68G/2.91G [00:06<00:00, 433MB/s]     94%|#########3| 2.72G/2.91G [00:07<00:00, 445MB/s]     95%|#########5| 2.77G/2.91G [00:07<00:00, 444MB/s]     97%|#########6| 2.81G/2.91G [00:07<00:00, 447MB/s]     98%|#########7| 2.85G/2.91G [00:07<00:00, 407MB/s]     99%|#########9| 2.89G/2.91G [00:07<00:00, 405MB/s]    100%|##########| 2.91G/2.91G [00:07<00:00, 416MB/s]
     PretrainedFiles(lexicon='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lexicon.txt', tokens='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/tokens.txt', lm='/root/.cache/torch/hub/torchaudio/decoder-assets/librispeech-4-gram/lm.bin')
 
 
@@ -954,10 +976,10 @@ computation time.
 
  .. code-block:: none
 
-    beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0470 secs)
-    beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0523 secs)
-    beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.1654 secs)
-    beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.5398 secs)
+    beam size 1  : i you ery much afra of shongut shot i was at some arte what he sad (score: 3144.93; 0.0233 secs)
+    beam size 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3688.02; 0.0480 secs)
+    beam size 50 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.1666 secs)
+    beam size 500: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.5521 secs)
 
 
 
@@ -1002,10 +1024,10 @@ hypotheses at the cost of computation.
 
  .. code-block:: none
 
-    beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.1599 secs)
-    beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.1800 secs)
-    beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.2000 secs)
-    beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2315 secs)
+    beam size token 1  : i rely was very much affray of showing him hoch shot i was at some part of what he sed (score: 3584.80; 0.1605 secs)
+    beam size token 5  : i rely was very much afraid of showing him how much shocked i was at some part of what he said (score: 3694.83; 0.1809 secs)
+    beam size token 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3696.25; 0.2005 secs)
+    beam size token 29 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2326 secs)
 
 
 
@@ -1051,10 +1073,10 @@ threshold such that plausible hypotheses are not pruned.
 
  .. code-block:: none
 
-    beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0280 secs)
-    beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0511 secs)
-    beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2134 secs)
-    beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2340 secs)
+    beam threshold 1  : i ila ery much afraid of shongut shot i was at some parts of what he said (score: 3316.20; 0.0287 secs)
+    beam threshold 5  : i rely was very much afraid of showing him how much shot i was at some parts of what he said (score: 3682.23; 0.0508 secs)
+    beam threshold 10 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2170 secs)
+    beam threshold 25 : i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2371 secs)
 
 
 
@@ -1098,9 +1120,9 @@ give more weight to the acoustic model score instead.
 
  .. code-block:: none
 
-    lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.2566 secs)
-    lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2634 secs)
-    lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2429 secs)
+    lm weight 0  : i rely was very much affraid of showing him ho much shoke i was at some parte of what he seid (score: 3834.05; 0.2575 secs)
+    lm weight 3.23: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: 3699.82; 0.2619 secs)
+    lm weight 15 : was there in his was at some of what he said (score: 2918.99; 0.2444 secs)
 
 
 
@@ -1121,7 +1143,7 @@ Additional parameters that can be optimized include the following
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  9.689 seconds)
+   **Total running time of the script:** ( 1 minutes  59.323 seconds)
 
 
 .. _sphx_glr_download_tutorials_asr_inference_with_ctc_decoder_tutorial.py:

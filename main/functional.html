@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.functional &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>torchaudio.functional &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -440,6 +438,10 @@
 <section id="utility">
 <h2>Utility<a class="headerlink" href="#utility" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.amplitude_to_DB.html#torchaudio.functional.amplitude_to_DB" title="torchaudio.functional.amplitude_to_DB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">amplitude_to_DB</span></code></a></p></td>
 <td><p>Turn a spectrogram from the power/amplitude scale to the decibel scale.</p></td>
@@ -469,7 +471,7 @@
 <td><p>Decode mu-law encoded signal.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec" title="torchaudio.functional.apply_codec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_codec</span></code></a></p></td>
-<td><p>DEPRECATED: Apply codecs as a form of augmentation.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.resample.html#torchaudio.functional.resample" title="torchaudio.functional.resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code></a></p></td>
 <td><p>Resamples the waveform at the new frequency using bandlimited interpolation.</p></td>
@@ -487,7 +489,7 @@
 <td><p>Scales and adds noise to waveform per signal-to-noise ratio.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.preemphasis.html#torchaudio.functional.preemphasis" title="torchaudio.functional.preemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preemphasis</span></code></a></p></td>
-<td><p>Pre-emphasizes a waveform along its last dimension, i.e. for each signal <span class="math">\(x\)</span> in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, computes output <span class="math">\(y\)</span> as.</p></td>
+<td><p>Pre-emphasizes a waveform along its last dimension, i.e. for each signal <span class="math notranslate nohighlight">\(x\)</span> in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, computes output <span class="math notranslate nohighlight">\(y\)</span> as.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.deemphasis.html#torchaudio.functional.deemphasis" title="torchaudio.functional.deemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deemphasis</span></code></a></p></td>
 <td><p>De-emphasizes a waveform along its last dimension.</p></td>
@@ -504,9 +506,13 @@
 <section id="forced-alignment">
 <h2>Forced Alignment<a class="headerlink" href="#forced-alignment" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.forced_align.html#torchaudio.functional.forced_align" title="torchaudio.functional.forced_align"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forced_align</span></code></a></p></td>
-<td><p>Align a CTC label sequence to an emission.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.merge_tokens.html#torchaudio.functional.merge_tokens" title="torchaudio.functional.merge_tokens"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_tokens</span></code></a></p></td>
 <td><p>Removes repeated tokens and blank tokens from the given CTC token sequence.</p></td>
@@ -520,6 +526,10 @@
 <section id="filtering">
 <h2>Filtering<a class="headerlink" href="#filtering" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.allpass_biquad.html#torchaudio.functional.allpass_biquad" title="torchaudio.functional.allpass_biquad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">allpass_biquad</span></code></a></p></td>
 <td><p>Design two-pole all-pass filter.</p></td>
@@ -590,6 +600,10 @@
 <section id="feature-extractions">
 <h2>Feature Extractions<a class="headerlink" href="#feature-extractions" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.vad.html#torchaudio.functional.vad" title="torchaudio.functional.vad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vad</span></code></a></p></td>
 <td><p>Voice Activity Detector.</p></td>
@@ -627,6 +641,10 @@
 <section id="multi-channel">
 <h2>Multi-channel<a class="headerlink" href="#multi-channel" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.psd.html#torchaudio.functional.psd" title="torchaudio.functional.psd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">psd</span></code></a></p></td>
 <td><p>Compute cross-channel power spectral density (PSD) matrix.</p></td>
@@ -652,9 +670,13 @@
 <section id="loss">
 <h2>Loss<a class="headerlink" href="#loss" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.rnnt_loss.html#torchaudio.functional.rnnt_loss" title="torchaudio.functional.rnnt_loss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rnnt_loss</span></code></a></p></td>
-<td><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em> <span id="id7">[<a class="reference internal" href="references.html#id18" title="Alex Graves. Sequence transduction with recurrent neural networks. 2012. arXiv:1211.3711.">Graves, 2012</a>]</span>.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 </tbody>
 </table>
@@ -662,6 +684,10 @@
 <section id="metric">
 <h2>Metric<a class="headerlink" href="#metric" title="Permalink to this heading">¶</a></h2>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.edit_distance.html#torchaudio.functional.edit_distance" title="torchaudio.functional.edit_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edit_distance</span></code></a></p></td>
 <td><p>Calculate the word level edit (Levenshtein) distance between two sequences.</p></td>
@@ -695,7 +721,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -746,9 +772,8 @@
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
+         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
      
 
   

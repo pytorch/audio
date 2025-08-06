@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.sox_effects.sox_effects &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.sox_effects.sox_effects &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.sox_effects.sox_effects &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,20 +428,20 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.sox_effects.sox_effects</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal.module_utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
-<span class="kn">from</span> <span class="nn">torchaudio.utils.sox_utils</span> <span class="kn">import</span> <span class="n">list_effects</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchaudio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._internal.module_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">deprecated</span><span class="p">,</span> <span class="n">dropping_support</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.utils.sox_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">list_effects</span>
 
 
 <span class="n">sox_ext</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">_extension</span><span class="o">.</span><span class="n">lazy_import_sox_ext</span><span class="p">()</span>
 
 
 <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Please remove the call. This function is called automatically.&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">init_sox_effects</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">init_sox_effects</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize resources required to use sox effects.</span>
 
 <span class="sd">    Note:</span>
@@ -458,7 +456,7 @@
 
 
 <span class="nd">@deprecated</span><span class="p">(</span><span class="s2">&quot;Please remove the call. This function is called automatically.&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">shutdown_sox_effects</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shutdown_sox_effects</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean up resources required to use sox effects.</span>
 
 <span class="sd">    Note:</span>
@@ -471,7 +469,8 @@
     <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="effect_names"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.effect_names.html#torchaudio.sox_effects.effect_names">[docs]</a><span class="k">def</span> <span class="nf">effect_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<div class="viewcode-block" id="effect_names"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.effect_names.html#torchaudio.sox_effects.effect_names">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">effect_names</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets list of valid sox effect names</span>
 
 <span class="sd">    Returns:</span>
@@ -484,7 +483,8 @@
     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">list_effects</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="apply_effects_tensor"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_tensor.html#torchaudio.sox_effects.apply_effects_tensor">[docs]</a><span class="k">def</span> <span class="nf">apply_effects_tensor</span><span class="p">(</span>
+<div class="viewcode-block" id="apply_effects_tensor"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_tensor.html#torchaudio.sox_effects.apply_effects_tensor">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_effects_tensor</span><span class="p">(</span>
     <span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
@@ -588,7 +588,8 @@
     <span class="k">return</span> <span class="n">sox_ext</span><span class="o">.</span><span class="n">apply_effects_tensor</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">effects</span><span class="p">,</span> <span class="n">channels_first</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="k">def</span> <span class="nf">apply_effects_file</span><span class="p">(</span>
+<div class="viewcode-block" id="apply_effects_file"><a class="viewcode-back" href="../../../generated/torchaudio.sox_effects.apply_effects_file.html#torchaudio.sox_effects.apply_effects_file">[docs]</a><span class="nd">@dropping_support</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_effects_file</span><span class="p">(</span>
     <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">effects</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -718,7 +719,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -757,9 +758,6 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../_static/katex_autorenderer.js"></script>
      
 
   

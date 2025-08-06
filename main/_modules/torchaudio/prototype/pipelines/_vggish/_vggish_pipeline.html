@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.pipelines._vggish._vggish_pipeline &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.prototype.pipelines._vggish._vggish_pipeline &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.prototype.pipelines._vggish._vggish_pipeline &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,22 +428,23 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.prototype.pipelines._vggish._vggish_pipeline</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
-
-<span class="kn">from</span> <span class="nn">._vggish_impl</span> <span class="kn">import</span> <span class="n">_SAMPLE_RATE</span><span class="p">,</span> <span class="n">VGGish</span> <span class="k">as</span> <span class="n">_VGGish</span><span class="p">,</span> <span class="n">VGGishInputProcessor</span> <span class="k">as</span> <span class="n">_VGGishInputProcessor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._internal.module_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dropping_class_support</span>
 
 
-<span class="k">def</span> <span class="nf">_get_state_dict</span><span class="p">():</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._vggish_impl</span><span class="w"> </span><span class="kn">import</span> <span class="n">_SAMPLE_RATE</span><span class="p">,</span> <span class="n">VGGish</span> <span class="k">as</span> <span class="n">_VGGish</span><span class="p">,</span> <span class="n">VGGishInputProcessor</span> <span class="k">as</span> <span class="n">_VGGishInputProcessor</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_state_dict</span><span class="p">():</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">download_asset</span><span class="p">(</span><span class="s2">&quot;models/vggish.pt&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="VGGishBundle"><a class="viewcode-back" href="../../../../../generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">VGGishBundle</span><span class="p">:</span>
+<div class="viewcode-block" id="VGGishBundle"><a class="viewcode-back" href="../../../../../generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle">[docs]</a><span class="nd">@dropping_class_support</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">VGGishBundle</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;VGGish :cite:`45611` inference pipeline ported from</span>
 <span class="sd">    `torchvggish &lt;https://github.com/harritaylor/torchvggish&gt;`__</span>
 <span class="sd">    and `tensorflow-models &lt;https://github.com/tensorflow/models/tree/master/research/audioset&gt;`__.</span>
@@ -466,23 +465,23 @@
 <span class="sd">        &gt;&gt;&gt; mono_output = model(input_proc(waveform))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">VGGish</span><span class="p">(</span><span class="n">_VGGish</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">VGGish</span><span class="p">(</span><span class="n">_VGGish</span><span class="p">):</span>
         <span class="vm">__doc__</span> <span class="o">=</span> <span class="n">_VGGish</span><span class="o">.</span><span class="vm">__doc__</span>
 
-    <span class="k">class</span> <span class="nc">VGGishInputProcessor</span><span class="p">(</span><span class="n">_VGGishInputProcessor</span><span class="p">):</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">VGGishInputProcessor</span><span class="p">(</span><span class="n">_VGGishInputProcessor</span><span class="p">):</span>
         <span class="vm">__doc__</span> <span class="o">=</span> <span class="n">_VGGishInputProcessor</span><span class="o">.</span><span class="vm">__doc__</span>
 
     <span class="n">_state_dict_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Dict</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample rate of input waveform expected by input processor and model.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_SAMPLE_RATE</span>
 
-<div class="viewcode-block" id="VGGishBundle.get_model"><a class="viewcode-back" href="../../../../../generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle.get_model">[docs]</a>    <span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VGGish</span><span class="p">:</span>
+<div class="viewcode-block" id="VGGishBundle.get_model"><a class="viewcode-back" href="../../../../../generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle.get_model">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VGGish</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs pre-trained VGGish model. Downloads and caches weights as necessary.</span>
 
 <span class="sd">        Returns:</span>
@@ -494,7 +493,7 @@
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">model</span></div>
 
-<div class="viewcode-block" id="VGGishBundle.get_input_processor"><a class="viewcode-back" href="../../../../../generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle.get_input_processor">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VGGishInputProcessor</span><span class="p">:</span>
+<div class="viewcode-block" id="VGGishBundle.get_input_processor"><a class="viewcode-back" href="../../../../../generated/torchaudio.prototype.pipelines.VGGishBundle.html#torchaudio.prototype.pipelines.VGGishBundle.get_input_processor">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_input_processor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VGGishInputProcessor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs input processor for VGGish.</span>
 
 <span class="sd">        Returns:</span>
@@ -528,7 +527,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -567,9 +566,6 @@
          <script src="../../../../../_static/underscore.js"></script>
          <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../../_static/katex_autorenderer.js"></script>
      
 
   

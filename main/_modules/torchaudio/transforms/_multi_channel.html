@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.transforms._multi_channel &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.transforms._multi_channel &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.transforms._multi_channel &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -432,18 +430,18 @@
   <h1>Source code for torchaudio.transforms._multi_channel</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torchaudio</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_mvdr_vector</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_mvdr_vector</span><span class="p">(</span>
     <span class="n">psd_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">psd_n</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">reference_vector</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -484,7 +482,7 @@
     <span class="k">return</span> <span class="n">beamform_vector</span>
 
 
-<div class="viewcode-block" id="PSD"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD">[docs]</a><span class="k">class</span> <span class="nc">PSD</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="PSD"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">PSD</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute cross-channel power spectral density (PSD) matrix.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -497,13 +495,13 @@
 <span class="sd">        eps (float, optional): Value to add to the denominator in mask normalization. (Default: ``1e-15``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multi_mask</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-15</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multi_mask</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-15</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">multi_mask</span> <span class="o">=</span> <span class="n">multi_mask</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="n">normalize</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
 
-<div class="viewcode-block" id="PSD.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="PSD.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.PSD.html#torchaudio.transforms.PSD.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            specgram (torch.Tensor): Multi-channel complex-valued spectrum.</span>
@@ -526,7 +524,7 @@
         <span class="k">return</span> <span class="n">psd</span></div></div>
 
 
-<div class="viewcode-block" id="MVDR"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.MVDR.html#torchaudio.transforms.MVDR">[docs]</a><span class="k">class</span> <span class="nc">MVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="MVDR"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.MVDR.html#torchaudio.transforms.MVDR">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">MVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Minimum Variance Distortionless Response (MVDR) module that performs MVDR beamforming with Time-Frequency masks.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -594,7 +592,7 @@
 <span class="sd">        eigenvalues of the PSD matrix are not distinct (i.e. some eigenvalues are close or identical).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">ref_channel</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">solution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ref_channel&quot;</span><span class="p">,</span>
@@ -629,7 +627,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;mask_sum_s&quot;</span><span class="p">,</span> <span class="n">mask_sum_s</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;mask_sum_n&quot;</span><span class="p">,</span> <span class="n">mask_sum_n</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_updated_mvdr_vector</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_updated_mvdr_vector</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">psd_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">psd_n</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -686,7 +684,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mask_sum_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_sum_n</span> <span class="o">+</span> <span class="n">mask_n</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">_get_mvdr_vector</span><span class="p">(</span><span class="n">psd_s</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">,</span> <span class="n">reference_vector</span><span class="p">,</span> <span class="n">solution</span><span class="p">,</span> <span class="n">diagonal_loading</span><span class="p">,</span> <span class="n">diag_eps</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_updated_psd_speech</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_updated_psd_speech</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update psd of speech recursively.</span>
 
 <span class="sd">        Args:</span>
@@ -703,7 +701,7 @@
         <span class="n">psd_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd_s</span> <span class="o">*</span> <span class="n">numerator</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">psd_s</span> <span class="o">*</span> <span class="n">denominator</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">psd_s</span>
 
-    <span class="k">def</span> <span class="nf">_get_updated_psd_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_n</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_updated_psd_noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd_n</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_n</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update psd of noise recursively.</span>
 
 <span class="sd">        Args:</span>
@@ -720,7 +718,7 @@
         <span class="n">psd_n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">psd_n</span> <span class="o">*</span> <span class="n">numerator</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">psd_n</span> <span class="o">*</span> <span class="n">denominator</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">psd_n</span>
 
-<div class="viewcode-block" id="MVDR.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.MVDR.html#torchaudio.transforms.MVDR.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="MVDR.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.MVDR.html#torchaudio.transforms.MVDR.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_s</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask_n</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform MVDR beamforming.</span>
@@ -772,7 +770,7 @@
         <span class="k">return</span> <span class="n">specgram_enhanced</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="RTFMVDR"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.RTFMVDR.html#torchaudio.transforms.RTFMVDR">[docs]</a><span class="k">class</span> <span class="nc">RTFMVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="RTFMVDR"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.RTFMVDR.html#torchaudio.transforms.RTFMVDR">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RTFMVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) module</span>
 <span class="sd">    based on the relative transfer function (RTF) and power spectral density (PSD) matrix of noise.</span>
 
@@ -799,7 +797,7 @@
 <span class="sd">        {{\bm{v}^{\mathsf{H}}}(f){\bf{\Phi}_{\textbf{NN}}^{-1}}(f){\bm{v}}(f)}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RTFMVDR.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.RTFMVDR.html#torchaudio.transforms.RTFMVDR.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="RTFMVDR.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.RTFMVDR.html#torchaudio.transforms.RTFMVDR.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">rtf</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -836,7 +834,7 @@
         <span class="k">return</span> <span class="n">spectrum_enhanced</span></div></div>
 
 
-<div class="viewcode-block" id="SoudenMVDR"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.SoudenMVDR.html#torchaudio.transforms.SoudenMVDR">[docs]</a><span class="k">class</span> <span class="nc">SoudenMVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="SoudenMVDR"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.SoudenMVDR.html#torchaudio.transforms.SoudenMVDR">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SoudenMVDR</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Minimum Variance Distortionless Response (*MVDR* :cite:`capon1969high`) module</span>
 <span class="sd">    based on the method proposed by *Souden et, al.* :cite:`souden2009optimal`.</span>
 
@@ -862,7 +860,7 @@
 <span class="sd">        {\text{Trace}({{{\bf{\Phi}_{\textbf{NN}}^{-1}}(f) \bf{\Phi}_{\textbf{SS}}}(f))}}\bm{u}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SoudenMVDR.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.SoudenMVDR.html#torchaudio.transforms.SoudenMVDR.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="SoudenMVDR.forward"><a class="viewcode-back" href="../../../generated/torchaudio.transforms.SoudenMVDR.html#torchaudio.transforms.SoudenMVDR.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">psd_s</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -913,7 +911,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -952,9 +950,6 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../_static/katex_autorenderer.js"></script>
      
 
   

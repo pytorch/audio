@@ -23,6 +23,16 @@ Forced alignment for multilingual data
 
 **Authors**: `Xiaohui Zhang <xiaohuizhang@meta.com>`__, `Moto Hira <moto@meta.com>`__.
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 This tutorial shows how to align transcript to speech for non-English languages.
 
 The process of aligning non-English (normalized) transcript is identical to aligning
@@ -32,7 +42,7 @@ In this tutorial, we use TorchAudio's high-level API,
 :py:class:`torchaudio.pipelines.Wav2Vec2FABundle`, which packages the pre-trained
 model, tokenizer and aligner, to perform the forced alignment with less code.
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-27
+.. GENERATED FROM PYTHON SOURCE LINES 26-37
 
 .. code-block:: default
 
@@ -55,14 +65,14 @@ model, tokenizer and aligner, to perform the forced alignment with less code.
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
     cuda
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-34
+.. GENERATED FROM PYTHON SOURCE LINES 39-44
 
 .. code-block:: default
 
@@ -78,7 +88,7 @@ model, tokenizer and aligner, to perform the forced alignment with less code.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-67
+.. GENERATED FROM PYTHON SOURCE LINES 45-77
 
 Creating the pipeline
 ---------------------
@@ -113,7 +123,7 @@ The following code instantiates a pre-trained acoustic model, a tokenizer
 which uses the same set of tokens as the model, and an aligner.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-76
+.. GENERATED FROM PYTHON SOURCE LINES 77-86
 
 .. code-block:: default
 
@@ -133,7 +143,7 @@ which uses the same set of tokens as the model, and an aligner.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-84
+.. GENERATED FROM PYTHON SOURCE LINES 87-94
 
 .. note::
 
@@ -143,7 +153,7 @@ which uses the same set of tokens as the model, and an aligner.
    You can disable this by passing ``with_star=False``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-94
+.. GENERATED FROM PYTHON SOURCE LINES 96-104
 
 The acoustic model of :py:data:`~torchaudio.pipelines.MMS_FA` was
 created and open-sourced as part of the research project,
@@ -154,7 +164,7 @@ It was trained with 23,000 hours of audio from 1100+ languages.
 The tokenizer simply maps the normalized characters to integers.
 You can check the mapping as follow;
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-98
+.. GENERATED FROM PYTHON SOURCE LINES 104-108
 
 .. code-block:: default
 
@@ -175,7 +185,7 @@ You can check the mapping as follow;
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-106
+.. GENERATED FROM PYTHON SOURCE LINES 109-116
 
 The aligner internally uses :py:func:`torchaudio.functional.forced_align`
 and :py:func:`torchaudio.functional.merge_tokens` to infer the time
@@ -185,13 +195,13 @@ The detail of the underlying mechanism is covered in
 `CTC forced alignment API tutorial <./ctc_forced_alignment_api_tutorial.html>`__,
 so please refer to it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-112
+.. GENERATED FROM PYTHON SOURCE LINES 119-122
 
 We define a utility function that performs the forced alignment with
 the above model, the tokenizer and the aligner.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-119
+.. GENERATED FROM PYTHON SOURCE LINES 122-129
 
 .. code-block:: default
 
@@ -209,12 +219,12 @@ the above model, the tokenizer and the aligner.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-122
+.. GENERATED FROM PYTHON SOURCE LINES 130-132
 
 We also define utility functions for plotting the result and previewing
 the audio segments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-151
+.. GENERATED FROM PYTHON SOURCE LINES 132-161
 
 .. code-block:: default
 
@@ -254,7 +264,7 @@ the audio segments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-162
+.. GENERATED FROM PYTHON SOURCE LINES 163-172
 
 .. code-block:: default
 
@@ -274,7 +284,7 @@ the audio segments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 163-222
+.. GENERATED FROM PYTHON SOURCE LINES 173-232
 
 Normalizing the transcript
 --------------------------
@@ -336,7 +346,7 @@ it was removed in the normalization step.
 To avoid this, one needs to romanize numbers, but this is known to be a non-trivial task.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-232
+.. GENERATED FROM PYTHON SOURCE LINES 234-242
 
 Aligning transcripts to speech
 ------------------------------
@@ -347,7 +357,7 @@ Now we perform the forced alignment for multiple languages.
 German
 ~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-241
+.. GENERATED FROM PYTHON SOURCE LINES 242-251
 
 .. code-block:: default
 
@@ -364,10 +374,19 @@ German
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-245
+
+.. GENERATED FROM PYTHON SOURCE LINES 253-255
 
 .. code-block:: default
 
@@ -380,7 +399,7 @@ German
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-260
+.. GENERATED FROM PYTHON SOURCE LINES 257-270
 
 .. code-block:: default
 
@@ -410,6 +429,8 @@ German
 
  .. code-block:: none
 
+    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  aber seit ich bei ihnen das brot hole
     Normalized Transcript:  aber seit ich bei ihnen das brot hole
 
@@ -427,7 +448,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-265
+.. GENERATED FROM PYTHON SOURCE LINES 272-275
 
 .. code-block:: default
 
@@ -458,7 +479,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 267-270
+.. GENERATED FROM PYTHON SOURCE LINES 277-280
 
 .. code-block:: default
 
@@ -489,7 +510,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 272-275
+.. GENERATED FROM PYTHON SOURCE LINES 282-285
 
 .. code-block:: default
 
@@ -520,7 +541,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-280
+.. GENERATED FROM PYTHON SOURCE LINES 287-290
 
 .. code-block:: default
 
@@ -551,7 +572,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-285
+.. GENERATED FROM PYTHON SOURCE LINES 292-295
 
 .. code-block:: default
 
@@ -582,7 +603,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 287-290
+.. GENERATED FROM PYTHON SOURCE LINES 297-300
 
 .. code-block:: default
 
@@ -613,7 +634,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 292-295
+.. GENERATED FROM PYTHON SOURCE LINES 302-305
 
 .. code-block:: default
 
@@ -644,7 +665,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-300
+.. GENERATED FROM PYTHON SOURCE LINES 307-310
 
 .. code-block:: default
 
@@ -675,7 +696,7 @@ German
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 301-311
+.. GENERATED FROM PYTHON SOURCE LINES 311-321
 
 Chinese
 ~~~~~~~
@@ -688,7 +709,7 @@ Tokenizer” <https://michelleful.github.io/code-blog/2015/09/10/parsing-chinese
 However this is not needed if you only want character-level alignments.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 311-315
+.. GENERATED FROM PYTHON SOURCE LINES 321-325
 
 .. code-block:: default
 
@@ -703,7 +724,7 @@ However this is not needed if you only want character-level alignments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 317-322
+.. GENERATED FROM PYTHON SOURCE LINES 327-332
 
 .. code-block:: default
 
@@ -716,10 +737,19 @@ However this is not needed if you only want character-level alignments.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 324-326
+
+.. GENERATED FROM PYTHON SOURCE LINES 334-336
 
 .. code-block:: default
 
@@ -732,7 +762,7 @@ However this is not needed if you only want character-level alignments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 328-339
+.. GENERATED FROM PYTHON SOURCE LINES 338-349
 
 .. code-block:: default
 
@@ -760,6 +790,8 @@ However this is not needed if you only want character-level alignments.
 
  .. code-block:: none
 
+    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  关 服务 高端 产品 仍 处于 供不应求 的 局面
     Normalized Transcript:  guan fuwu gaoduan chanpin reng chuyu gongbuyingqiu de jumian
 
@@ -777,7 +809,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 341-344
+.. GENERATED FROM PYTHON SOURCE LINES 351-354
 
 .. code-block:: default
 
@@ -808,7 +840,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 346-349
+.. GENERATED FROM PYTHON SOURCE LINES 356-359
 
 .. code-block:: default
 
@@ -839,7 +871,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 351-354
+.. GENERATED FROM PYTHON SOURCE LINES 361-364
 
 .. code-block:: default
 
@@ -870,7 +902,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 356-359
+.. GENERATED FROM PYTHON SOURCE LINES 366-369
 
 .. code-block:: default
 
@@ -901,7 +933,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 361-364
+.. GENERATED FROM PYTHON SOURCE LINES 371-374
 
 .. code-block:: default
 
@@ -932,7 +964,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 366-369
+.. GENERATED FROM PYTHON SOURCE LINES 376-379
 
 .. code-block:: default
 
@@ -963,7 +995,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 371-374
+.. GENERATED FROM PYTHON SOURCE LINES 381-384
 
 .. code-block:: default
 
@@ -994,7 +1026,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 376-379
+.. GENERATED FROM PYTHON SOURCE LINES 386-389
 
 .. code-block:: default
 
@@ -1025,7 +1057,7 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 381-385
+.. GENERATED FROM PYTHON SOURCE LINES 391-395
 
 .. code-block:: default
 
@@ -1057,12 +1089,12 @@ However this is not needed if you only want character-level alignments.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 386-388
+.. GENERATED FROM PYTHON SOURCE LINES 396-398
 
 Polish
 ~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 388-395
+.. GENERATED FROM PYTHON SOURCE LINES 398-405
 
 .. code-block:: default
 
@@ -1077,10 +1109,19 @@ Polish
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 397-399
+
+.. GENERATED FROM PYTHON SOURCE LINES 407-409
 
 .. code-block:: default
 
@@ -1093,7 +1134,7 @@ Polish
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 401-412
+.. GENERATED FROM PYTHON SOURCE LINES 411-422
 
 .. code-block:: default
 
@@ -1121,6 +1162,8 @@ Polish
 
  .. code-block:: none
 
+    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  wtedy ujrzałem na jego brzuchu okrągłą czarną ranę
     Normalized Transcript:  wtedy ujrzalem na jego brzuchu okragla czarna rane
 
@@ -1138,7 +1181,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 414-417
+.. GENERATED FROM PYTHON SOURCE LINES 424-427
 
 .. code-block:: default
 
@@ -1169,7 +1212,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 419-422
+.. GENERATED FROM PYTHON SOURCE LINES 429-432
 
 .. code-block:: default
 
@@ -1200,7 +1243,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 424-427
+.. GENERATED FROM PYTHON SOURCE LINES 434-437
 
 .. code-block:: default
 
@@ -1231,7 +1274,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 429-432
+.. GENERATED FROM PYTHON SOURCE LINES 439-442
 
 .. code-block:: default
 
@@ -1262,7 +1305,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 434-437
+.. GENERATED FROM PYTHON SOURCE LINES 444-447
 
 .. code-block:: default
 
@@ -1293,7 +1336,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 439-442
+.. GENERATED FROM PYTHON SOURCE LINES 449-452
 
 .. code-block:: default
 
@@ -1324,7 +1367,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 444-447
+.. GENERATED FROM PYTHON SOURCE LINES 454-457
 
 .. code-block:: default
 
@@ -1355,7 +1398,7 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 449-452
+.. GENERATED FROM PYTHON SOURCE LINES 459-462
 
 .. code-block:: default
 
@@ -1386,12 +1429,12 @@ Polish
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 453-455
+.. GENERATED FROM PYTHON SOURCE LINES 463-465
 
 Portuguese
 ~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 455-464
+.. GENERATED FROM PYTHON SOURCE LINES 465-474
 
 .. code-block:: default
 
@@ -1408,10 +1451,19 @@ Portuguese
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 466-468
+
+.. GENERATED FROM PYTHON SOURCE LINES 476-478
 
 .. code-block:: default
 
@@ -1424,7 +1476,7 @@ Portuguese
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 470-481
+.. GENERATED FROM PYTHON SOURCE LINES 480-491
 
 .. code-block:: default
 
@@ -1452,6 +1504,8 @@ Portuguese
 
  .. code-block:: none
 
+    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  na imensa extensão onde se esconde o inconsciente imortal
     Normalized Transcript:  na imensa extensao onde se esconde o inconsciente imortal
 
@@ -1469,7 +1523,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 483-486
+.. GENERATED FROM PYTHON SOURCE LINES 493-496
 
 .. code-block:: default
 
@@ -1500,7 +1554,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 488-491
+.. GENERATED FROM PYTHON SOURCE LINES 498-501
 
 .. code-block:: default
 
@@ -1531,7 +1585,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 493-496
+.. GENERATED FROM PYTHON SOURCE LINES 503-506
 
 .. code-block:: default
 
@@ -1562,7 +1616,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 498-501
+.. GENERATED FROM PYTHON SOURCE LINES 508-511
 
 .. code-block:: default
 
@@ -1593,7 +1647,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 503-506
+.. GENERATED FROM PYTHON SOURCE LINES 513-516
 
 .. code-block:: default
 
@@ -1624,7 +1678,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 508-511
+.. GENERATED FROM PYTHON SOURCE LINES 518-521
 
 .. code-block:: default
 
@@ -1655,7 +1709,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 513-516
+.. GENERATED FROM PYTHON SOURCE LINES 523-526
 
 .. code-block:: default
 
@@ -1686,7 +1740,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 518-521
+.. GENERATED FROM PYTHON SOURCE LINES 528-531
 
 .. code-block:: default
 
@@ -1717,7 +1771,7 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 523-527
+.. GENERATED FROM PYTHON SOURCE LINES 533-537
 
 .. code-block:: default
 
@@ -1749,12 +1803,12 @@ Portuguese
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 528-530
+.. GENERATED FROM PYTHON SOURCE LINES 538-540
 
 Italian
 ~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 530-537
+.. GENERATED FROM PYTHON SOURCE LINES 540-547
 
 .. code-block:: default
 
@@ -1769,10 +1823,19 @@ Italian
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 539-541
+
+.. GENERATED FROM PYTHON SOURCE LINES 549-551
 
 .. code-block:: default
 
@@ -1785,7 +1848,7 @@ Italian
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 543-554
+.. GENERATED FROM PYTHON SOURCE LINES 553-564
 
 .. code-block:: default
 
@@ -1813,6 +1876,8 @@ Italian
 
  .. code-block:: none
 
+    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  elle giacean per terra tutte quante
     Normalized Transcript:  elle giacean per terra tutte quante
 
@@ -1830,7 +1895,7 @@ Italian
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 556-559
+.. GENERATED FROM PYTHON SOURCE LINES 566-569
 
 .. code-block:: default
 
@@ -1861,7 +1926,7 @@ Italian
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 561-564
+.. GENERATED FROM PYTHON SOURCE LINES 571-574
 
 .. code-block:: default
 
@@ -1892,7 +1957,7 @@ Italian
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 566-569
+.. GENERATED FROM PYTHON SOURCE LINES 576-579
 
 .. code-block:: default
 
@@ -1923,7 +1988,7 @@ Italian
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 571-574
+.. GENERATED FROM PYTHON SOURCE LINES 581-584
 
 .. code-block:: default
 
@@ -1954,7 +2019,7 @@ Italian
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 576-579
+.. GENERATED FROM PYTHON SOURCE LINES 586-589
 
 .. code-block:: default
 
@@ -1985,7 +2050,7 @@ Italian
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 581-584
+.. GENERATED FROM PYTHON SOURCE LINES 591-594
 
 .. code-block:: default
 
@@ -2016,7 +2081,7 @@ Italian
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 585-592
+.. GENERATED FROM PYTHON SOURCE LINES 595-602
 
 Conclusion
 ----------
@@ -2026,7 +2091,7 @@ API and a Wav2Vec2 pre-trained mulilingual acoustic model to align
 speech data to transcripts in five languages.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 594-601
+.. GENERATED FROM PYTHON SOURCE LINES 604-611
 
 Acknowledgement
 ---------------
@@ -2039,7 +2104,7 @@ forced aligner API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.200 seconds)
+   **Total running time of the script:** ( 0 minutes  3.474 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_for_multilingual_data_tutorial.py:

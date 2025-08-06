@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.io._effector &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.io._effector &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.io._effector &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,28 +428,28 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.io._effector</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
 
-<span class="kn">from</span> <span class="nn">torio.io._streaming_media_decoder</span> <span class="kn">import</span> <span class="n">_get_afilter_desc</span><span class="p">,</span> <span class="n">StreamingMediaDecoder</span> <span class="k">as</span> <span class="n">StreamReader</span>
-<span class="kn">from</span> <span class="nn">torio.io._streaming_media_encoder</span> <span class="kn">import</span> <span class="n">CodecConfig</span><span class="p">,</span> <span class="n">StreamingMediaEncoder</span> <span class="k">as</span> <span class="n">StreamWriter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torio.io._streaming_media_decoder</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_afilter_desc</span><span class="p">,</span> <span class="n">StreamingMediaDecoder</span> <span class="k">as</span> <span class="n">StreamReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torio.io._streaming_media_encoder</span><span class="w"> </span><span class="kn">import</span> <span class="n">CodecConfig</span><span class="p">,</span> <span class="n">StreamingMediaEncoder</span> <span class="k">as</span> <span class="n">StreamWriter</span>
 
 
-<span class="k">class</span> <span class="nc">_StreamingIOBuffer</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_StreamingIOBuffer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Streaming Bytes IO buffer. Data are dropped when read.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">:</span> <span class="n">List</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">b</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Pop the oldest byte string. It does not necessary return the requested amount&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_buffer</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
@@ -462,7 +460,7 @@
         <span class="k">return</span> <span class="n">ret</span>
 
 
-<span class="k">def</span> <span class="nf">_get_sample_fmt</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sample_fmt</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
     <span class="n">types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span> <span class="s2">&quot;u8&quot;</span><span class="p">,</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">int16</span><span class="p">:</span> <span class="s2">&quot;s16&quot;</span><span class="p">,</span>
@@ -475,10 +473,10 @@
     <span class="k">return</span> <span class="n">types</span><span class="p">[</span><span class="n">dtype</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">_AudioStreamingEncoder</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_AudioStreamingEncoder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a waveform, encode on-demand and return bytes&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -507,7 +505,7 @@
         <span class="c1"># the writer is closed.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">i_iter</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">_buffer</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_iter</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">write_audio_chunk</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">src</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">i_iter</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_iter</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fpc</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">i_iter</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fpc</span>
@@ -518,7 +516,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_encode</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_encode</span><span class="p">(</span>
     <span class="n">src</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
     <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">effect</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -542,7 +540,7 @@
     <span class="k">return</span> <span class="n">buffer</span>
 
 
-<span class="k">def</span> <span class="nf">_get_muxer</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_muxer</span><span class="p">(</span><span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
     <span class="c1"># TODO: check if this works in Windows.</span>
     <span class="n">types</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span> <span class="s2">&quot;u8&quot;</span><span class="p">,</span>
@@ -556,7 +554,7 @@
     <span class="k">return</span> <span class="n">types</span><span class="p">[</span><span class="n">dtype</span><span class="p">]</span>
 
 
-<div class="viewcode-block" id="AudioEffector"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector">[docs]</a><span class="k">class</span> <span class="nc">AudioEffector</span><span class="p">:</span>
+<div class="viewcode-block" id="AudioEffector"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">AudioEffector</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply various filters and/or codecs to waveforms.</span>
 
 <span class="sd">    .. versionadded:: 2.1</span>
@@ -669,7 +667,7 @@
 <span class="sd">        &gt;&gt;&gt; AudioEffector(format=&quot;mp3&quot;, codec_config=CodecConfig(bit_rate=32_000))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">effect</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -687,7 +685,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">codec_config</span> <span class="o">=</span> <span class="n">codec_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad_end</span> <span class="o">=</span> <span class="n">pad_end</span>
 
-    <span class="k">def</span> <span class="nf">_get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_reader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">num_frames</span><span class="p">,</span> <span class="n">num_channels</span> <span class="o">=</span> <span class="n">waveform</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -719,7 +717,7 @@
         <span class="n">reader</span><span class="o">.</span><span class="n">add_audio_stream</span><span class="p">(</span><span class="n">frames_per_chunk</span> <span class="ow">or</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">filter_desc</span><span class="o">=</span><span class="n">filter_desc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">reader</span>
 
-<div class="viewcode-block" id="AudioEffector.apply"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="AudioEffector.apply"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.apply">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the effect and/or codecs to the whole tensor.</span>
 
 <span class="sd">        Args:</span>
@@ -747,7 +745,7 @@
         <span class="p">(</span><span class="n">applied</span><span class="p">,)</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">pop_chunks</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">Tensor</span><span class="p">(</span><span class="n">applied</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AudioEffector.stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.stream">[docs]</a>    <span class="k">def</span> <span class="nf">stream</span><span class="p">(</span>
+<div class="viewcode-block" id="AudioEffector.stream"><a class="viewcode-back" href="../../../generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector.stream">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">stream</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">frames_per_chunk</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">output_sample_rate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the effect and/or codecs to the given tensor chunk by chunk.</span>
@@ -793,7 +791,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -832,9 +830,6 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../_static/katex_autorenderer.js"></script>
      
 
   

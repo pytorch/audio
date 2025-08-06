@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional.frechet_distance &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.functional.frechet_distance &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -397,7 +395,7 @@
         
       <li>torchaudio.functional.frechet_distance &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -442,27 +440,25 @@
 <dt class="sig sig-object py" id="torchaudio.functional.frechet_distance">
 <span class="sig-prename descclassname"><span class="pre">torchaudio.functional.</span></span><span class="sig-name descname"><span class="pre">frechet_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma_y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/functional/functional.html#frechet_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.functional.frechet_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Fréchet distance between two multivariate normal distributions <span id="id1">[<a class="reference internal" href="../references.html#id72" title="DC Dowson and BV666017 Landau. The fréchet distance between multivariate normal distributions. Journal of multivariate analysis, 12(3):450–455, 1982.">Dowson and Landau, 1982</a>]</span>.</p>
-<p>Concretely, for multivariate Gaussians <span class="math">\(X(\mu_X, \Sigma_X)\)</span>
-and <span class="math">\(Y(\mu_Y, \Sigma_Y)\)</span>, the function computes and returns <span class="math">\(F\)</span> as</p>
-<div class="math">
+<p>Concretely, for multivariate Gaussians <span class="math notranslate nohighlight">\(X(\mu_X, \Sigma_X)\)</span>
+and <span class="math notranslate nohighlight">\(Y(\mu_Y, \Sigma_Y)\)</span>, the function computes and returns <span class="math notranslate nohighlight">\(F\)</span> as</p>
+<div class="math notranslate nohighlight">
 \[F(X, Y) = || \mu_X - \mu_Y ||_2^2
-+ \text{Tr}\left( \Sigma_X + \Sigma_Y - 2 \sqrt{\Sigma_X \Sigma_Y} \right)
-
-\]</div>
++ \text{Tr}\left( \Sigma_X + \Sigma_Y - 2 \sqrt{\Sigma_X \Sigma_Y} \right)\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mu_x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><em>torch.Tensor</em></a>) – mean <span class="math">\(\mu_X\)</span> of multivariate Gaussian <span class="math">\(X\)</span>, with shape <cite>(N,)</cite>.</p></li>
-<li><p><strong>sigma_x</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><em>torch.Tensor</em></a>) – covariance matrix <span class="math">\(\Sigma_X\)</span> of <span class="math">\(X\)</span>, with shape <cite>(N, N)</cite>.</p></li>
-<li><p><strong>mu_y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><em>torch.Tensor</em></a>) – mean <span class="math">\(\mu_Y\)</span> of multivariate Gaussian <span class="math">\(Y\)</span>, with shape <cite>(N,)</cite>.</p></li>
-<li><p><strong>sigma_y</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><em>torch.Tensor</em></a>) – covariance matrix <span class="math">\(\Sigma_Y\)</span> of <span class="math">\(Y\)</span>, with shape <cite>(N, N)</cite>.</p></li>
+<li><p><strong>mu_x</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><em>torch.Tensor</em></a>) – mean <span class="math notranslate nohighlight">\(\mu_X\)</span> of multivariate Gaussian <span class="math notranslate nohighlight">\(X\)</span>, with shape <cite>(N,)</cite>.</p></li>
+<li><p><strong>sigma_x</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><em>torch.Tensor</em></a>) – covariance matrix <span class="math notranslate nohighlight">\(\Sigma_X\)</span> of <span class="math notranslate nohighlight">\(X\)</span>, with shape <cite>(N, N)</cite>.</p></li>
+<li><p><strong>mu_y</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><em>torch.Tensor</em></a>) – mean <span class="math notranslate nohighlight">\(\mu_Y\)</span> of multivariate Gaussian <span class="math notranslate nohighlight">\(Y\)</span>, with shape <cite>(N,)</cite>.</p></li>
+<li><p><strong>sigma_y</strong> (<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><em>torch.Tensor</em></a>) – covariance matrix <span class="math notranslate nohighlight">\(\Sigma_Y\)</span> of <span class="math notranslate nohighlight">\(Y\)</span>, with shape <cite>(N, N)</cite>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the Fréchet distance between <span class="math">\(X\)</span> and <span class="math">\(Y\)</span>.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the Fréchet distance between <span class="math notranslate nohighlight">\(X\)</span> and <span class="math notranslate nohighlight">\(Y\)</span>.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)">torch.Tensor</a></p>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)">torch.Tensor</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -493,7 +489,7 @@ and <span class="math">\(Y(\mu_Y, \Sigma_Y)\)</span>, the function computes and 
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -535,9 +531,8 @@ and <span class="math">\(Y(\mu_Y, \Sigma_Y)\)</span>, the function computes and 
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
+         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
      
 
   

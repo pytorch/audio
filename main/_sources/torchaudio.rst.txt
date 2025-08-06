@@ -3,6 +3,20 @@ torchaudio
 
 .. currentmodule:: torchaudio
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - Most APIs listed below are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec. For convenience, we provide
+      :func:`~torchaudio.load_with_torchcodec` as a replacement for
+      :func:`~torchaudio.load` and :func:`~torchaudio.save_with_torchcodec` as a
+      replacement for :func:`~torchaudio.save`, but we recommend that you port
+      your code to native torchcodec APIs.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 I/O
 ---
 
@@ -16,7 +30,9 @@ it easy to handle audio data.
 
    info
    load
+   load_with_torchcodec
    save
+   save_with_torchcodec
    list_audio_backends
 
 .. _backend:

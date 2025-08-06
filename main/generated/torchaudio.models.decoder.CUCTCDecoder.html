@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CUCTCDecoder &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>CUCTCDecoder &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -397,7 +395,7 @@
         
       <li>CUCTCDecoder &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -441,12 +439,20 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CUCTCDecoder">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></span><span class="sig-name descname"><span class="pre">CUCTCDecoder</span></span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_cuda_ctc_decoder.html#CUCTCDecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CUCTCDecoder" title="Permalink to this definition">¶</a></dt>
-<dd><p>CUDA CTC beam search decoder.</p>
-<a class="reference external image-reference" href="../supported_features.html#devices"><img alt="This feature supports the following devices: CUDA" class="shield-badge" src="../_images/4f5c4872f982dc9b424393646bb6c7c34fe2c478499eb80f3a2470339a73837c.svg" /></a>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>To build the decoder, please use the factory function <a class="reference internal" href="torchaudio.models.decoder.cuda_ctc_decoder.html#torchaudio.models.decoder.cuda_ctc_decoder" title="torchaudio.models.decoder.cuda_ctc_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">cuda_ctc_decoder()</span></code></a>.</p>
+<dd><p>DEPRECATED</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is deprecated from version 2.8. It will be removed in the 2.9 release.
+This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
 </div>
+<p>CUDA CTC beam search decoder.</p>
+<blockquote>
+<div><a class="reference external image-reference" href="../supported_features.html#devices"><img alt="This feature supports the following devices: CUDA" class="shield-badge" src="../_images/4f5c4872f982dc9b424393646bb6c7c34fe2c478499eb80f3a2470339a73837c.svg" /></a>
+<dl class="simple">
+<dt>Note:</dt><dd><p>To build the decoder, please use the factory function <a class="reference internal" href="torchaudio.models.decoder.cuda_ctc_decoder.html#torchaudio.models.decoder.cuda_ctc_decoder" title="torchaudio.models.decoder.cuda_ctc_decoder"><code class="xref py py-func docutils literal notranslate"><span class="pre">cuda_ctc_decoder()</span></code></a>.</p>
+</dd>
+</dl>
+</div></blockquote>
 <dl>
 <dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CUCTCDecoder</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Yuekai Zhang &lt;yuekaiz@nvidia.com&gt;`__"><img alt="ASR Inference with CUDA CTC Decoder" src="../_images/sphx_glr_asr_inference_with_cuda_ctc_decoder_tutorial_thumb.png" />
 <p><a class="reference internal" href="../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-cuda-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CUDA CTC Decoder</span></a></p>
@@ -463,9 +469,9 @@
 <div class="py attribute docutils container">
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CUCTCDecoder.__call__">
-<span class="sig-prename descclassname"><span class="pre">CUCTCDecoder.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_out_lens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_cuda_ctc_decoder.html#CUCTCDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CUCTCDecoder.__call__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">CUCTCDecoder.</span></span><span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_prob</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder_out_lens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_cuda_ctc_decoder.html#CUCTCDecoder.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CUCTCDecoder.__call__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>log_prob</strong> (<em>torch.FloatTensor</em>) – GPU tensor of shape <cite>(batch, frame, num_tokens)</cite> storing sequences of
 probability distribution over labels; log_softmax(output of acoustic model).</p></li>
@@ -473,10 +479,10 @@ probability distribution over labels; log_softmax(output of acoustic model).</p>
 in time axis of the output Tensor in each batch.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>List of sorted best hypotheses for each audio sequence in the batch.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>List[List[<a class="reference internal" href="#torchaudio.models.decoder.CUCTCHypothesis" title="torchaudio.models.decoder.CUCTCHypothesis">CUCTCHypothesis</a>]]</p>
 </dd>
 </dl>
@@ -492,7 +498,13 @@ in time axis of the output Tensor in each batch.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.models.decoder.CUCTCHypothesis">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.models.decoder.</span></span><span class="sig-name descname"><span class="pre">CUCTCHypothesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokens</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/models/decoder/_cuda_ctc_decoder.html#CUCTCHypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.models.decoder.CUCTCHypothesis" title="Permalink to this definition">¶</a></dt>
-<dd><p>Represents hypothesis generated by CUCTC beam search decoder <a class="reference internal" href="#torchaudio.models.decoder.CUCTCDecoder" title="torchaudio.models.decoder.CUCTCDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">CUCTCDecoder</span></code></a>.</p>
+<dd><p>DEPRECATED</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is deprecated from version 2.8. It will be removed in the 2.9 release.
+This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
+<p>Represents hypothesis generated by CUCTC beam search decoder <a class="reference internal" href="#torchaudio.models.decoder.CUCTCDecoder" title="torchaudio.models.decoder.CUCTCDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">CUCTCDecoder</span></code></a>.</p>
 <dl>
 <dt>Tutorials using <code class="docutils literal notranslate"><span class="pre">CUCTCHypothesis</span></code>:</dt><dd><div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="**Author**: `Yuekai Zhang &lt;yuekaiz@nvidia.com&gt;`__"><img alt="ASR Inference with CUDA CTC Decoder" src="../_images/sphx_glr_asr_inference_with_cuda_ctc_decoder_tutorial_thumb.png" />
 <p><a class="reference internal" href="../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html#sphx-glr-tutorials-asr-inference-with-cuda-ctc-decoder-tutorial-py"><span class="std std-ref">ASR Inference with CUDA CTC Decoder</span></a></p>
@@ -546,7 +558,7 @@ in time axis of the output Tensor in each batch.</p></li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -596,9 +608,6 @@ in time axis of the output Tensor in each batch.</p></li>
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
      
 
   

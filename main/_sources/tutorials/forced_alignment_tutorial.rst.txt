@@ -23,6 +23,16 @@ Forced Alignment with Wav2Vec2
 
 **Author**: `Moto Hira <moto@meta.com>`__
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 This tutorial shows how to align transcript to speech with
 ``torchaudio``, using CTC segmentation algorithm described in
 `CTC-Segmentation of Large Corpora for German End-to-end Speech
@@ -48,7 +58,7 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
    <forced_alignment_for_multilingual_data_tutorial.html>`__ which
    illustrates its usage.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-44
+.. GENERATED FROM PYTHON SOURCE LINES 42-54
 
 .. code-block:: default
 
@@ -72,14 +82,14 @@ Recognition <https://arxiv.org/abs/2007.09127>`__.
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
     cuda
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-58
+.. GENERATED FROM PYTHON SOURCE LINES 55-68
 
 Overview
 --------
@@ -95,7 +105,7 @@ In this example, we use ``torchaudio``\ ’s ``Wav2Vec2`` model for
 acoustic feature extraction.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-66
+.. GENERATED FROM PYTHON SOURCE LINES 71-76
 
 Preparation
 -----------
@@ -103,7 +113,7 @@ Preparation
 First we import the necessary packages, and fetch data that we work on.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-77
+.. GENERATED FROM PYTHON SOURCE LINES 76-87
 
 .. code-block:: default
 
@@ -122,10 +132,17 @@ First we import the necessary packages, and fetch data that we work on.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/forced_alignment_tutorial.py:84: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-94
+
+.. GENERATED FROM PYTHON SOURCE LINES 88-104
 
 Generate frame-wise label probability
 -------------------------------------
@@ -144,7 +161,7 @@ labels.
    normalize the ``emission`` with :py:func:`torch.log_softmax`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-107
+.. GENERATED FROM PYTHON SOURCE LINES 104-117
 
 .. code-block:: default
 
@@ -169,17 +186,21 @@ labels.
 
  .. code-block:: none
 
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
     ('-', '|', 'E', 'T', 'A', 'O', 'N', 'I', 'H', 'S', 'R', 'D', 'L', 'U', 'M', 'W', 'C', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', "'", 'X', 'J', 'Q', 'Z')
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-110
+.. GENERATED FROM PYTHON SOURCE LINES 118-120
 
 Visualization
 ~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-124
+.. GENERATED FROM PYTHON SOURCE LINES 120-134
 
 .. code-block:: default
 
@@ -209,7 +230,7 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-161
+.. GENERATED FROM PYTHON SOURCE LINES 135-171
 
 Generate alignment probability (trellis)
 ----------------------------------------
@@ -248,7 +269,7 @@ detail of CTC algorithm, please refer to the *Sequence Modeling with CTC*
 [`distill.pub <https://distill.pub/2017/ctc/>`__])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-192
+.. GENERATED FROM PYTHON SOURCE LINES 171-202
 
 .. code-block:: default
 
@@ -296,12 +317,12 @@ detail of CTC algorithm, please refer to the *Sequence Modeling with CTC*
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-195
+.. GENERATED FROM PYTHON SOURCE LINES 203-205
 
 Visualization
 ~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-208
+.. GENERATED FROM PYTHON SOURCE LINES 205-218
 
 .. code-block:: default
 
@@ -330,13 +351,13 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-212
+.. GENERATED FROM PYTHON SOURCE LINES 219-222
 
 In the above visualization, we can see that there is a trace of high
 probability crossing the matrix diagonally.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-234
+.. GENERATED FROM PYTHON SOURCE LINES 225-244
 
 Find the most likely path (backtracking)
 ----------------------------------------
@@ -358,7 +379,7 @@ probability of each segment, we take the frame-wise probability from
 emission matrix.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-284
+.. GENERATED FROM PYTHON SOURCE LINES 244-294
 
 .. code-block:: default
 
@@ -451,133 +472,133 @@ emission matrix.
     Point(token_index=0, time_index=28, score=0.9999985694885254)
     Point(token_index=0, time_index=29, score=0.9999943971633911)
     Point(token_index=0, time_index=30, score=0.9999842643737793)
-    Point(token_index=1, time_index=31, score=0.9846118092536926)
+    Point(token_index=1, time_index=31, score=0.9846633672714233)
     Point(token_index=1, time_index=32, score=0.9999706745147705)
-    Point(token_index=1, time_index=33, score=0.15352763235569)
+    Point(token_index=1, time_index=33, score=0.15361329913139343)
     Point(token_index=1, time_index=34, score=0.9999172687530518)
-    Point(token_index=2, time_index=35, score=0.6091406941413879)
-    Point(token_index=2, time_index=36, score=0.9997723698616028)
-    Point(token_index=3, time_index=37, score=0.9997134804725647)
+    Point(token_index=2, time_index=35, score=0.6085338592529297)
+    Point(token_index=2, time_index=36, score=0.9997722506523132)
+    Point(token_index=3, time_index=37, score=0.999714195728302)
     Point(token_index=3, time_index=38, score=0.9999358654022217)
-    Point(token_index=4, time_index=39, score=0.986176073551178)
-    Point(token_index=4, time_index=40, score=0.9241712093353271)
-    Point(token_index=5, time_index=41, score=0.9259618520736694)
-    Point(token_index=5, time_index=42, score=0.01559634879231453)
-    Point(token_index=5, time_index=43, score=0.9998377561569214)
-    Point(token_index=6, time_index=44, score=0.998847484588623)
-    Point(token_index=7, time_index=45, score=0.10197910666465759)
-    Point(token_index=7, time_index=46, score=0.9999427795410156)
+    Point(token_index=4, time_index=39, score=0.9861765503883362)
+    Point(token_index=4, time_index=40, score=0.9241003394126892)
+    Point(token_index=5, time_index=41, score=0.9259175062179565)
+    Point(token_index=5, time_index=42, score=0.015625856816768646)
+    Point(token_index=5, time_index=43, score=0.9998376369476318)
+    Point(token_index=6, time_index=44, score=0.9988446235656738)
+    Point(token_index=7, time_index=45, score=0.10159187018871307)
+    Point(token_index=7, time_index=46, score=0.9999426603317261)
     Point(token_index=8, time_index=47, score=0.9999943971633911)
     Point(token_index=8, time_index=48, score=0.9979596138000488)
-    Point(token_index=9, time_index=49, score=0.035976238548755646)
-    Point(token_index=9, time_index=50, score=0.06177717074751854)
-    Point(token_index=9, time_index=51, score=4.336948768468574e-05)
+    Point(token_index=9, time_index=49, score=0.036005258560180664)
+    Point(token_index=9, time_index=50, score=0.06174848601222038)
+    Point(token_index=9, time_index=51, score=4.3377182009862736e-05)
     Point(token_index=10, time_index=52, score=0.9999799728393555)
-    Point(token_index=11, time_index=53, score=0.9967018961906433)
+    Point(token_index=11, time_index=53, score=0.9967069029808044)
     Point(token_index=11, time_index=54, score=0.9999257326126099)
     Point(token_index=11, time_index=55, score=0.9999982118606567)
-    Point(token_index=12, time_index=56, score=0.9990664124488831)
+    Point(token_index=12, time_index=56, score=0.999064028263092)
     Point(token_index=12, time_index=57, score=0.9999996423721313)
     Point(token_index=12, time_index=58, score=0.9999996423721313)
-    Point(token_index=12, time_index=59, score=0.8452622294425964)
+    Point(token_index=12, time_index=59, score=0.8450244069099426)
     Point(token_index=12, time_index=60, score=0.9999996423721313)
-    Point(token_index=13, time_index=61, score=0.9996007084846497)
+    Point(token_index=13, time_index=61, score=0.9996004700660706)
     Point(token_index=13, time_index=62, score=0.999998927116394)
-    Point(token_index=14, time_index=63, score=0.0035339989699423313)
+    Point(token_index=14, time_index=63, score=0.003534560324624181)
     Point(token_index=14, time_index=64, score=1.0)
     Point(token_index=14, time_index=65, score=1.0)
     Point(token_index=14, time_index=66, score=0.9999915361404419)
-    Point(token_index=15, time_index=67, score=0.997150719165802)
+    Point(token_index=15, time_index=67, score=0.9971501231193542)
     Point(token_index=15, time_index=68, score=0.9999990463256836)
     Point(token_index=15, time_index=69, score=0.9999992847442627)
     Point(token_index=15, time_index=70, score=0.9999997615814209)
     Point(token_index=15, time_index=71, score=0.9999998807907104)
-    Point(token_index=15, time_index=72, score=0.9999881982803345)
-    Point(token_index=15, time_index=73, score=0.011422759853303432)
+    Point(token_index=15, time_index=72, score=0.9999880790710449)
+    Point(token_index=15, time_index=73, score=0.011419214308261871)
     Point(token_index=15, time_index=74, score=0.9999977350234985)
-    Point(token_index=16, time_index=75, score=0.9996122717857361)
+    Point(token_index=16, time_index=75, score=0.9996128678321838)
     Point(token_index=16, time_index=76, score=0.999998927116394)
-    Point(token_index=16, time_index=77, score=0.9728758931159973)
+    Point(token_index=16, time_index=77, score=0.9729052782058716)
     Point(token_index=16, time_index=78, score=0.999998927116394)
-    Point(token_index=17, time_index=79, score=0.9949368238449097)
+    Point(token_index=17, time_index=79, score=0.9949370622634888)
     Point(token_index=17, time_index=80, score=0.999998927116394)
-    Point(token_index=17, time_index=81, score=0.9999123811721802)
+    Point(token_index=17, time_index=81, score=0.9999125003814697)
     Point(token_index=17, time_index=82, score=0.9999774694442749)
-    Point(token_index=18, time_index=83, score=0.6574353575706482)
-    Point(token_index=18, time_index=84, score=0.9984305500984192)
+    Point(token_index=18, time_index=83, score=0.6575068831443787)
+    Point(token_index=18, time_index=84, score=0.9984293580055237)
     Point(token_index=18, time_index=85, score=0.9999876022338867)
-    Point(token_index=19, time_index=86, score=0.9993749260902405)
+    Point(token_index=19, time_index=86, score=0.9993751645088196)
     Point(token_index=19, time_index=87, score=0.9999988079071045)
-    Point(token_index=19, time_index=88, score=0.10454574227333069)
+    Point(token_index=19, time_index=88, score=0.10444644093513489)
     Point(token_index=19, time_index=89, score=0.9999969005584717)
-    Point(token_index=20, time_index=90, score=0.3973246216773987)
+    Point(token_index=20, time_index=90, score=0.3971569836139679)
     Point(token_index=20, time_index=91, score=0.9999932050704956)
-    Point(token_index=21, time_index=92, score=1.6972246612567687e-06)
-    Point(token_index=21, time_index=93, score=0.9860996603965759)
+    Point(token_index=21, time_index=92, score=1.696418848950998e-06)
+    Point(token_index=21, time_index=93, score=0.9860828518867493)
     Point(token_index=21, time_index=94, score=0.9999960660934448)
-    Point(token_index=22, time_index=95, score=0.9992732405662537)
-    Point(token_index=22, time_index=96, score=0.9993422627449036)
+    Point(token_index=22, time_index=95, score=0.9992727637290955)
+    Point(token_index=22, time_index=96, score=0.9993411898612976)
     Point(token_index=22, time_index=97, score=0.9999983310699463)
     Point(token_index=23, time_index=98, score=0.9999971389770508)
     Point(token_index=23, time_index=99, score=0.9999998807907104)
     Point(token_index=23, time_index=100, score=0.9999995231628418)
     Point(token_index=23, time_index=101, score=0.9999732971191406)
-    Point(token_index=24, time_index=102, score=0.9983194470405579)
+    Point(token_index=24, time_index=102, score=0.9983185529708862)
     Point(token_index=24, time_index=103, score=0.9999991655349731)
     Point(token_index=24, time_index=104, score=0.9999996423721313)
     Point(token_index=24, time_index=105, score=0.9999998807907104)
     Point(token_index=24, time_index=106, score=1.0)
-    Point(token_index=24, time_index=107, score=0.999862790107727)
+    Point(token_index=24, time_index=107, score=0.999862551689148)
     Point(token_index=24, time_index=108, score=0.9999980926513672)
-    Point(token_index=25, time_index=109, score=0.9988560676574707)
+    Point(token_index=25, time_index=109, score=0.9988523721694946)
     Point(token_index=25, time_index=110, score=0.9999798536300659)
-    Point(token_index=26, time_index=111, score=0.8575499653816223)
+    Point(token_index=26, time_index=111, score=0.8575892448425293)
     Point(token_index=26, time_index=112, score=0.9999847412109375)
-    Point(token_index=27, time_index=113, score=0.987017810344696)
-    Point(token_index=27, time_index=114, score=1.898651862575207e-05)
+    Point(token_index=27, time_index=113, score=0.9870195388793945)
+    Point(token_index=27, time_index=114, score=1.9013934434042312e-05)
     Point(token_index=27, time_index=115, score=0.9999796152114868)
-    Point(token_index=28, time_index=116, score=0.9998251795768738)
+    Point(token_index=28, time_index=116, score=0.9998248219490051)
     Point(token_index=28, time_index=117, score=0.9999990463256836)
     Point(token_index=29, time_index=118, score=0.9999732971191406)
-    Point(token_index=29, time_index=119, score=0.0008991437498480082)
-    Point(token_index=29, time_index=120, score=0.9993476271629333)
-    Point(token_index=30, time_index=121, score=0.9975395202636719)
-    Point(token_index=30, time_index=122, score=0.0003041217278223485)
+    Point(token_index=29, time_index=119, score=0.0008990301284939051)
+    Point(token_index=29, time_index=120, score=0.9993460774421692)
+    Point(token_index=30, time_index=121, score=0.9975366592407227)
+    Point(token_index=30, time_index=122, score=0.000303806911688298)
     Point(token_index=30, time_index=123, score=0.9999344348907471)
-    Point(token_index=31, time_index=124, score=6.082251275074668e-06)
-    Point(token_index=31, time_index=125, score=0.9833292961120605)
-    Point(token_index=32, time_index=126, score=0.9974585175514221)
-    Point(token_index=33, time_index=127, score=0.0008251372491940856)
-    Point(token_index=33, time_index=128, score=0.9965135455131531)
-    Point(token_index=34, time_index=129, score=0.017435934394598007)
+    Point(token_index=31, time_index=124, score=6.088280770200072e-06)
+    Point(token_index=31, time_index=125, score=0.9833387136459351)
+    Point(token_index=32, time_index=126, score=0.9974588751792908)
+    Point(token_index=33, time_index=127, score=0.0008261289913207293)
+    Point(token_index=33, time_index=128, score=0.9965143799781799)
+    Point(token_index=34, time_index=129, score=0.017432427033782005)
     Point(token_index=34, time_index=130, score=0.9989168643951416)
     Point(token_index=35, time_index=131, score=0.9999697208404541)
     Point(token_index=36, time_index=132, score=0.9999842643737793)
     Point(token_index=36, time_index=133, score=0.9997639060020447)
-    Point(token_index=37, time_index=134, score=0.5117325186729431)
+    Point(token_index=37, time_index=134, score=0.5108126401901245)
     Point(token_index=37, time_index=135, score=0.9998301267623901)
-    Point(token_index=38, time_index=136, score=0.08520185202360153)
-    Point(token_index=38, time_index=137, score=0.004068952519446611)
+    Point(token_index=38, time_index=136, score=0.08521389961242676)
+    Point(token_index=38, time_index=137, score=0.004068504087626934)
     Point(token_index=38, time_index=138, score=0.9999815225601196)
-    Point(token_index=39, time_index=139, score=0.012018151581287384)
+    Point(token_index=39, time_index=139, score=0.011991607956588268)
     Point(token_index=39, time_index=140, score=0.9999980926513672)
-    Point(token_index=39, time_index=141, score=0.000581191445235163)
-    Point(token_index=39, time_index=142, score=0.9999070167541504)
+    Point(token_index=39, time_index=141, score=0.0005900734104216099)
+    Point(token_index=39, time_index=142, score=0.9999085664749146)
     Point(token_index=40, time_index=143, score=0.9999960660934448)
     Point(token_index=40, time_index=144, score=0.9999980926513672)
     Point(token_index=40, time_index=145, score=0.9999916553497314)
-    Point(token_index=41, time_index=146, score=0.9971164464950562)
-    Point(token_index=41, time_index=147, score=0.9981791973114014)
+    Point(token_index=41, time_index=146, score=0.9971139430999756)
+    Point(token_index=41, time_index=147, score=0.9981796741485596)
     Point(token_index=41, time_index=148, score=0.9999310970306396)
-    Point(token_index=42, time_index=149, score=0.9879276156425476)
-    Point(token_index=42, time_index=150, score=0.999763548374176)
+    Point(token_index=42, time_index=149, score=0.9879123568534851)
+    Point(token_index=42, time_index=150, score=0.9997639060020447)
     Point(token_index=42, time_index=151, score=0.9999536275863647)
     Point(token_index=43, time_index=152, score=0.9999715089797974)
-    Point(token_index=44, time_index=153, score=0.3192700445652008)
-    Point(token_index=44, time_index=154, score=0.9997826218605042)
-    Point(token_index=45, time_index=155, score=0.016051672399044037)
+    Point(token_index=44, time_index=153, score=0.32006949186325073)
+    Point(token_index=44, time_index=154, score=0.9997830986976624)
+    Point(token_index=45, time_index=155, score=0.01606338657438755)
     Point(token_index=45, time_index=156, score=0.999901294708252)
-    Point(token_index=46, time_index=157, score=0.46622487902641296)
+    Point(token_index=46, time_index=157, score=0.46633121371269226)
     Point(token_index=46, time_index=158, score=0.9999994039535522)
     Point(token_index=46, time_index=159, score=0.9999996423721313)
     Point(token_index=46, time_index=160, score=0.9999995231628418)
@@ -593,12 +614,12 @@ emission matrix.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 285-287
+.. GENERATED FROM PYTHON SOURCE LINES 295-297
 
 Visualization
 ~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 287-301
+.. GENERATED FROM PYTHON SOURCE LINES 297-311
 
 .. code-block:: default
 
@@ -628,11 +649,11 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 302-303
+.. GENERATED FROM PYTHON SOURCE LINES 312-313
 
 Looking good.
 
-.. GENERATED FROM PYTHON SOURCE LINES 305-313
+.. GENERATED FROM PYTHON SOURCE LINES 315-323
 
 Segment the path
 ----------------
@@ -643,7 +664,7 @@ When merging the multiple path points, we simply take the average
 probability for the merged segments.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 313-355
+.. GENERATED FROM PYTHON SOURCE LINES 323-365
 
 .. code-block:: default
 
@@ -748,12 +769,12 @@ probability for the merged segments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 356-358
+.. GENERATED FROM PYTHON SOURCE LINES 366-368
 
 Visualization
 ~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 358-403
+.. GENERATED FROM PYTHON SOURCE LINES 368-413
 
 .. code-block:: default
 
@@ -814,11 +835,11 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 404-405
+.. GENERATED FROM PYTHON SOURCE LINES 414-415
 
 Looks good.
 
-.. GENERATED FROM PYTHON SOURCE LINES 407-416
+.. GENERATED FROM PYTHON SOURCE LINES 417-426
 
 Merge the segments into words
 -----------------------------
@@ -830,7 +851,7 @@ Then, finally, we segment the original audio into segmented audio and
 listen to them to see if the segmentation is correct.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 416-440
+.. GENERATED FROM PYTHON SOURCE LINES 426-450
 
 .. code-block:: default
 
@@ -879,12 +900,12 @@ listen to them to see if the segmentation is correct.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 441-443
+.. GENERATED FROM PYTHON SOURCE LINES 451-453
 
 Visualization
 ~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 443-489
+.. GENERATED FROM PYTHON SOURCE LINES 453-499
 
 .. code-block:: default
 
@@ -946,13 +967,13 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 490-493
+.. GENERATED FROM PYTHON SOURCE LINES 500-503
 
 Audio Samples
 -------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 493-505
+.. GENERATED FROM PYTHON SOURCE LINES 503-515
 
 .. code-block:: default
 
@@ -975,7 +996,7 @@ Audio Samples
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 507-513
+.. GENERATED FROM PYTHON SOURCE LINES 517-523
 
 .. code-block:: default
 
@@ -1009,7 +1030,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 515-518
+.. GENERATED FROM PYTHON SOURCE LINES 525-528
 
 .. code-block:: default
 
@@ -1040,7 +1061,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 520-523
+.. GENERATED FROM PYTHON SOURCE LINES 530-533
 
 .. code-block:: default
 
@@ -1071,7 +1092,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 525-528
+.. GENERATED FROM PYTHON SOURCE LINES 535-538
 
 .. code-block:: default
 
@@ -1102,7 +1123,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 530-533
+.. GENERATED FROM PYTHON SOURCE LINES 540-543
 
 .. code-block:: default
 
@@ -1133,7 +1154,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 535-538
+.. GENERATED FROM PYTHON SOURCE LINES 545-548
 
 .. code-block:: default
 
@@ -1164,7 +1185,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 540-543
+.. GENERATED FROM PYTHON SOURCE LINES 550-553
 
 .. code-block:: default
 
@@ -1195,7 +1216,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 545-548
+.. GENERATED FROM PYTHON SOURCE LINES 555-558
 
 .. code-block:: default
 
@@ -1226,7 +1247,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 550-553
+.. GENERATED FROM PYTHON SOURCE LINES 560-563
 
 .. code-block:: default
 
@@ -1257,7 +1278,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 555-558
+.. GENERATED FROM PYTHON SOURCE LINES 565-568
 
 .. code-block:: default
 
@@ -1288,7 +1309,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 559-565
+.. GENERATED FROM PYTHON SOURCE LINES 569-575
 
 Conclusion
 ----------
@@ -1300,7 +1321,7 @@ perform CTC segmentation for forced alignment.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.731 seconds)
+   **Total running time of the script:** ( 0 minutes  1.665 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_tutorial.py:

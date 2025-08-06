@@ -26,13 +26,23 @@ StreamReader Advanced Usages
 This tutorial is the continuation of
 `StreamReader Basic Usages <./streamreader_basic_tutorial.html>`__.
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
 - Device inputs, such as microphone, webcam and screen recording
 - Generating synthetic audio / video
 - Applying preprocessing with custom filter expressions
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-32
+.. GENERATED FROM PYTHON SOURCE LINES 26-42
 
 .. code-block:: default
 
@@ -60,13 +70,13 @@ This shows how to use :py:class:`~torchaudio.io.StreamReader` for
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-103
+.. GENERATED FROM PYTHON SOURCE LINES 43-113
 
 Audio / Video device input
 --------------------------
@@ -139,7 +149,7 @@ streams to a format supported by decoder.
    SourceAudioStream(media_type='audio', codec='pcm_f32le', codec_long_name='PCM 32-bit floating point little-endian', format='flt', bit_rate=3072000, sample_rate=48000.0, num_channels=2)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-120
+.. GENERATED FROM PYTHON SOURCE LINES 115-130
 
 .. _lavfi:
 
@@ -157,13 +167,13 @@ The detail of filter description can be found at
 https://ffmpeg.org/ffmpeg-filters.html
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-126
+.. GENERATED FROM PYTHON SOURCE LINES 133-136
 
 Audio Examples
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-145
+.. GENERATED FROM PYTHON SOURCE LINES 138-155
 
 Sine wave
 ^^^^^^^^^
@@ -183,7 +193,7 @@ https://ffmpeg.org/ffmpeg-filters.html#sine
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-173
+.. GENERATED FROM PYTHON SOURCE LINES 157-183
 
 Signal with arbitral expression
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -212,7 +222,7 @@ https://ffmpeg.org/ffmpeg-filters.html#aevalsrc
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-192
+.. GENERATED FROM PYTHON SOURCE LINES 185-202
 
 Noise
 ^^^^^
@@ -232,13 +242,13 @@ https://ffmpeg.org/ffmpeg-filters.html#anoisesrc
     class="sphx-glr-single-img" style="width:80%">
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-197
+.. GENERATED FROM PYTHON SOURCE LINES 204-207
 
 Video Examples
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-213
+.. GENERATED FROM PYTHON SOURCE LINES 209-223
 
 Cellular automaton
 ^^^^^^^^^^^^^^^^^^
@@ -255,7 +265,7 @@ https://ffmpeg.org/ffmpeg-filters.html#cellauto
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-229
+.. GENERATED FROM PYTHON SOURCE LINES 225-239
 
 Mandelbrot
 ^^^^^^^^^^
@@ -272,7 +282,7 @@ https://ffmpeg.org/ffmpeg-filters.html#cellauto
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-245
+.. GENERATED FROM PYTHON SOURCE LINES 241-255
 
 MPlayer Test patterns
 ^^^^^^^^^^^^^^^^^^^^^
@@ -289,7 +299,7 @@ https://ffmpeg.org/ffmpeg-filters.html#mptestsrc
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-261
+.. GENERATED FROM PYTHON SOURCE LINES 257-271
 
 John Conway's life game
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -306,7 +316,7 @@ https://ffmpeg.org/ffmpeg-filters.html#life
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 263-277
+.. GENERATED FROM PYTHON SOURCE LINES 273-287
 
 Sierpinski carpet/triangle fractal
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -323,7 +333,7 @@ https://ffmpeg.org/ffmpeg-filters.html#sierpinski
    </video>
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-309
+.. GENERATED FROM PYTHON SOURCE LINES 289-319
 
 Custom filters
 --------------
@@ -356,14 +366,14 @@ achieved with ``add_(audio|video)_stream``.
      stream into multiple of them, and merge them later.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 311-315
+.. GENERATED FROM PYTHON SOURCE LINES 321-325
 
 Audio Examples
 ~~~~~~~~~~~~~~
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 315-341
+.. GENERATED FROM PYTHON SOURCE LINES 325-351
 
 .. code-block:: default
 
@@ -400,7 +410,7 @@ Audio Examples
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 343-369
+.. GENERATED FROM PYTHON SOURCE LINES 353-379
 
 .. code-block:: default
 
@@ -434,16 +444,23 @@ Audio Examples
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/streamreader_advanced_tutorial.py:356: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      streamer = StreamReader(AUDIO_URL)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 370-373
+
+.. GENERATED FROM PYTHON SOURCE LINES 380-383
 
 Original
 ^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 373-376
+.. GENERATED FROM PYTHON SOURCE LINES 383-386
 
 .. code-block:: default
 
@@ -479,13 +496,13 @@ Original
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 377-380
+.. GENERATED FROM PYTHON SOURCE LINES 387-390
 
 Highpass / lowpass filter
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 380-383
+.. GENERATED FROM PYTHON SOURCE LINES 390-393
 
 .. code-block:: default
 
@@ -521,13 +538,13 @@ Highpass / lowpass filter
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 384-387
+.. GENERATED FROM PYTHON SOURCE LINES 394-397
 
 FFT filter - Robot 🤖
 ^^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 387-390
+.. GENERATED FROM PYTHON SOURCE LINES 397-400
 
 .. code-block:: default
 
@@ -563,13 +580,13 @@ FFT filter - Robot 🤖
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 391-394
+.. GENERATED FROM PYTHON SOURCE LINES 401-404
 
 FFT filter - Whisper
 ^^^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 394-397
+.. GENERATED FROM PYTHON SOURCE LINES 404-407
 
 .. code-block:: default
 
@@ -605,13 +622,13 @@ FFT filter - Whisper
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 398-401
+.. GENERATED FROM PYTHON SOURCE LINES 408-411
 
 Video Examples
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 401-421
+.. GENERATED FROM PYTHON SOURCE LINES 411-431
 
 .. code-block:: default
 
@@ -642,7 +659,7 @@ Video Examples
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 423-446
+.. GENERATED FROM PYTHON SOURCE LINES 433-456
 
 .. code-block:: default
 
@@ -673,15 +690,22 @@ Video Examples
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/streamreader_advanced_tutorial.py:434: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      streamer = StreamReader(VIDEO_URL)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 447-449
+
+.. GENERATED FROM PYTHON SOURCE LINES 457-459
 
 Original
 ^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 449-452
+.. GENERATED FROM PYTHON SOURCE LINES 459-462
 
 .. code-block:: default
 
@@ -706,12 +730,12 @@ Original
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 453-455
+.. GENERATED FROM PYTHON SOURCE LINES 463-465
 
 Mirror
 ^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 455-458
+.. GENERATED FROM PYTHON SOURCE LINES 465-468
 
 .. code-block:: default
 
@@ -736,12 +760,12 @@ Mirror
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 459-461
+.. GENERATED FROM PYTHON SOURCE LINES 469-471
 
 Edge detection
 ^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 461-464
+.. GENERATED FROM PYTHON SOURCE LINES 471-474
 
 .. code-block:: default
 
@@ -766,12 +790,12 @@ Edge detection
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 465-467
+.. GENERATED FROM PYTHON SOURCE LINES 475-477
 
 Random rotation
 ^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 467-470
+.. GENERATED FROM PYTHON SOURCE LINES 477-480
 
 .. code-block:: default
 
@@ -796,12 +820,12 @@ Random rotation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 471-473
+.. GENERATED FROM PYTHON SOURCE LINES 481-483
 
 Pixel manipulation
 ^^^^^^^^^^^^^^^^^^
 
-.. GENERATED FROM PYTHON SOURCE LINES 473-476
+.. GENERATED FROM PYTHON SOURCE LINES 483-486
 
 .. code-block:: default
 
@@ -826,14 +850,14 @@ Pixel manipulation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 477-478
+.. GENERATED FROM PYTHON SOURCE LINES 487-488
 
 Tag: :obj:`torchaudio.io`
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  18.560 seconds)
+   **Total running time of the script:** ( 0 minutes  19.054 seconds)
 
 
 .. _sphx_glr_download_tutorials_streamreader_advanced_tutorial.py:

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.transforms._transforms &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.prototype.transforms._transforms &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.prototype.transforms._transforms &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,14 +428,15 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.prototype.transforms._transforms</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchaudio.prototype.functional</span> <span class="kn">import</span> <span class="n">barkscale_fbanks</span><span class="p">,</span> <span class="n">chroma_filterbank</span>
-<span class="kn">from</span> <span class="nn">torchaudio.transforms</span> <span class="kn">import</span> <span class="n">Spectrogram</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.prototype.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">barkscale_fbanks</span><span class="p">,</span> <span class="n">chroma_filterbank</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">Spectrogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._internal.module_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dropping_support</span><span class="p">,</span> <span class="n">dropping_class_support</span>
 
-
-<div class="viewcode-block" id="BarkScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale">[docs]</a><span class="k">class</span> <span class="nc">BarkScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="BarkScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale">[docs]</a><span class="nd">@dropping_class_support</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BarkScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn a normal STFT into a bark frequency STFT with triangular filter banks.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -467,7 +466,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;n_barks&quot;</span><span class="p">,</span> <span class="s2">&quot;sample_rate&quot;</span><span class="p">,</span> <span class="s2">&quot;f_min&quot;</span><span class="p">,</span> <span class="s2">&quot;f_max&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">n_barks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
@@ -489,7 +488,7 @@
         <span class="n">fb</span> <span class="o">=</span> <span class="n">barkscale_fbanks</span><span class="p">(</span><span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_barks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bark_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;fb&quot;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BarkScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="BarkScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkScale.html#torchaudio.prototype.transforms.BarkScale.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">specgram</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            specgram (torch.Tensor): A spectrogram STFT of dimension (..., freq, time).</span>
@@ -504,7 +503,8 @@
         <span class="k">return</span> <span class="n">bark_specgram</span></div></div>
 
 
-<div class="viewcode-block" id="InverseBarkScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale">[docs]</a><span class="k">class</span> <span class="nc">InverseBarkScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="InverseBarkScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale">[docs]</a><span class="nd">@dropping_class_support</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InverseBarkScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Estimate a STFT in normal frequency domain from bark frequency domain.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -543,7 +543,7 @@
         <span class="s2">&quot;sgdargs&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">n_stft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">n_barks</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
@@ -572,7 +572,7 @@
         <span class="n">fb</span> <span class="o">=</span> <span class="n">barkscale_fbanks</span><span class="p">(</span><span class="n">n_stft</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_barks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">bark_scale</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;fb&quot;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
 
-<div class="viewcode-block" id="InverseBarkScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barkspec</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="InverseBarkScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.InverseBarkScale.html#torchaudio.prototype.transforms.InverseBarkScale.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">barkspec</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            barkspec (torch.Tensor): A Bark frequency spectrogram of dimension (..., ``n_barks``, time)</span>
@@ -620,7 +620,8 @@
         <span class="k">return</span> <span class="n">specgram</span></div></div>
 
 
-<div class="viewcode-block" id="BarkSpectrogram"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">BarkSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="BarkSpectrogram"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram">[docs]</a><span class="nd">@dropping_class_support</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BarkSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create BarkSpectrogram for a raw audio signal.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -669,7 +670,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">__constants__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sample_rate&quot;</span><span class="p">,</span> <span class="s2">&quot;n_fft&quot;</span><span class="p">,</span> <span class="s2">&quot;win_length&quot;</span><span class="p">,</span> <span class="s2">&quot;hop_length&quot;</span><span class="p">,</span> <span class="s2">&quot;pad&quot;</span><span class="p">,</span> <span class="s2">&quot;n_barks&quot;</span><span class="p">,</span> <span class="s2">&quot;f_min&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16000</span><span class="p">,</span>
         <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
@@ -716,7 +717,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">n_barks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_rate</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_fft</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bark_scale</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="BarkSpectrogram.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="BarkSpectrogram.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.BarkSpectrogram.html#torchaudio.prototype.transforms.BarkSpectrogram.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (torch.Tensor): torch.Tensor of audio of dimension (..., time).</span>
@@ -729,7 +730,8 @@
         <span class="k">return</span> <span class="n">bark_specgram</span></div></div>
 
 
-<div class="viewcode-block" id="ChromaScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaScale.html#torchaudio.prototype.transforms.ChromaScale">[docs]</a><span class="k">class</span> <span class="nc">ChromaScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="ChromaScale"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaScale.html#torchaudio.prototype.transforms.ChromaScale">[docs]</a><span class="nd">@dropping_class_support</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChromaScale</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Converts spectrogram to chromagram.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -759,7 +761,7 @@
 <span class="sd">        generate the filter bank.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">n_freqs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -777,7 +779,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;fb&quot;</span><span class="p">,</span> <span class="n">fb</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ChromaScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaScale.html#torchaudio.prototype.transforms.ChromaScale.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="ChromaScale.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaScale.html#torchaudio.prototype.transforms.ChromaScale.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            specgram (torch.Tensor): Spectrogram of dimension (..., ``n_freqs``, time).</span>
@@ -788,7 +790,8 @@
         <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fb</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="ChromaSpectrogram"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaSpectrogram.html#torchaudio.prototype.transforms.ChromaSpectrogram">[docs]</a><span class="k">class</span> <span class="nc">ChromaSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="ChromaSpectrogram"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaSpectrogram.html#torchaudio.prototype.transforms.ChromaSpectrogram">[docs]</a><span class="nd">@dropping_class_support</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ChromaSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Generates chromagram for audio signal.</span>
 
 <span class="sd">    .. devices:: CPU CUDA</span>
@@ -829,7 +832,7 @@
 <span class="sd">        &gt;&gt;&gt; chromagram = transform(waveform)  # (channel, n_chroma, time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -875,7 +878,7 @@
             <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="ChromaSpectrogram.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaSpectrogram.html#torchaudio.prototype.transforms.ChromaSpectrogram.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<div class="viewcode-block" id="ChromaSpectrogram.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.transforms.ChromaSpectrogram.html#torchaudio.prototype.transforms.ChromaSpectrogram.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            waveform (Tensor): Tensor of audio of dimension (..., time).</span>
@@ -902,7 +905,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -941,9 +944,6 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
   

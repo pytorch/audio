@@ -23,6 +23,16 @@ CTC forced alignment API tutorial
 
 **Author**: `Xiaohui Zhang <xiaohuizhang@meta.com>`__, `Moto Hira <moto@meta.com>`__
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 The forced alignment is a process to align transcript with speech.
 This tutorial shows how to align transcripts to speech using
 :py:func:`torchaudio.functional.forced_align` which was developed along the work of
@@ -41,12 +51,12 @@ to run forced-alignments.
 <./forced_alignment_for_multilingual_data_tutorial.html>`__ uses this API to
 illustrate how to align non-English transcripts.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-29
+.. GENERATED FROM PYTHON SOURCE LINES 37-39
 
 Preparation
 -----------
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-36
+.. GENERATED FROM PYTHON SOURCE LINES 39-46
 
 .. code-block:: default
 
@@ -65,13 +75,13 @@ Preparation
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-42
+.. GENERATED FROM PYTHON SOURCE LINES 48-52
 
 .. code-block:: default
 
@@ -92,7 +102,7 @@ Preparation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-50
+.. GENERATED FROM PYTHON SOURCE LINES 54-60
 
 .. code-block:: default
 
@@ -109,13 +119,13 @@ Preparation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-54
+.. GENERATED FROM PYTHON SOURCE LINES 61-64
 
 First we prepare the speech data and the transcript we area going
 to use.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-60
+.. GENERATED FROM PYTHON SOURCE LINES 64-70
 
 .. code-block:: default
 
@@ -129,10 +139,21 @@ to use.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/ctc_forced_alignment_api_tutorial.py:65: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-80
+
+.. GENERATED FROM PYTHON SOURCE LINES 71-90
 
 Generating emissions
 ~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +175,7 @@ We will use a pre-trained Wav2Vec2 model,
 the transcript.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-88
+.. GENERATED FROM PYTHON SOURCE LINES 90-98
 
 .. code-block:: default
 
@@ -175,12 +196,12 @@ the transcript.
  .. code-block:: none
 
     Downloading: "https://dl.fbaipublicfiles.com/mms/torchaudio/ctc_alignment_mling_uroman/model.pt" to /root/.cache/torch/hub/checkpoints/model.pt
-      0%|          | 0.00/1.18G [00:00<?, ?B/s]      1%|          | 11.9M/1.18G [00:00<00:10, 115MB/s]      2%|1         | 22.9M/1.18G [00:00<00:14, 87.3MB/s]      3%|2         | 31.6M/1.18G [00:00<00:15, 77.8MB/s]      4%|4         | 50.0M/1.18G [00:00<00:10, 114MB/s]       6%|5         | 67.5M/1.18G [00:00<00:08, 136MB/s]      7%|6         | 83.1M/1.18G [00:00<00:08, 145MB/s]      8%|8         | 101M/1.18G [00:00<00:07, 159MB/s]      10%|9         | 117M/1.18G [00:00<00:08, 130MB/s]     11%|#         | 131M/1.18G [00:01<00:09, 122MB/s]     12%|#2        | 145M/1.18G [00:01<00:08, 128MB/s]     14%|#3        | 162M/1.18G [00:01<00:07, 143MB/s]     15%|#5        | 182M/1.18G [00:01<00:06, 159MB/s]     16%|#6        | 198M/1.18G [00:01<00:07, 150MB/s]     18%|#7        | 214M/1.18G [00:01<00:06, 157MB/s]     19%|#9        | 230M/1.18G [00:01<00:06, 160MB/s]     20%|##        | 246M/1.18G [00:01<00:06, 158MB/s]     22%|##1       | 261M/1.18G [00:01<00:06, 157MB/s]     23%|##3       | 277M/1.18G [00:02<00:06, 159MB/s]     24%|##4       | 292M/1.18G [00:02<00:06, 147MB/s]     25%|##5       | 307M/1.18G [00:02<00:06, 149MB/s]     27%|##6       | 324M/1.18G [00:02<00:05, 157MB/s]     28%|##8       | 340M/1.18G [00:02<00:05, 160MB/s]     30%|##9       | 356M/1.18G [00:02<00:06, 145MB/s]     31%|###       | 372M/1.18G [00:02<00:05, 150MB/s]     32%|###2      | 388M/1.18G [00:02<00:05, 147MB/s]     34%|###3      | 407M/1.18G [00:02<00:05, 160MB/s]     36%|###5      | 429M/1.18G [00:03<00:04, 180MB/s]     37%|###7      | 449M/1.18G [00:03<00:04, 187MB/s]     39%|###8      | 468M/1.18G [00:03<00:04, 190MB/s]     40%|####      | 486M/1.18G [00:03<00:03, 189MB/s]     42%|####1     | 505M/1.18G [00:03<00:03, 191MB/s]     43%|####3     | 523M/1.18G [00:03<00:03, 182MB/s]     45%|####4     | 541M/1.18G [00:03<00:04, 158MB/s]     47%|####6     | 562M/1.18G [00:03<00:03, 175MB/s]     48%|####8     | 580M/1.18G [00:04<00:04, 147MB/s]     50%|####9     | 601M/1.18G [00:04<00:03, 165MB/s]     51%|#####1    | 618M/1.18G [00:04<00:03, 166MB/s]     53%|#####2    | 636M/1.18G [00:04<00:03, 172MB/s]     55%|#####4    | 657M/1.18G [00:04<00:03, 185MB/s]     56%|#####6    | 677M/1.18G [00:04<00:02, 191MB/s]     58%|#####7    | 697M/1.18G [00:04<00:02, 196MB/s]     60%|#####9    | 718M/1.18G [00:04<00:02, 201MB/s]     61%|######1   | 738M/1.18G [00:04<00:02, 200MB/s]     63%|######2   | 758M/1.18G [00:04<00:02, 203MB/s]     65%|######4   | 778M/1.18G [00:05<00:02, 195MB/s]     66%|######6   | 796M/1.18G [00:05<00:02, 157MB/s]     68%|######7   | 813M/1.18G [00:05<00:02, 154MB/s]     69%|######9   | 834M/1.18G [00:05<00:02, 172MB/s]     71%|#######1  | 859M/1.18G [00:05<00:01, 193MB/s]     73%|#######2  | 878M/1.18G [00:05<00:01, 182MB/s]     74%|#######4  | 896M/1.18G [00:05<00:01, 173MB/s]     76%|#######5  | 914M/1.18G [00:05<00:01, 177MB/s]     77%|#######7  | 931M/1.18G [00:06<00:01, 173MB/s]     79%|#######8  | 948M/1.18G [00:06<00:01, 162MB/s]     80%|########  | 967M/1.18G [00:06<00:01, 170MB/s]     82%|########1 | 984M/1.18G [00:06<00:01, 173MB/s]     83%|########3 | 0.98G/1.18G [00:06<00:01, 176MB/s]     85%|########4 | 1.00G/1.18G [00:06<00:01, 162MB/s]     87%|########6 | 1.02G/1.18G [00:06<00:00, 186MB/s]     89%|########8 | 1.04G/1.18G [00:06<00:00, 197MB/s]     90%|######### | 1.06G/1.18G [00:06<00:00, 193MB/s]     92%|#########1| 1.08G/1.18G [00:06<00:00, 191MB/s]     93%|#########3| 1.10G/1.18G [00:07<00:00, 194MB/s]     95%|#########4| 1.11G/1.18G [00:07<00:00, 193MB/s]     96%|#########6| 1.13G/1.18G [00:07<00:00, 183MB/s]     98%|#########7| 1.15G/1.18G [00:07<00:00, 176MB/s]     99%|#########9| 1.17G/1.18G [00:07<00:00, 151MB/s]    100%|##########| 1.18G/1.18G [00:07<00:00, 165MB/s]
+      0%|          | 0.00/1.18G [00:00<?, ?B/s]      2%|2         | 26.5M/1.18G [00:00<00:04, 277MB/s]      4%|4         | 53.0M/1.18G [00:00<00:04, 251MB/s]      7%|6         | 78.6M/1.18G [00:00<00:04, 259MB/s]      9%|8         | 104M/1.18G [00:00<00:04, 248MB/s]      11%|#         | 130M/1.18G [00:00<00:04, 257MB/s]     13%|#3        | 159M/1.18G [00:00<00:04, 271MB/s]     15%|#5        | 185M/1.18G [00:00<00:04, 245MB/s]     17%|#7        | 208M/1.18G [00:00<00:04, 232MB/s]     19%|#9        | 231M/1.18G [00:01<00:04, 212MB/s]     21%|##        | 252M/1.18G [00:01<00:04, 205MB/s]     23%|##2       | 272M/1.18G [00:01<00:04, 200MB/s]     25%|##4       | 298M/1.18G [00:01<00:04, 221MB/s]     27%|##7       | 326M/1.18G [00:01<00:03, 240MB/s]     29%|##9       | 353M/1.18G [00:01<00:03, 254MB/s]     32%|###1      | 384M/1.18G [00:01<00:03, 272MB/s]     34%|###4      | 411M/1.18G [00:01<00:02, 277MB/s]     36%|###6      | 439M/1.18G [00:01<00:02, 280MB/s]     39%|###8      | 467M/1.18G [00:01<00:02, 284MB/s]     41%|####1     | 496M/1.18G [00:02<00:02, 289MB/s]     43%|####3     | 524M/1.18G [00:02<00:02, 290MB/s]     46%|####5     | 552M/1.18G [00:02<00:02, 294MB/s]     48%|####8     | 580M/1.18G [00:02<00:02, 292MB/s]     51%|#####     | 612M/1.18G [00:02<00:02, 304MB/s]     54%|#####3    | 645M/1.18G [00:02<00:01, 315MB/s]     56%|#####6    | 675M/1.18G [00:02<00:01, 315MB/s]     59%|#####8    | 708M/1.18G [00:02<00:01, 325MB/s]     61%|######1   | 739M/1.18G [00:02<00:01, 323MB/s]     64%|######3   | 770M/1.18G [00:02<00:01, 293MB/s]     66%|######6   | 799M/1.18G [00:03<00:01, 275MB/s]     69%|######8   | 828M/1.18G [00:03<00:01, 282MB/s]     71%|#######1  | 855M/1.18G [00:03<00:01, 275MB/s]     73%|#######3  | 882M/1.18G [00:03<00:01, 279MB/s]     76%|#######5  | 909M/1.18G [00:03<00:01, 271MB/s]     78%|#######7  | 938M/1.18G [00:03<00:01, 278MB/s]     80%|########  | 968M/1.18G [00:03<00:00, 290MB/s]     83%|########3 | 999M/1.18G [00:03<00:00, 300MB/s]     85%|########5 | 1.00G/1.18G [00:03<00:00, 292MB/s]     88%|########8 | 1.03G/1.18G [00:04<00:00, 302MB/s]     91%|######### | 1.07G/1.18G [00:04<00:00, 309MB/s]     93%|#########3| 1.10G/1.18G [00:04<00:00, 315MB/s]     96%|#########5| 1.13G/1.18G [00:04<00:00, 286MB/s]     98%|#########8| 1.15G/1.18G [00:04<00:00, 271MB/s]    100%|##########| 1.18G/1.18G [00:04<00:00, 274MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-101
+.. GENERATED FROM PYTHON SOURCE LINES 100-111
 
 .. code-block:: default
 
@@ -207,14 +228,14 @@ the transcript.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-106
+.. GENERATED FROM PYTHON SOURCE LINES 112-116
 
 Tokenize the transcript
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 We create a dictionary, which maps each label into token.
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-112
+.. GENERATED FROM PYTHON SOURCE LINES 116-122
 
 .. code-block:: default
 
@@ -264,11 +285,11 @@ We create a dictionary, which maps each label into token.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-114
+.. GENERATED FROM PYTHON SOURCE LINES 123-124
 
 converting transcript to tokens is as simple as
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-121
+.. GENERATED FROM PYTHON SOURCE LINES 124-131
 
 .. code-block:: default
 
@@ -292,7 +313,7 @@ converting transcript to tokens is as simple as
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-132
+.. GENERATED FROM PYTHON SOURCE LINES 132-142
 
 Computing alignments
 --------------------
@@ -305,7 +326,7 @@ frame-level alignment. For the detail of function signature, please
 refer to :py:func:`~torchaudio.functional.forced_align`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-145
+.. GENERATED FROM PYTHON SOURCE LINES 142-155
 
 .. code-block:: default
 
@@ -326,14 +347,21 @@ refer to :py:func:`~torchaudio.functional.forced_align`.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/ctc_forced_alignment_api_tutorial.py:146: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      alignments, scores = F.forced_align(emission, targets, blank=0)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-147
+
+.. GENERATED FROM PYTHON SOURCE LINES 156-157
 
 Now let's look at the output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-151
+.. GENERATED FROM PYTHON SOURCE LINES 157-161
 
 .. code-block:: default
 
@@ -522,7 +550,7 @@ Now let's look at the output.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-188
+.. GENERATED FROM PYTHON SOURCE LINES 162-198
 
 .. note::
 
@@ -561,7 +589,7 @@ interpretation of the non-blank tokens.
         ^^^       ^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-199
+.. GENERATED FROM PYTHON SOURCE LINES 201-209
 
 Token-level alignments
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -572,7 +600,7 @@ not depend on previous alignments.
 :py:class:`~torchaudio.functional.TokenSpan` object, which represents
 which token from the transcript is present at what time span.
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-210
+.. GENERATED FROM PYTHON SOURCE LINES 212-220
 
 .. code-block:: default
 
@@ -634,14 +662,14 @@ which token from the transcript is present at what time span.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-215
+.. GENERATED FROM PYTHON SOURCE LINES 221-225
 
 Word-level alignments
 ~~~~~~~~~~~~~~~~~~~~~
 
 Now let’s group the token-level alignments into word-level alignments.
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-230
+.. GENERATED FROM PYTHON SOURCE LINES 225-240
 
 .. code-block:: default
 
@@ -667,13 +695,13 @@ Now let’s group the token-level alignments into word-level alignments.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-234
+.. GENERATED FROM PYTHON SOURCE LINES 241-244
 
 Audio previews
 ~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-251
+.. GENERATED FROM PYTHON SOURCE LINES 244-261
 
 .. code-block:: default
 
@@ -701,7 +729,7 @@ Audio previews
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 252-257
+.. GENERATED FROM PYTHON SOURCE LINES 262-267
 
 .. code-block:: default
 
@@ -734,7 +762,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 259-262
+.. GENERATED FROM PYTHON SOURCE LINES 269-272
 
 .. code-block:: default
 
@@ -765,7 +793,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 264-267
+.. GENERATED FROM PYTHON SOURCE LINES 274-277
 
 .. code-block:: default
 
@@ -796,7 +824,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-272
+.. GENERATED FROM PYTHON SOURCE LINES 279-282
 
 .. code-block:: default
 
@@ -827,7 +855,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 274-277
+.. GENERATED FROM PYTHON SOURCE LINES 284-287
 
 .. code-block:: default
 
@@ -858,7 +886,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-282
+.. GENERATED FROM PYTHON SOURCE LINES 289-292
 
 .. code-block:: default
 
@@ -889,7 +917,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-287
+.. GENERATED FROM PYTHON SOURCE LINES 294-297
 
 .. code-block:: default
 
@@ -920,7 +948,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 289-292
+.. GENERATED FROM PYTHON SOURCE LINES 299-302
 
 .. code-block:: default
 
@@ -951,7 +979,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-297
+.. GENERATED FROM PYTHON SOURCE LINES 304-307
 
 .. code-block:: default
 
@@ -982,7 +1010,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 299-302
+.. GENERATED FROM PYTHON SOURCE LINES 309-312
 
 .. code-block:: default
 
@@ -1013,7 +1041,7 @@ Audio previews
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-308
+.. GENERATED FROM PYTHON SOURCE LINES 313-318
 
 Visualization
 ~~~~~~~~~~~~~
@@ -1021,7 +1049,7 @@ Visualization
 Now let's look at the alignment result and segment the original
 speech into words.
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-334
+.. GENERATED FROM PYTHON SOURCE LINES 318-344
 
 .. code-block:: default
 
@@ -1058,7 +1086,7 @@ speech into words.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 336-339
+.. GENERATED FROM PYTHON SOURCE LINES 346-349
 
 .. code-block:: default
 
@@ -1077,7 +1105,7 @@ speech into words.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 340-350
+.. GENERATED FROM PYTHON SOURCE LINES 350-360
 
 Inconsistent treatment of ``blank`` token
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1090,7 +1118,7 @@ This is easy to see when we plot the scores. The following figure
 shows word regions and non-word regions, with the frame-level scores
 of non-blank tokens.
 
-.. GENERATED FROM PYTHON SOURCE LINES 351-372
+.. GENERATED FROM PYTHON SOURCE LINES 361-382
 
 .. code-block:: default
 
@@ -1127,7 +1155,7 @@ of non-blank tokens.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 373-410
+.. GENERATED FROM PYTHON SOURCE LINES 383-420
 
 In this plot, the blank tokens are those highlighted area without
 vertical bar.
@@ -1167,7 +1195,7 @@ are facing here.
    *e.g. to get meaningful time accurate alignments of phonemes*
    *to a transcription.*
 
-.. GENERATED FROM PYTHON SOURCE LINES 412-425
+.. GENERATED FROM PYTHON SOURCE LINES 422-435
 
 Advanced: Handling transcripts with ``<star>`` token
 ----------------------------------------------------
@@ -1183,11 +1211,11 @@ existing word “this”. However, this issue can be mitigated by using the
 ``<star>`` token to model the missing text.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 427-428
+.. GENERATED FROM PYTHON SOURCE LINES 437-438
 
 First, we extend the dictionary to include the ``<star>`` token.
 
-.. GENERATED FROM PYTHON SOURCE LINES 428-431
+.. GENERATED FROM PYTHON SOURCE LINES 438-441
 
 .. code-block:: default
 
@@ -1201,13 +1229,13 @@ First, we extend the dictionary to include the ``<star>`` token.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 432-435
+.. GENERATED FROM PYTHON SOURCE LINES 442-445
 
 Next, we extend the emission tensor with the extra dimension
 corresponding to the ``<star>`` token.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 435-443
+.. GENERATED FROM PYTHON SOURCE LINES 445-453
 
 .. code-block:: default
 
@@ -1231,12 +1259,12 @@ corresponding to the ``<star>`` token.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 444-446
+.. GENERATED FROM PYTHON SOURCE LINES 454-456
 
 The following function combines all the processes, and compute
 word segments from emission in one-go.
 
-.. GENERATED FROM PYTHON SOURCE LINES 446-456
+.. GENERATED FROM PYTHON SOURCE LINES 456-466
 
 .. code-block:: default
 
@@ -1257,12 +1285,12 @@ word segments from emission in one-go.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 457-459
+.. GENERATED FROM PYTHON SOURCE LINES 467-469
 
 Full Transcript
 ~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 459-463
+.. GENERATED FROM PYTHON SOURCE LINES 469-473
 
 .. code-block:: default
 
@@ -1279,17 +1307,24 @@ Full Transcript
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/ctc_forced_alignment_api_tutorial.py:146: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      alignments, scores = F.forced_align(emission, targets, blank=0)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 464-468
+
+.. GENERATED FROM PYTHON SOURCE LINES 474-478
 
 Partial Transcript with ``<star>`` token
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now we replace the first part of the transcript with the ``<star>`` token.
 
-.. GENERATED FROM PYTHON SOURCE LINES 468-473
+.. GENERATED FROM PYTHON SOURCE LINES 478-483
 
 .. code-block:: default
 
@@ -1307,10 +1342,17 @@ Now we replace the first part of the transcript with the ``<star>`` token.
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/ctc_forced_alignment_api_tutorial.py:146: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      alignments, scores = F.forced_align(emission, targets, blank=0)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 475-478
+
+.. GENERATED FROM PYTHON SOURCE LINES 485-488
 
 .. code-block:: default
 
@@ -1341,7 +1383,7 @@ Now we replace the first part of the transcript with the ``<star>`` token.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 480-483
+.. GENERATED FROM PYTHON SOURCE LINES 490-493
 
 .. code-block:: default
 
@@ -1372,7 +1414,7 @@ Now we replace the first part of the transcript with the ``<star>`` token.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 485-488
+.. GENERATED FROM PYTHON SOURCE LINES 495-498
 
 .. code-block:: default
 
@@ -1403,7 +1445,7 @@ Now we replace the first part of the transcript with the ``<star>`` token.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 489-495
+.. GENERATED FROM PYTHON SOURCE LINES 499-505
 
 Partial Transcript without ``<star>`` token
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1412,7 +1454,7 @@ As a comparison, the following aligns the partial transcript
 without using ``<star>`` token.
 It demonstrates the effect of ``<star>`` token for dealing with deletion errors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 495-500
+.. GENERATED FROM PYTHON SOURCE LINES 505-510
 
 .. code-block:: default
 
@@ -1430,10 +1472,17 @@ It demonstrates the effect of ``<star>`` token for dealing with deletion errors.
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/ctc_forced_alignment_api_tutorial.py:146: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      alignments, scores = F.forced_align(emission, targets, blank=0)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 501-509
+
+.. GENERATED FROM PYTHON SOURCE LINES 511-519
 
 Conclusion
 ----------
@@ -1444,7 +1493,7 @@ How introducing a ``<star>`` token could improve alignment accuracy when
 transcription errors exist.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 512-518
+.. GENERATED FROM PYTHON SOURCE LINES 522-528
 
 Acknowledgement
 ---------------
@@ -1456,7 +1505,7 @@ forced aligner API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  11.126 seconds)
+   **Total running time of the script:** ( 0 minutes  7.698 seconds)
 
 
 .. _sphx_glr_download_tutorials_ctc_forced_alignment_api_tutorial.py:

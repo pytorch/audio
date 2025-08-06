@@ -12,8 +12,6 @@ TorchAudio integrates PyTorch for numerical computation and third party librarie
    - `MSVC <https://visualstudio.microsoft.com>`_  2019 or newer (Windows)
 - `CUDA toolkit <https://developer.nvidia.com/cudnn>`_ and `cuDNN <https://developer.nvidia.com/cudnn>`_ (if building CUDA extension)
 
-Most of the tools are available in `Conda <https://conda.io/>`_, so we recommend using conda.
-
 .. toctree::
    :maxdepth: 1
 

@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.utils &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.utils &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>torchaudio.utils &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -437,7 +435,22 @@
   <span class="target" id="module-torchaudio.utils"></span><section id="torchaudio-utils">
 <h1>torchaudio.utils<a class="headerlink" href="#torchaudio-utils" title="Permalink to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio.utils</span></code> module contains utility functions to configure the global state of third party libraries.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Starting with version 2.8, we are refactoring TorchAudio to transition it
+into a maintenance phase. As a result:
+- <code class="docutils literal notranslate"><span class="pre">sox_utils</span></code> and <cite>ffmpeg_utils`</cite> are deprecated in 2.8 and will be removed in 2.9.
+- The decoding and encoding capabilities of PyTorch for both audio and video</p>
+<blockquote>
+<div><p>are being consolidated into TorchCodec.</p>
+</div></blockquote>
+<p>Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.utils.sox_utils.html#module-torchaudio.utils.sox_utils" title="torchaudio.utils.sox_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sox_utils</span></code></a></p></td>
 <td><p>Module to change the configuration of libsox, which is used by I/O functions like <code class="xref py py-mod docutils literal notranslate"><span class="pre">sox_io_backend</span></code> and <a class="reference internal" href="sox_effects.html#module-torchaudio.sox_effects" title="torchaudio.sox_effects"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sox_effects</span></code></a>.</p></td>
@@ -473,7 +486,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -515,9 +528,6 @@
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

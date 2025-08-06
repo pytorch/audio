@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ChromaSpectrogram &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>ChromaSpectrogram &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -399,7 +397,7 @@
         
       <li>ChromaSpectrogram &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -443,41 +441,53 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="torchaudio.prototype.transforms.ChromaSpectrogram">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.transforms.</span></span><span class="sig-name descname"><span class="pre">ChromaSpectrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">sample_rate:</span> <span class="pre">int,</span> <span class="pre">n_fft:</span> <span class="pre">int,</span> <span class="pre">*,</span> <span class="pre">win_length:</span> <span class="pre">~typing.Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">hop_length:</span> <span class="pre">~typing.Optional[int]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">pad:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">window_fn:</span> <span class="pre">~typing.Callable[[...],</span> <span class="pre">~torch.Tensor]</span> <span class="pre">=</span> <span class="pre">&lt;built-in</span> <span class="pre">method</span> <span class="pre">hann_window</span> <span class="pre">of</span> <span class="pre">type</span> <span class="pre">object&gt;,</span> <span class="pre">power:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">2.0,</span> <span class="pre">normalized:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">wkwargs:</span> <span class="pre">~typing.Optional[dict]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">center:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">pad_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'reflect',</span> <span class="pre">n_chroma:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">12,</span> <span class="pre">tuning:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0,</span> <span class="pre">ctroct:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">5.0,</span> <span class="pre">octwidth:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">2.0,</span> <span class="pre">norm:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">2,</span> <span class="pre">base_c:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/prototype/transforms/_transforms.html#ChromaSpectrogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.transforms.ChromaSpectrogram" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates chromagram for audio signal.</p>
-<a class="reference external image-reference" href="../supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="../_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
+<dd><p>DEPRECATED</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This class is deprecated from version 2.8. It will be removed in the 2.9 release.
+This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
+<p>Generates chromagram for audio signal.</p>
+<blockquote>
+<div><a class="reference external image-reference" href="../supported_features.html#devices"><img alt="This feature supports the following devices: CPU, CUDA" class="shield-badge" src="../_images/f04dfdd7619480b49d72cc9f0fb641c626bd3593f7715ed8c58c6f4eb493910b.svg" /></a>
 <a class="reference external image-reference" href="../supported_features.html#properties"><img alt="This API supports the following properties: Autograd" class="shield-badge" src="../_images/304d5440efdca77d8969ce1760648aa666bc677fbe8bdce0aa756cb6a99fcad5.svg" /></a>
 <p>Composes <a class="reference internal" href="torchaudio.transforms.Spectrogram.html#torchaudio.transforms.Spectrogram" title="torchaudio.transforms.Spectrogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.transforms.Spectrogram()</span></code></a> and
 and <a class="reference internal" href="torchaudio.prototype.transforms.ChromaScale.html#torchaudio.prototype.transforms.ChromaScale" title="torchaudio.prototype.transforms.ChromaScale"><code class="xref py py-func docutils literal notranslate"><span class="pre">torchaudio.prototype.transforms.ChromaScale()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sample_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Sample rate of audio signal.</p></li>
-<li><p><strong>n_fft</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins.</p></li>
-<li><p><strong>win_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Window size. (Default: <code class="docutils literal notranslate"><span class="pre">n_fft</span></code>)</p></li>
-<li><p><strong>hop_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Length of hop between STFT windows. (Default: <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">2</span></code>)</p></li>
-<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)</p></li>
-<li><p><strong>window_fn</strong> (<em>Callable</em><em>[</em><em>...</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><em>torch.Tensor</em></a><em>]</em><em>, </em><em>optional</em>) – A function to create a window tensor
-that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p></li>
-<li><p><strong>power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – Exponent for the magnitude spectrogram,
-(must be &gt; 0) e.g., 1 for energy, 2 for power, etc. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p></li>
-<li><p><strong>normalized</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to normalize by magnitude after stft. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</p></li>
-<li><p><strong>wkwargs</strong> (<em>Dict</em><em>[</em><em>...</em><em>, </em><em>...</em><em>] or </em><em>None</em><em>, </em><em>optional</em>) – Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p><strong>center</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – whether to pad <code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform</span></code> on both sides so
-that the <span class="math">\(t\)</span>-th frame is centered at time <span class="math">\(t \times \text{hop\_length}\)</span>.
-(Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p></li>
-<li><p><strong>pad_mode</strong> (<em>string</em><em>, </em><em>optional</em>) – controls the padding method used when
-<code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code>)</p></li>
-<li><p><strong>n_chroma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Number of chroma. (Default: <code class="docutils literal notranslate"><span class="pre">12</span></code>)</p></li>
-<li><p><strong>tuning</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – Tuning deviation from A440 in fractions of a chroma bin. (Default: 0.0)</p></li>
-<li><p><strong>ctroct</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>optional</em>) – Center of Gaussian dominance window to weight filters by, in octaves. (Default: 5.0)</p></li>
-<li><p><strong>octwidth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Width of Gaussian dominance window to weight filters by, in octaves.
-If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then disable weighting altogether. (Default: 2.0)</p></li>
-<li><p><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – order of norm to normalize filter bank by. (Default: 2)</p></li>
-<li><p><strong>base_c</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, then start filter bank at C. Otherwise, start at A. (Default: True)</p></li>
-</ul>
+<dl>
+<dt>Args:</dt><dd><p>sample_rate (int): Sample rate of audio signal.
+n_fft (int, optional): Size of FFT, creates <code class="docutils literal notranslate"><span class="pre">n_fft</span> <span class="pre">//</span> <span class="pre">2</span> <span class="pre">+</span> <span class="pre">1</span></code> bins.
+win_length (int or None, optional): Window size. (Default: <code class="docutils literal notranslate"><span class="pre">n_fft</span></code>)
+hop_length (int or None, optional): Length of hop between STFT windows. (Default: <code class="docutils literal notranslate"><span class="pre">win_length</span> <span class="pre">//</span> <span class="pre">2</span></code>)
+pad (int, optional): Two sided padding of signal. (Default: <code class="docutils literal notranslate"><span class="pre">0</span></code>)
+window_fn (Callable[…, torch.Tensor], optional): A function to create a window tensor</p>
+<blockquote>
+<div><p>that is applied/multiplied to each frame/window. (Default: <code class="docutils literal notranslate"><span class="pre">torch.hann_window</span></code>)</p>
+</div></blockquote>
+<dl class="simple">
+<dt>power (float, optional): Exponent for the magnitude spectrogram,</dt><dd><p>(must be &gt; 0) e.g., 1 for energy, 2 for power, etc. (Default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</p>
 </dd>
 </dl>
-<dl>
+<p>normalized (bool, optional): Whether to normalize by magnitude after stft. (Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)
+wkwargs (Dict[…, …] or None, optional): Arguments for window function. (Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)
+center (bool, optional): whether to pad <code class="xref py py-attr docutils literal notranslate"><span class="pre">waveform</span></code> on both sides so</p>
+<blockquote>
+<div><p>that the <span class="math notranslate nohighlight">\(t\)</span>-th frame is centered at time <span class="math notranslate nohighlight">\(t \times \text{hop\_length}\)</span>.
+(Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>)</p>
+</div></blockquote>
+<dl class="simple">
+<dt>pad_mode (string, optional): controls the padding method used when</dt><dd><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>. (Default: <code class="docutils literal notranslate"><span class="pre">&quot;reflect&quot;</span></code>)</p>
+</dd>
+</dl>
+<p>n_chroma (int, optional): Number of chroma. (Default: <code class="docutils literal notranslate"><span class="pre">12</span></code>)
+tuning (float, optional): Tuning deviation from A440 in fractions of a chroma bin. (Default: 0.0)
+ctroct (float, optional): Center of Gaussian dominance window to weight filters by, in octaves. (Default: 5.0)
+octwidth (float or None, optional): Width of Gaussian dominance window to weight filters by, in octaves.</p>
+<blockquote>
+<div><p>If <code class="docutils literal notranslate"><span class="pre">None</span></code>, then disable weighting altogether. (Default: 2.0)</p>
+</div></blockquote>
+<p>norm (int, optional): order of norm to normalize filter bank by. (Default: 2)
+base_c (bool, optional): If True, then start filter bank at C. Otherwise, start at A. (Default: True)</p>
+</dd>
 <dt>Example</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">waveform</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;test.wav&quot;</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">ChromaSpectrogram</span><span class="p">(</span><span class="n">sample_rate</span><span class="o">=</span><span class="n">sample_rate</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">chromagram</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">waveform</span><span class="p">)</span>  <span class="c1"># (channel, n_chroma, time)</span>
@@ -485,17 +495,18 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 </div>
 </dd>
 </dl>
+</div></blockquote>
 <dl class="py method">
 <dt class="sig sig-object py" id="torchaudio.prototype.transforms.ChromaSpectrogram.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.5)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/transforms/_transforms.html#ChromaSpectrogram.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.transforms.ChromaSpectrogram.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waveform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/transforms/_transforms.html#ChromaSpectrogram.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.transforms.ChromaSpectrogram.forward" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>waveform</strong> (<em>Tensor</em>) – Tensor of audio of dimension (…, time).</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dt class="field-even">Returns</dt>
 <dd class="field-even"><p>Chromagram of size (…, <code class="docutils literal notranslate"><span class="pre">n_chroma</span></code>, time).</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
@@ -529,7 +540,7 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -571,9 +582,8 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
+         <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
      
 
   

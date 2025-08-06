@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype.pipelines.hifigan_pipeline &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.prototype.pipelines.hifigan_pipeline &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.prototype.pipelines.hifigan_pipeline &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,20 +428,23 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.prototype.pipelines.hifigan_pipeline</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
-<span class="kn">from</span> <span class="nn">torchaudio._internal</span> <span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._internal</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_state_dict_from_url</span>
 
-<span class="kn">from</span> <span class="nn">torchaudio.prototype.models.hifi_gan</span> <span class="kn">import</span> <span class="n">hifigan_vocoder</span><span class="p">,</span> <span class="n">HiFiGANVocoder</span>
-<span class="kn">from</span> <span class="nn">torchaudio.transforms</span> <span class="kn">import</span> <span class="n">MelSpectrogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.prototype.models.hifi_gan</span><span class="w"> </span><span class="kn">import</span> <span class="n">hifigan_vocoder</span><span class="p">,</span> <span class="n">HiFiGANVocoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">MelSpectrogram</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio._internal.module_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">dropping_support</span><span class="p">,</span> <span class="n">dropping_class_support</span>
 
 
-<div class="viewcode-block" id="HiFiGANVocoderBundle"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">HiFiGANVocoderBundle</span><span class="p">:</span>
+<div class="viewcode-block" id="HiFiGANVocoderBundle"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle">[docs]</a><span class="nd">@dropping_class_support</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HiFiGANVocoderBundle</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Data class that bundles associated information to use pretrained</span>
 <span class="sd">    :py:class:`~torchaudio.prototype.models.HiFiGANVocoder`.</span>
 
@@ -508,13 +509,14 @@
     <span class="n">_mel_params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>  <span class="c1"># Mel transformation parameters</span>
     <span class="n">_sample_rate</span><span class="p">:</span> <span class="nb">float</span>
 
-    <span class="k">def</span> <span class="nf">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="p">):</span>
         <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://download.pytorch.org/torchaudio/models/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_path</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">dl_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">dl_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dl_kwargs</span>
         <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="o">**</span><span class="n">dl_kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">state_dict</span>
 
-<div class="viewcode-block" id="HiFiGANVocoderBundle.get_vocoder"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_vocoder">[docs]</a>    <span class="k">def</span> <span class="nf">get_vocoder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HiFiGANVocoder</span><span class="p">:</span>
+<div class="viewcode-block" id="HiFiGANVocoderBundle.get_vocoder"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_vocoder">[docs]</a>    <span class="nd">@dropping_support</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_vocoder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">dl_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HiFiGANVocoder</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the HiFiGAN Generator model, which can be used a vocoder, and load the pretrained weight.</span>
 
 <span class="sd">        The weight file is downloaded from the internet and cached with</span>
@@ -531,7 +533,8 @@
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">model</span></div>
 
-<div class="viewcode-block" id="HiFiGANVocoderBundle.get_mel_transform"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform">[docs]</a>    <span class="k">def</span> <span class="nf">get_mel_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span><span class="p">:</span>
+<div class="viewcode-block" id="HiFiGANVocoderBundle.get_mel_transform"><a class="viewcode-back" href="../../../../generated/torchaudio.prototype.pipelines.HiFiGANVocoderBundle.html#torchaudio.prototype.pipelines.HiFiGANVocoderBundle.get_mel_transform">[docs]</a>    <span class="nd">@dropping_support</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mel_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Module</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an object which transforms waveforms into mel spectrograms.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_HiFiGANMelSpectrogram</span><span class="p">(</span>
             <span class="n">n_mels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_vocoder_params</span><span class="p">[</span><span class="s2">&quot;in_channels&quot;</span><span class="p">],</span>
@@ -540,7 +543,7 @@
         <span class="p">)</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample rate of the audio that the model is trained on.</span>
 
 <span class="sd">        :type: float</span>
@@ -548,7 +551,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_rate</span></div>
 
 
-<span class="k">class</span> <span class="nc">_HiFiGANMelSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_HiFiGANMelSpectrogram</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate mel spectrogram in a way equivalent to the original HiFiGAN implementation:</span>
 <span class="sd">    https://github.com/jik876/hifi-gan/blob/4769534d45265d52a904b850da5a622601885777/meldataset.py#L49-L72</span>
@@ -566,7 +569,7 @@
 <span class="sd">        n_mels (int):  Number of mel filterbanks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hop_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">n_fft</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -600,7 +603,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">=</span> <span class="n">n_mels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_fft</span> <span class="o">-</span> <span class="n">hop_size</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">waveform</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate mel spectrogram from a waveform. Should have same sample rate as ``self.sample_rate``.</span>
 
 <span class="sd">        Args:</span>
@@ -674,7 +677,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -713,9 +716,6 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
   

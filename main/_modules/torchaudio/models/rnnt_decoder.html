@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.models.rnnt_decoder &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.models.rnnt_decoder &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.models.rnnt_decoder &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,10 +428,10 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.rnnt_decoder</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torchaudio.models</span> <span class="kn">import</span> <span class="n">RNNT</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">RNNT</span>
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Hypothesis&quot;</span><span class="p">,</span> <span class="s2">&quot;RNNTBeamSearch&quot;</span><span class="p">]</span>
@@ -445,27 +443,27 @@
 <span class="s2">    &quot;&quot;&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_get_hypo_tokens</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_hypo_tokens</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
     <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_hypo_predictor_out</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_hypo_predictor_out</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_hypo_state</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_hypo_state</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
     <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_hypo_score</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_hypo_score</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">hypo</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_hypo_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_hypo_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">hypo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_batch_state</span><span class="p">(</span><span class="n">hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_batch_state</span><span class="p">(</span><span class="n">hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
     <span class="n">states</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_get_hypo_state</span><span class="p">(</span><span class="n">hypos</span><span class="p">[</span><span class="mi">0</span><span class="p">]))):</span>
         <span class="n">batched_state_components</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
@@ -475,16 +473,16 @@
     <span class="k">return</span> <span class="n">states</span>
 
 
-<span class="k">def</span> <span class="nf">_slice_state</span><span class="p">(</span><span class="n">states</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_slice_state</span><span class="p">(</span><span class="n">states</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]],</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]:</span>
     <span class="n">idx_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">idx</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[[</span><span class="n">state</span><span class="o">.</span><span class="n">index_select</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">idx_tensor</span><span class="p">)</span> <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">state_tuple</span><span class="p">]</span> <span class="k">for</span> <span class="n">state_tuple</span> <span class="ow">in</span> <span class="n">states</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_default_hypo_sort_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_default_hypo_sort_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">hypo</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_get_hypo_tokens</span><span class="p">(</span><span class="n">hypo</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_compute_updated_scores</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compute_updated_scores</span><span class="p">(</span>
     <span class="n">hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span>
     <span class="n">next_token_probs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
     <span class="n">beam_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -497,14 +495,14 @@
     <span class="k">return</span> <span class="n">nonblank_nbest_scores</span><span class="p">,</span> <span class="n">nonblank_nbest_hypo_idx</span><span class="p">,</span> <span class="n">nonblank_nbest_token</span>
 
 
-<span class="k">def</span> <span class="nf">_remove_hypo</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">,</span> <span class="n">hypo_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_remove_hypo</span><span class="p">(</span><span class="n">hypo</span><span class="p">:</span> <span class="n">Hypothesis</span><span class="p">,</span> <span class="n">hypo_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">elem</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hypo_list</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">_get_hypo_key</span><span class="p">(</span><span class="n">hypo</span><span class="p">)</span> <span class="o">==</span> <span class="n">_get_hypo_key</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
             <span class="k">del</span> <span class="n">hypo_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">break</span>
 
 
-<div class="viewcode-block" id="RNNTBeamSearch"><a class="viewcode-back" href="../../../generated/torchaudio.models.RNNTBeamSearch.html#torchaudio.models.RNNTBeamSearch">[docs]</a><span class="k">class</span> <span class="nc">RNNTBeamSearch</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="RNNTBeamSearch"><a class="viewcode-back" href="../../../generated/torchaudio.models.RNNTBeamSearch.html#torchaudio.models.RNNTBeamSearch">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">RNNTBeamSearch</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Beam search decoder for RNN-T model.</span>
 
 <span class="sd">    See Also:</span>
@@ -521,7 +519,7 @@
 <span class="sd">        step_max_tokens (int, optional): maximum number of tokens to emit per input time step. (Default: 100)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">RNNT</span><span class="p">,</span>
         <span class="n">blank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -541,7 +539,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">step_max_tokens</span> <span class="o">=</span> <span class="n">step_max_tokens</span>
 
-    <span class="k">def</span> <span class="nf">_init_b_hypos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_b_hypos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]:</span>
         <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blank</span>
         <span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -555,7 +553,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">init_hypo</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_gen_next_token_probs</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_next_token_probs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">enc_out</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
         <span class="n">one_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
@@ -569,7 +567,7 @@
         <span class="n">joined_out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="n">joined_out</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">joined_out</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_gen_b_hypos</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_b_hypos</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">b_hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span>
         <span class="n">a_hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span>
@@ -596,7 +594,7 @@
         <span class="n">_</span><span class="p">,</span> <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">_get_hypo_score</span><span class="p">(</span><span class="n">hypo</span><span class="p">)</span> <span class="k">for</span> <span class="n">hypo</span> <span class="ow">in</span> <span class="n">b_hypos</span><span class="p">])</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">b_hypos</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">sorted_idx</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_gen_a_hypos</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_a_hypos</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">a_hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span>
         <span class="n">b_hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span>
@@ -634,7 +632,7 @@
 
         <span class="k">return</span> <span class="n">new_hypos</span>
 
-    <span class="k">def</span> <span class="nf">_gen_new_hypos</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gen_new_hypos</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_hypos</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">],</span>
         <span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -655,7 +653,7 @@
             <span class="n">new_hypos</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">new_tokens</span><span class="p">,</span> <span class="n">pred_out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">_slice_state</span><span class="p">(</span><span class="n">pred_states</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">device</span><span class="p">),</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
         <span class="k">return</span> <span class="n">new_hypos</span>
 
-    <span class="k">def</span> <span class="nf">_search</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_search</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">enc_out</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">hypo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]],</span>
@@ -696,7 +694,7 @@
 
         <span class="k">return</span> <span class="n">b_hypos</span>
 
-<div class="viewcode-block" id="RNNTBeamSearch.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.RNNTBeamSearch.html#torchaudio.models.RNNTBeamSearch.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">beam_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]:</span>
+<div class="viewcode-block" id="RNNTBeamSearch.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.RNNTBeamSearch.html#torchaudio.models.RNNTBeamSearch.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">beam_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Hypothesis</span><span class="p">]:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Performs beam search for the given input sequence.</span>
 
 <span class="sd">        T: number of frames;</span>
@@ -725,7 +723,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_search</span><span class="p">(</span><span class="n">enc_out</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">beam_width</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RNNTBeamSearch.infer"><a class="viewcode-back" href="../../../generated/torchaudio.models.RNNTBeamSearch.html#torchaudio.models.RNNTBeamSearch.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
-    <span class="k">def</span> <span class="nf">infer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="nb">input</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">length</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -785,7 +783,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -824,9 +822,6 @@
          <script src="../../../_static/underscore.js"></script>
          <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../_static/katex_autorenderer.js"></script>
      
 
   

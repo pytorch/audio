@@ -23,13 +23,23 @@ ASR Inference with CUDA CTC Decoder
 
 **Author**: `Yuekai Zhang <yuekaiz@nvidia.com>`__
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 This tutorial shows how to perform speech recognition inference using a
 CUDA-based CTC beam search decoder.
 We demonstrate this on a pretrained
 `Zipformer <https://github.com/k2-fsa/icefall/tree/master/egs/librispeech/ASR/pruned_transducer_stateless7_ctc>`__
 model from `Next-gen Kaldi <https://nadirapovey.com/next-gen-kaldi-what-is-it>`__ project.
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-35
+.. GENERATED FROM PYTHON SOURCE LINES 26-45
 
 Overview
 --------
@@ -51,7 +61,7 @@ requires the following components
 -  BPE Model: the byte-pair encoding (BPE) tokenizer file
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-44
+.. GENERATED FROM PYTHON SOURCE LINES 48-54
 
 Acoustic Model and Set Up
 -------------------------
@@ -60,7 +70,7 @@ First we import the necessary utilities and fetch the data that we are
 working with
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-51
+.. GENERATED FROM PYTHON SOURCE LINES 54-61
 
 .. code-block:: default
 
@@ -79,13 +89,13 @@ working with
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-62
+.. GENERATED FROM PYTHON SOURCE LINES 63-72
 
 .. code-block:: default
 
@@ -105,7 +115,7 @@ working with
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-68
+.. GENERATED FROM PYTHON SOURCE LINES 73-78
 
 We use the pretrained
 `Zipformer <https://huggingface.co/Zengwei/icefall-asr-librispeech-pruned-transducer-stateless7-ctc-2022-12-01>`__
@@ -113,7 +123,7 @@ model that is trained on the `LibriSpeech
 dataset <http://www.openslr.org/12>`__. The model is jointly trained with CTC and Transducer loss functions.
 In this tutorial, we only use CTC head of the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-84
+.. GENERATED FROM PYTHON SOURCE LINES 79-94
 
 .. code-block:: default
 
@@ -140,17 +150,17 @@ In this tutorial, we only use CTC head of the model.
 
  .. code-block:: none
 
-      0%|          | 0.00/269M [00:00<?, ?B/s]      8%|7         | 20.2M/269M [00:00<00:01, 210MB/s]     15%|#5        | 40.9M/269M [00:00<00:01, 213MB/s]     23%|##3       | 62.4M/269M [00:00<00:00, 218MB/s]     31%|###       | 83.2M/269M [00:00<00:00, 209MB/s]     39%|###9      | 106M/269M [00:00<00:00, 218MB/s]      47%|####6     | 126M/269M [00:00<00:00, 215MB/s]     55%|#####4    | 148M/269M [00:00<00:00, 219MB/s]     63%|######3   | 170M/269M [00:00<00:00, 222MB/s]     71%|#######   | 191M/269M [00:00<00:00, 222MB/s]     79%|#######8  | 213M/269M [00:01<00:00, 224MB/s]     88%|########7 | 237M/269M [00:01<00:00, 233MB/s]     96%|#########6| 259M/269M [00:01<00:00, 224MB/s]    100%|##########| 269M/269M [00:01<00:00, 219MB/s]
+      0%|          | 0.00/269M [00:00<?, ?B/s]     17%|#6        | 45.0M/269M [00:00<00:00, 469MB/s]     33%|###3      | 89.8M/269M [00:00<00:00, 457MB/s]     50%|####9     | 133M/269M [00:00<00:00, 417MB/s]      64%|######4   | 174M/269M [00:00<00:00, 352MB/s]     77%|#######7  | 208M/269M [00:00<00:00, 353MB/s]     90%|######### | 243M/269M [00:00<00:00, 357MB/s]    100%|##########| 269M/269M [00:00<00:00, 377MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-87
+.. GENERATED FROM PYTHON SOURCE LINES 95-97
 
 We will load a sample from the LibriSpeech test-other dataset.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-94
+.. GENERATED FROM PYTHON SOURCE LINES 97-104
 
 .. code-block:: default
 
@@ -169,7 +179,13 @@ We will load a sample from the LibriSpeech test-other dataset.
 
  .. code-block:: none
 
-      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 135MB/s]
+    /pytorch/audio/examples/tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.py:98: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
+      0%|          | 0.00/441k [00:00<?, ?B/s]    100%|##########| 441k/441k [00:00<00:00, 112MB/s]
+    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
+      warnings.warn(
+    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 .. raw:: html
@@ -185,7 +201,7 @@ We will load a sample from the LibriSpeech test-other dataset.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-101
+.. GENERATED FROM PYTHON SOURCE LINES 105-111
 
 The transcript corresponding to this audio file is
 
@@ -194,7 +210,7 @@ The transcript corresponding to this audio file is
    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-109
+.. GENERATED FROM PYTHON SOURCE LINES 114-119
 
 Files and Data for Decoder
 --------------------------
@@ -202,7 +218,7 @@ Files and Data for Decoder
 Next, we load in our token from BPE model, which is the tokenizer for decoding.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-134
+.. GENERATED FROM PYTHON SOURCE LINES 122-144
 
 Tokens
 ~~~~~~
@@ -227,7 +243,7 @@ index, or as a list of tokens, each mapping to a unique index.
    ...
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-142
+.. GENERATED FROM PYTHON SOURCE LINES 144-152
 
 .. code-block:: default
 
@@ -247,13 +263,13 @@ index, or as a list of tokens, each mapping to a unique index.
 
  .. code-block:: none
 
-      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 97.0MB/s]
+      0%|          | 0.00/239k [00:00<?, ?B/s]    100%|##########| 239k/239k [00:00<00:00, 83.8MB/s]
     ['<blk>', '<sos/eos>', '<unk>', 'S', '▁THE', '▁A', 'T', '▁AND', 'ED', '▁OF', '▁TO', 'E', 'D', 'N', 'ING', '▁IN', 'Y', 'M', 'C', '▁I', 'A', 'P', '▁HE', 'R', 'O', 'L', 'RE', 'I', 'U', 'ER', '▁IT', 'LY', '▁THAT', '▁WAS', '▁', '▁S', 'AR', '▁BE', 'F', '▁C', 'IN', 'B', '▁FOR', 'OR', 'LE', "'", '▁HIS', '▁YOU', 'AL', '▁RE', 'V', '▁B', 'G', 'RI', '▁E', '▁WITH', '▁T', '▁AS', 'LL', '▁P', '▁HER', 'ST', '▁HAD', '▁SO', '▁F', 'W', 'CE', '▁IS', 'ND', '▁NOT', 'TH', '▁BUT', 'EN', '▁SHE', '▁ON', 'VE', 'ON', 'SE', '▁DE', 'UR', '▁G', 'CH', 'K', 'TER', '▁AT', 'IT', '▁ME', 'RO', 'NE', 'RA', 'ES', 'IL', 'NG', 'IC', '▁NO', '▁HIM', 'ENT', 'IR', '▁WE', 'H', '▁DO', '▁ALL', '▁HAVE', 'LO', '▁BY', '▁MY', '▁MO', '▁THIS', 'LA', '▁ST', '▁WHICH', '▁CON', '▁THEY', 'CK', 'TE', '▁SAID', '▁FROM', '▁GO', '▁WHO', '▁TH', '▁OR', '▁D', '▁W', 'VER', 'LI', '▁SE', '▁ONE', '▁CA', '▁AN', '▁LA', '▁WERE', 'EL', '▁HA', '▁MAN', '▁FA', '▁EX', 'AD', '▁SU', 'RY', '▁MI', 'AT', '▁BO', '▁WHEN', 'AN', 'THER', 'PP', 'ATION', '▁FI', '▁WOULD', '▁PRO', 'OW', 'ET', '▁O', '▁THERE', '▁HO', 'ION', '▁WHAT', '▁FE', '▁PA', 'US', 'MENT', '▁MA', 'UT', '▁OUT', '▁THEIR', '▁IF', '▁LI', '▁K', '▁WILL', '▁ARE', 'ID', '▁RO', 'DE', 'TION', '▁WA', 'PE', '▁UP', '▁SP', '▁PO', 'IGHT', '▁UN', 'RU', '▁LO', 'AS', 'OL', '▁LE', '▁BEEN', '▁SH', '▁RA', '▁SEE', 'KE', 'UL', 'TED', '▁SA', 'UN', 'UND', 'ANT', '▁NE', 'IS', '▁THEM', 'CI', 'GE', '▁COULD', '▁DIS', 'OM', 'ISH', 'HE', 'EST', '▁SOME', 'ENCE', 'ITY', 'IVE', '▁US', '▁MORE', '▁EN', 'ARD', 'ATE', '▁YOUR', '▁INTO', '▁KNOW', '▁CO', 'ANCE', '▁TIME', '▁WI', '▁YE', 'AGE', '▁NOW', 'TI', 'FF', 'ABLE', '▁VERY', '▁LIKE', 'AM', 'HI', 'Z', '▁OTHER', '▁THAN', '▁LITTLE', '▁DID', '▁LOOK', 'TY', 'ERS', '▁CAN', '▁CHA', '▁AR', 'X', 'FUL', 'UGH', '▁BA', '▁DAY', '▁ABOUT', 'TEN', 'IM', '▁ANY', '▁PRE', '▁OVER', 'IES', 'NESS', 'ME', 'BLE', '▁M', 'ROW', '▁HAS', '▁GREAT', '▁VI', 'TA', '▁AFTER', 'PER', '▁AGAIN', 'HO', 'SH', '▁UPON', '▁DI', '▁HAND', '▁COM', 'IST', 'TURE', '▁STA', '▁THEN', '▁SHOULD', '▁GA', 'OUS', 'OUR', '▁WELL', '▁ONLY', 'MAN', '▁GOOD', '▁TWO', '▁MAR', '▁SAY', '▁HU', 'TING', '▁OUR', 'RESS', '▁DOWN', 'IOUS', '▁BEFORE', '▁DA', '▁NA', 'QUI', '▁MADE', '▁EVERY', '▁OLD', '▁EVEN', 'IG', '▁COME', '▁GRA', '▁RI', '▁LONG', 'OT', 'SIDE', 'WARD', '▁FO', '▁WHERE', 'MO', 'LESS', '▁SC', '▁MUST', '▁NEVER', '▁HOW', '▁CAME', '▁SUCH', '▁RU', '▁TAKE', '▁WO', '▁CAR', 'UM', 'AK', '▁THINK', '▁MUCH', '▁MISTER', '▁MAY', '▁JO', '▁WAY', '▁COMP', '▁THOUGHT', '▁STO', '▁MEN', '▁BACK', '▁DON', 'J', '▁LET', '▁TRA', '▁FIRST', '▁JUST', '▁VA', '▁OWN', '▁PLA', '▁MAKE', 'ATED', '▁HIMSELF', '▁WENT', '▁PI', 'GG', 'RING', '▁DU', '▁MIGHT', '▁PART', '▁GIVE', '▁IMP', '▁BU', '▁PER', '▁PLACE', '▁HOUSE', '▁THROUGH', 'IAN', '▁SW', '▁UNDER', 'QUE', '▁AWAY', '▁LOVE', 'QUA', '▁LIFE', '▁GET', '▁WITHOUT', '▁PASS', '▁TURN', 'IGN', '▁HEAD', '▁MOST', '▁THOSE', '▁SHALL', '▁EYES', '▁COL', '▁STILL', '▁NIGHT', '▁NOTHING', 'ITION', 'HA', '▁TELL', '▁WORK', '▁LAST', '▁NEW', '▁FACE', '▁HI', '▁WORD', '▁FOUND', '▁COUNT', '▁OB', '▁WHILE', '▁SHA', '▁MEAN', '▁SAW', '▁PEOPLE', '▁FRIEND', '▁THREE', '▁ROOM', '▁SAME', '▁THOUGH', '▁RIGHT', '▁CHILD', '▁FATHER', '▁ANOTHER', '▁HEART', '▁WANT', '▁TOOK', 'OOK', '▁LIGHT', '▁MISSUS', '▁OPEN', '▁JU', '▁ASKED', 'PORT', '▁LEFT', '▁JA', '▁WORLD', '▁HOME', '▁WHY', '▁ALWAYS', '▁ANSWER', '▁SEEMED', '▁SOMETHING', '▁GIRL', '▁BECAUSE', '▁NAME', '▁TOLD', '▁NI', '▁HIGH', 'IZE', '▁WOMAN', '▁FOLLOW', '▁RETURN', '▁KNEW', '▁EACH', '▁KIND', '▁JE', '▁ACT', '▁LU', '▁CERTAIN', '▁YEARS', '▁QUITE', '▁APPEAR', '▁BETTER', '▁HALF', '▁PRESENT', '▁PRINCE', 'SHIP', '▁ALSO', '▁BEGAN', '▁HAVING', '▁ENOUGH', '▁PERSON', '▁LADY', '▁WHITE', '▁COURSE', '▁VOICE', '▁SPEAK', '▁POWER', '▁MORNING', '▁BETWEEN', '▁AMONG', '▁KEEP', '▁WALK', '▁MATTER', '▁TEA', '▁BELIEVE', '▁SMALL', '▁TALK', '▁FELT', '▁HORSE', '▁MYSELF', '▁SIX', '▁HOWEVER', '▁FULL', '▁HERSELF', '▁POINT', '▁STOOD', '▁HUNDRED', '▁ALMOST', '▁SINCE', '▁LARGE', '▁LEAVE', '▁PERHAPS', '▁DARK', '▁SUDDEN', '▁REPLIED', '▁ANYTHING', '▁WONDER', '▁UNTIL', 'Q']
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-149
+.. GENERATED FROM PYTHON SOURCE LINES 153-159
 
 Construct CUDA Decoder
 ----------------------
@@ -262,7 +278,7 @@ The decoder can be constructed using the factory function
 :py:func:`~torchaudio.models.decoder.cuda_ctc_decoder`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-151
+.. GENERATED FROM PYTHON SOURCE LINES 159-161
 
 .. code-block:: default
 
@@ -272,10 +288,19 @@ The decoder can be constructed using the factory function
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.py:160: UserWarning: torchaudio.models.decoder._cuda_ctc_decoder.cuda_ctc_decoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      cuda_decoder = cuda_ctc_decoder(tokens, nbest=10, beam_size=10, blank_skip_threshold=0.95)
+    /pytorch/audio/src/torchaudio/models/decoder/_cuda_ctc_decoder.py:187: UserWarning: torchaudio.models.decoder._cuda_ctc_decoder.CUCTCDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      return CUCTCDecoder(vocab_list=tokens, beam_size=beam_size, nbest=nbest, blank_skip_threshold=blank_skip_threshold)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-166
+
+.. GENERATED FROM PYTHON SOURCE LINES 162-176
 
 Run Inference
 -------------
@@ -292,7 +317,7 @@ waveform is
    i really was very much afraid of showing him how much shocked i was at some parts of what he said
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-187
+.. GENERATED FROM PYTHON SOURCE LINES 176-197
 
 .. code-block:: default
 
@@ -330,12 +355,12 @@ waveform is
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-190
+.. GENERATED FROM PYTHON SOURCE LINES 198-200
 
 The cuda ctc decoder gives the following result.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-200
+.. GENERATED FROM PYTHON SOURCE LINES 200-210
 
 .. code-block:: default
 
@@ -363,7 +388,7 @@ The cuda ctc decoder gives the following result.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-209
+.. GENERATED FROM PYTHON SOURCE LINES 211-219
 
 Beam Search Decoder Parameters
 ------------------------------
@@ -374,13 +399,13 @@ please refer to the
 :py:func:`documentation <torchaudio.models.decoder.cuda_ctc_decoder>`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-215
+.. GENERATED FROM PYTHON SOURCE LINES 222-225
 
 Helper Function
 ~~~~~~~~~~~~~~~
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 215-226
+.. GENERATED FROM PYTHON SOURCE LINES 225-236
 
 .. code-block:: default
 
@@ -402,7 +427,7 @@ Helper Function
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-234
+.. GENERATED FROM PYTHON SOURCE LINES 237-244
 
 nbest
 ~~~~~
@@ -412,7 +437,7 @@ instance, by setting ``nbest=10`` when constructing the beam search
 decoder earlier, we can now access the hypotheses with the top 10 scores.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-241
+.. GENERATED FROM PYTHON SOURCE LINES 244-251
 
 .. code-block:: default
 
@@ -431,21 +456,21 @@ decoder earlier, we can now access the hypotheses with the top 10 scores.
 
  .. code-block:: none
 
-    i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20280733704566956)
-    i really was very much afraid of showing him how much shocked i was at some part of what he said (score: -1.7408883571624756)
-    i really was very much afraid of sheowing him how much shocked i was at some parts of what he said (score: -6.67951774597168)
-    i reallyly very much afraid of showing him how much shocked i was at some parts of what he said (score: -7.597038745880127)
-    i really was very much afraid of sheowing him how much shocked i was at some part of what he said (score: -8.224080085754395)
-    i really was very much afraid of shwing him how much shocked i was at some parts of what he said (score: -8.439373970031738)
-    i really was very much afraid of showing him how much shocked i was in some parts of what he said (score: -8.781461715698242)
-    i really was very much afraid of showing him how much shocked i was at some parts of what said (score: -8.883706092834473)
-    i really was very much afraid of showing him how much shocked i was at some partes of what he said (score: -8.999059677124023)
-    i really was very much afraid of showing him how much shocked i was at some parts of what he say (score: -9.138861656188965)
+    i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20293806493282318)
+    i really was very much afraid of showing him how much shocked i was at some part of what he said (score: -1.740274429321289)
+    i really was very much afraid of sheowing him how much shocked i was at some parts of what he said (score: -6.679695129394531)
+    i reallyly very much afraid of showing him how much shocked i was at some parts of what he said (score: -7.597385883331299)
+    i really was very much afraid of sheowing him how much shocked i was at some part of what he said (score: -8.223531723022461)
+    i really was very much afraid of shwing him how much shocked i was at some parts of what he said (score: -8.439902305603027)
+    i really was very much afraid of showing him how much shocked i was in some parts of what he said (score: -8.782021522521973)
+    i really was very much afraid of showing him how much shocked i was at some parts of what said (score: -8.884115219116211)
+    i really was very much afraid of showing him how much shocked i was at some partes of what he said (score: -8.99947452545166)
+    i really was very much afraid of showing him how much shocked i was at some parts of what he say (score: -9.13825798034668)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-255
+.. GENERATED FROM PYTHON SOURCE LINES 252-265
 
 beam size
 ~~~~~~~~~
@@ -461,7 +486,7 @@ increase beam size from 1 to 3, but notice how using a beam size
 of 3 provides the same output as beam size 10.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 255-268
+.. GENERATED FROM PYTHON SOURCE LINES 265-278
 
 .. code-block:: default
 
@@ -486,6 +511,10 @@ of 3 provides the same output as beam size 10.
 
  .. code-block:: none
 
+    /pytorch/audio/examples/tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.py:269: UserWarning: torchaudio.models.decoder._cuda_ctc_decoder.cuda_ctc_decoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      beam_search_decoder = cuda_ctc_decoder(
+    /pytorch/audio/src/torchaudio/models/decoder/_cuda_ctc_decoder.py:187: UserWarning: torchaudio.models.decoder._cuda_ctc_decoder.CUCTCDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      return CUCTCDecoder(vocab_list=tokens, beam_size=beam_size, nbest=nbest, blank_skip_threshold=blank_skip_threshold)
     beam size 1  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -1.35; 0.0009 secs)
     beam size 2  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.21; 0.0009 secs)
     beam size 3  : i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20; 0.0009 secs)
@@ -494,7 +523,7 @@ of 3 provides the same output as beam size 10.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-279
+.. GENERATED FROM PYTHON SOURCE LINES 279-289
 
 blank skip threshold
 ~~~~~~~~~~~~~~~~~~~~
@@ -507,7 +536,7 @@ to avoid mistakenly merge two consecutive identical symbols.
 We recommend to set blank_skip_threshold=0.95 for cuda beam search decoder.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-293
+.. GENERATED FROM PYTHON SOURCE LINES 289-303
 
 .. code-block:: default
 
@@ -533,6 +562,10 @@ We recommend to set blank_skip_threshold=0.95 for cuda beam search decoder.
 
  .. code-block:: none
 
+    /pytorch/audio/examples/tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.py:293: UserWarning: torchaudio.models.decoder._cuda_ctc_decoder.cuda_ctc_decoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      beam_search_decoder = cuda_ctc_decoder(
+    /pytorch/audio/src/torchaudio/models/decoder/_cuda_ctc_decoder.py:187: UserWarning: torchaudio.models.decoder._cuda_ctc_decoder.CUCTCDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      return CUCTCDecoder(vocab_list=tokens, beam_size=beam_size, nbest=nbest, blank_skip_threshold=blank_skip_threshold)
     blank_skip_threshold 0.25: i really was very much afraid of showing him how much shocked i was at some part of what he said (score: -0.01; 0.0009 secs)
     blank_skip_threshold 0.95: i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.20; 0.0010 secs)
     blank_skip_threshold 1.0: i really was very much afraid of showing him how much shocked i was at some parts of what he said (score: -0.21; 0.0044 secs)
@@ -540,7 +573,7 @@ We recommend to set blank_skip_threshold=0.95 for cuda beam search decoder.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-312
+.. GENERATED FROM PYTHON SOURCE LINES 304-322
 
 Benchmark with flashlight CPU decoder
 -------------------------------------
@@ -564,7 +597,7 @@ From the above table, CUDA decoder could give a slight improvement in WER and a 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.683 seconds)
+   **Total running time of the script:** ( 0 minutes  2.002 seconds)
 
 
 .. _sphx_glr_download_tutorials_asr_inference_with_cuda_ctc_decoder_tutorial.py:

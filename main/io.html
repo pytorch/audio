@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.io &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.io &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>torchaudio.io &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -436,7 +434,22 @@
               
   <span class="target" id="module-torchaudio.io"></span><section id="torchaudio-io">
 <h1>torchaudio.io<a class="headerlink" href="#torchaudio-io" title="Permalink to this heading">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Starting with version 2.8, we are refactoring TorchAudio to transition it
+into a maintenance phase. As a result:</p>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">torchaudio.io</span></code> module is deprecated in 2.8 and will be removed in 2.9.</p></li>
+<li><p>The decoding and encoding capabilities of PyTorch for both audio and video
+are being consolidated into TorchCodec.</p></li>
+</ul>
+<p>Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
 <table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">StreamReader</span></code></a></p></td>
 <td><p>alias of <a class="reference internal" href="generated/torio.io.StreamingMediaDecoder.html#torio.io.StreamingMediaDecoder" title="torio.io._streaming_media_decoder.StreamingMediaDecoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingMediaDecoder</span></code></a></p></td>
@@ -445,10 +458,10 @@
 <td><p>alias of <a class="reference internal" href="generated/torio.io.StreamingMediaEncoder.html#torio.io.StreamingMediaEncoder" title="torio.io._streaming_media_encoder.StreamingMediaEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingMediaEncoder</span></code></a></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.io.AudioEffector.html#torchaudio.io.AudioEffector" title="torchaudio.io.AudioEffector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AudioEffector</span></code></a></p></td>
-<td><p>Apply various filters and/or codecs to waveforms.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.io.play_audio.html#torchaudio.io.play_audio" title="torchaudio.io.play_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">play_audio</span></code></a></p></td>
-<td><p>Plays audio through specified or available output device.</p></td>
+<td><p>DEPRECATED</p></td>
 </tr>
 </tbody>
 </table>
@@ -509,7 +522,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -551,9 +564,6 @@
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

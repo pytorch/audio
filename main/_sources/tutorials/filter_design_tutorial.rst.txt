@@ -23,6 +23,16 @@ Filter design tutorial
 
 **Author**: `Moto Hira <moto@meta.com>`__
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 This tutorial shows how to create basic digital filters
 (impulse responses) and their properties.
 
@@ -36,7 +46,7 @@ windowed-sinc kernels, and frequency sampling method.
    Please refer to https://pytorch.org/get-started/locally
    for instructions for installing a nightly build.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-32
+.. GENERATED FROM PYTHON SOURCE LINES 34-42
 
 .. code-block:: default
 
@@ -56,13 +66,13 @@ windowed-sinc kernels, and frequency sampling method.
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-36
+.. GENERATED FROM PYTHON SOURCE LINES 44-46
 
 .. code-block:: default
 
@@ -75,7 +85,7 @@ windowed-sinc kernels, and frequency sampling method.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-59
+.. GENERATED FROM PYTHON SOURCE LINES 47-69
 
 Windowed-Sinc Filter
 --------------------
@@ -100,12 +110,12 @@ generates windowed-sinc impulse response for given cutoff
 frequencies.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 72-74
 
 Low-pass filter
 ~~~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-73
+.. GENERATED FROM PYTHON SOURCE LINES 77-83
 
 Impulse Response
 ^^^^^^^^^^^^^^^^
@@ -114,7 +124,7 @@ Creating sinc IR is as easy as passing cutoff frequency values to
 :py:func:`~torchaudio.prototype.functional.sinc_impulse_response`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-82
+.. GENERATED FROM PYTHON SOURCE LINES 84-92
 
 .. code-block:: default
 
@@ -134,18 +144,20 @@ Creating sinc IR is as easy as passing cutoff frequency values to
 
  .. code-block:: none
 
+    /pytorch/audio/examples/tutorials/filter_design_tutorial.py:86: UserWarning: torchaudio.prototype.functional._dsp.sinc_impulse_response has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      irs = sinc_impulse_response(cutoff, window_size=513)
     Cutoff shape: torch.Size([9])
     Impulse response shape: torch.Size([9, 513])
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-85
+.. GENERATED FROM PYTHON SOURCE LINES 93-95
 
 Let's visualize the resulting impulse responses.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-106
+.. GENERATED FROM PYTHON SOURCE LINES 96-116
 
 .. code-block:: default
 
@@ -176,7 +188,7 @@ Let's visualize the resulting impulse responses.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-110
+.. GENERATED FROM PYTHON SOURCE LINES 118-120
 
 .. code-block:: default
 
@@ -194,7 +206,7 @@ Let's visualize the resulting impulse responses.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-118
+.. GENERATED FROM PYTHON SOURCE LINES 121-128
 
 Frequency Response
 ^^^^^^^^^^^^^^^^^^
@@ -204,7 +216,7 @@ Simpy applying Fourier transform to the impulse responses will give
 the frequency responses.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-123
+.. GENERATED FROM PYTHON SOURCE LINES 129-133
 
 .. code-block:: default
 
@@ -219,12 +231,12 @@ the frequency responses.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-126
+.. GENERATED FROM PYTHON SOURCE LINES 134-136
 
 Let's visualize the resulting frequency responses.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-152
+.. GENERATED FROM PYTHON SOURCE LINES 137-162
 
 .. code-block:: default
 
@@ -260,7 +272,7 @@ Let's visualize the resulting frequency responses.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-156
+.. GENERATED FROM PYTHON SOURCE LINES 164-166
 
 .. code-block:: default
 
@@ -278,7 +290,7 @@ Let's visualize the resulting frequency responses.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-167
+.. GENERATED FROM PYTHON SOURCE LINES 167-177
 
 High-pass filter
 ~~~~~~~~~~~~~~~~
@@ -291,7 +303,7 @@ Passing ``high_pass=True`` to
 will change the returned filter kernel to high pass filter.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-172
+.. GENERATED FROM PYTHON SOURCE LINES 178-182
 
 .. code-block:: default
 
@@ -303,16 +315,23 @@ will change the returned filter kernel to high pass filter.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/filter_design_tutorial.py:179: UserWarning: torchaudio.prototype.functional._dsp.sinc_impulse_response has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      irs = sinc_impulse_response(cutoff, window_size=513, high_pass=True)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-176
+
+.. GENERATED FROM PYTHON SOURCE LINES 183-186
 
 Impulse Response
 ^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-180
+.. GENERATED FROM PYTHON SOURCE LINES 187-190
 
 .. code-block:: default
 
@@ -331,13 +350,13 @@ Impulse Response
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-184
+.. GENERATED FROM PYTHON SOURCE LINES 191-194
 
 Frequency Response
 ^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-188
+.. GENERATED FROM PYTHON SOURCE LINES 195-198
 
 .. code-block:: default
 
@@ -356,7 +375,7 @@ Frequency Response
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-194
+.. GENERATED FROM PYTHON SOURCE LINES 199-204
 
 Band-pass filter
 ~~~~~~~~~~~~~~~~
@@ -364,7 +383,7 @@ Band-pass filter
 Band-pass filter can be obtained by subtracting low-pass filter for
 upper band from that of lower band.
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-203
+.. GENERATED FROM PYTHON SOURCE LINES 205-213
 
 .. code-block:: default
 
@@ -380,16 +399,23 @@ upper band from that of lower band.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/filter_design_tutorial.py:210: UserWarning: torchaudio.prototype.functional._dsp.sinc_impulse_response has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      irs = sinc_impulse_response(c_low, window_size=513) - sinc_impulse_response(c_high, window_size=513)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-207
+
+.. GENERATED FROM PYTHON SOURCE LINES 214-217
 
 Impulse Response
 ^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-212
+.. GENERATED FROM PYTHON SOURCE LINES 218-222
 
 .. code-block:: default
 
@@ -409,13 +435,13 @@ Impulse Response
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-216
+.. GENERATED FROM PYTHON SOURCE LINES 223-226
 
 Frequency Response
 ^^^^^^^^^^^^^^^^^^
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-221
+.. GENERATED FROM PYTHON SOURCE LINES 227-231
 
 .. code-block:: default
 
@@ -435,7 +461,7 @@ Frequency Response
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-238
+.. GENERATED FROM PYTHON SOURCE LINES 232-248
 
 Frequency Sampling
 ------------------
@@ -454,14 +480,14 @@ In the following, we create multiple filters and compare the input
 frequency response and the actual frequency response.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-245
+.. GENERATED FROM PYTHON SOURCE LINES 251-255
 
 Brick-wall filter
 ~~~~~~~~~~~~~~~~~
 
 Let's start from brick-wall filter
 
-.. GENERATED FROM PYTHON SOURCE LINES 246-254
+.. GENERATED FROM PYTHON SOURCE LINES 256-264
 
 .. code-block:: default
 
@@ -481,13 +507,15 @@ Let's start from brick-wall filter
 
  .. code-block:: none
 
+    /pytorch/audio/examples/tutorials/filter_design_tutorial.py:258: UserWarning: torchaudio.prototype.functional._dsp.frequency_impulse_response has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      ir = frequency_impulse_response(magnitudes)
     Magnitudes: torch.Size([256])
     Impulse Response: torch.Size([510])
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 256-282
+.. GENERATED FROM PYTHON SOURCE LINES 266-292
 
 .. code-block:: default
 
@@ -524,7 +552,7 @@ Let's start from brick-wall filter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-287
+.. GENERATED FROM PYTHON SOURCE LINES 294-297
 
 .. code-block:: default
 
@@ -543,13 +571,13 @@ Let's start from brick-wall filter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 288-291
+.. GENERATED FROM PYTHON SOURCE LINES 298-301
 
 Notice that there are artifacts around the transition band. This is
 more noticeable when the window size is small.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 292-296
+.. GENERATED FROM PYTHON SOURCE LINES 302-306
 
 .. code-block:: default
 
@@ -561,10 +589,17 @@ more noticeable when the window size is small.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/filter_design_tutorial.py:304: UserWarning: torchaudio.prototype.functional._dsp.frequency_impulse_response has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      ir = frequency_impulse_response(magnitudes)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 298-301
+
+.. GENERATED FROM PYTHON SOURCE LINES 308-311
 
 .. code-block:: default
 
@@ -583,14 +618,14 @@ more noticeable when the window size is small.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 302-306
+.. GENERATED FROM PYTHON SOURCE LINES 312-316
 
 Arbitrary shapes
 ~~~~~~~~~~~~~~~~
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 307-312
+.. GENERATED FROM PYTHON SOURCE LINES 317-322
 
 .. code-block:: default
 
@@ -603,10 +638,17 @@ Arbitrary shapes
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/filter_design_tutorial.py:319: UserWarning: torchaudio.prototype.functional._dsp.frequency_impulse_response has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      ir = frequency_impulse_response(magnitudes)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 314-317
+
+.. GENERATED FROM PYTHON SOURCE LINES 324-327
 
 .. code-block:: default
 
@@ -625,7 +667,7 @@ Arbitrary shapes
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 319-323
+.. GENERATED FROM PYTHON SOURCE LINES 329-333
 
 .. code-block:: default
 
@@ -637,10 +679,17 @@ Arbitrary shapes
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/filter_design_tutorial.py:330: UserWarning: torchaudio.prototype.functional._dsp.frequency_impulse_response has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      ir = frequency_impulse_response(magnitudes)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 325-329
+
+.. GENERATED FROM PYTHON SOURCE LINES 335-339
 
 .. code-block:: default
 
@@ -660,7 +709,7 @@ Arbitrary shapes
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 330-338
+.. GENERATED FROM PYTHON SOURCE LINES 340-348
 
 References
 ----------
@@ -674,7 +723,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.220 seconds)
+   **Total running time of the script:** ( 0 minutes  5.016 seconds)
 
 
 .. _sphx_glr_download_tutorials_filter_design_tutorial.py:

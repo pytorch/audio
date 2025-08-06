@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>StreamReader Basic Usages &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>StreamReader Basic Usages &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>StreamReader Basic Usages &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -467,6 +465,17 @@ to download the full example code</p>
 <p>This tutorial shows how to use <a class="reference internal" href="../generated/torchaudio.io.StreamReader.html#torchaudio.io.StreamReader" title="torchaudio.io.StreamReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">torchaudio.io.StreamReader</span></code></a> to
 fetch and decode audio/video data and apply preprocessings that
 libavfilter provides.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Starting with version 2.8, we are refactoring TorchAudio to transition it
+into a maintenance phase. As a result:</p>
+<ul class="simple">
+<li><p>The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.</p></li>
+<li><p>The decoding and encoding capabilities of PyTorch for both audio and video
+are being consolidated into TorchCodec.</p></li>
+</ul>
+<p>Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This tutorial requires FFmpeg libraries.
@@ -504,22 +513,22 @@ please file a feature request.</p>
 </section>
 <section id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torchaudio</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchaudio</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">torchaudio</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">torchaudio.io</span> <span class="kn">import</span> <span class="n">StreamReader</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchaudio.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamReader</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a> <span class="o">=</span> <span class="s2">&quot;https://download.pytorch.org/torchaudio/tutorial-assets&quot;</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">AUDIO_URL</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a><span class="si">}</span><span class="s2">/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav&quot;</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">VIDEO_URL</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">base_url</span></a><span class="si">}</span><span class="s2">/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4.mp4&quot;</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.6.0.dev20241104
-2.5.0.dev20241105
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>2.8.0+cu126
+2.8.0
 </pre></div>
 </div>
 </section>
@@ -589,21 +598,21 @@ as well. In this case the <code class="docutils literal notranslate"><span class
 </div>
 <p>In case where third-party libraries implement <code class="docutils literal notranslate"><span class="pre">seek</span></code> so that it raises
 an error, you can write a wrapper class to mask the <code class="docutils literal notranslate"><span class="pre">seek</span></code> method.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">UnseekableWrapper</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">UnseekableWrapper</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
 
-    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
 
 <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://example.com/video.mp4&quot;</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">raw</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">boto3</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">boto3</span>
 
 <span class="n">response</span> <span class="o">=</span> <span class="n">boto3</span><span class="o">.</span><span class="n">client</span><span class="p">(</span><span class="s2">&quot;s3&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="s2">&quot;my_bucket&quot;</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="s2">&quot;key&quot;</span><span class="p">)</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">StreamReader</span><span class="p">(</span><span class="n">UnseekableWrapper</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Body&quot;</span><span class="p">]))</span>
@@ -664,7 +673,9 @@ and <cite>JPEG</cite>, the number of souorce streams is 1.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The number of source streams: 1
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/examples/tutorials/streamreader_basic_tutorial.py:256: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release.
+  streamer = StreamReader(AUDIO_URL)
+The number of source streams: 1
 SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;pcm_s16le&#39;, codec_long_name=&#39;PCM signed 16-bit little-endian&#39;, format=&#39;s16&#39;, bit_rate=256000, num_frames=0, bits_per_sample=0, metadata={}, sample_rate=16000.0, num_channels=1)
 </pre></div>
 </div>
@@ -677,7 +688,9 @@ of different media type.</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>The number of source streams: 27
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/examples/tutorials/streamreader_basic_tutorial.py:266: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release.
+  streamer = StreamReader(src)
+The number of source streams: 27
 SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=335457, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:39.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;2177116&#39;}, width=960, height=540, frame_rate=60.0)
 SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1351204, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:42.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;8001098&#39;}, width=1920, height=1080, frame_rate=60.0)
 SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=1019347, num_frames=0, bits_per_sample=8, metadata={&#39;compatible_brands&#39;: &#39;mp41mp42isomhlsf&#39;, &#39;creation_time&#39;: &#39;2016-12-21T21:37:48.000000Z&#39;, &#39;major_brand&#39;: &#39;mp42&#39;, &#39;minor_version&#39;: &#39;1&#39;, &#39;variant_bitrate&#39;: &#39;6312875&#39;}, width=1920, height=1080, frame_rate=60.0)
@@ -861,7 +874,9 @@ We will use the following video.</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">streamer</span><span class="o">.</span><span class="n">get_src_stream_info</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={&#39;creation_time&#39;: &#39;2018-07-24T17:40:48.000000Z&#39;, &#39;encoder&#39;: &#39;AVC Coding&#39;, &#39;handler_name&#39;: &#39;\x1fMainconcept Video Media Handler&#39;, &#39;language&#39;: &#39;eng&#39;, &#39;vendor_id&#39;: &#39;[0][0][0][0]&#39;}, width=1920, height=1080, frame_rate=29.97002997002997)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/pytorch/audio/examples/tutorials/streamreader_basic_tutorial.py:471: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release.
+  streamer = StreamReader(VIDEO_URL)
+SourceVideoStream(media_type=&#39;video&#39;, codec=&#39;h264&#39;, codec_long_name=&#39;H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10&#39;, format=&#39;yuv420p&#39;, bit_rate=9958354, num_frames=6175, bits_per_sample=8, metadata={&#39;creation_time&#39;: &#39;2018-07-24T17:40:48.000000Z&#39;, &#39;encoder&#39;: &#39;AVC Coding&#39;, &#39;handler_name&#39;: &#39;\x1fMainconcept Video Media Handler&#39;, &#39;language&#39;: &#39;eng&#39;, &#39;vendor_id&#39;: &#39;[0][0][0][0]&#39;}, width=1920, height=1080, frame_rate=29.97002997002997)
 SourceAudioStream(media_type=&#39;audio&#39;, codec=&#39;aac&#39;, codec_long_name=&#39;AAC (Advanced Audio Coding)&#39;, format=&#39;fltp&#39;, bit_rate=317375, num_frames=9658, bits_per_sample=0, metadata={&#39;creation_time&#39;: &#39;2018-07-24T17:40:48.000000Z&#39;, &#39;handler_name&#39;: &#39;#Mainconcept MP4 Sound Media Handler&#39;, &#39;language&#39;: &#39;eng&#39;, &#39;vendor_id&#39;: &#39;[0][0][0][0]&#39;}, sample_rate=48000.0, num_channels=2)
 </pre></div>
 </div>
@@ -993,7 +1008,7 @@ torch.Size([3, 1, 320, 320])
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_streamreader_basic_tutorial_001.png" srcset="../_images/sphx_glr_streamreader_basic_tutorial_001.png" alt="Iteration 0, Iteration 1, Iteration 2" class = "sphx-glr-single-img"/><p>Tag: <a class="reference internal" href="../io.html#module-torchaudio.io" title="torchaudio.io"><code class="xref py py-obj docutils literal notranslate"><span class="pre">torchaudio.io</span></code></a></p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  14.379 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  13.733 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-tutorials-streamreader-basic-tutorial-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/dc81b404e96c6cb650e0c5a8115bc1f1/streamreader_basic_tutorial.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">streamreader_basic_tutorial.py</span></code></a></p>
@@ -1031,7 +1046,7 @@ torch.Size([3, 1, 320, 320])
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -1097,9 +1112,6 @@ torch.Size([3, 1, 320, 320])
          <script src="../_static/underscore.js"></script>
          <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../_static/katex_autorenderer.js"></script>
      
 
   

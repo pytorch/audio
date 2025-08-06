@@ -6,11 +6,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.prototype &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.prototype &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -32,8 +32,6 @@
   <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" type="text/css" />
@@ -224,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -395,7 +393,7 @@
         
       <li>torchaudio.prototype &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -436,6 +434,12 @@
               
   <section id="torchaudio-prototype">
 <h1>torchaudio.prototype<a class="headerlink" href="#torchaudio-prototype" title="Permalink to this heading">¶</a></h1>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Starting with version 2.8, we are refactoring TorchAudio to transition it
+into a maintenance phase. As a result, the <code class="docutils literal notranslate"><span class="pre">prototype</span></code> module is
+deprecated in 2.8 and will be removed in 2.9.</p>
+</div>
 <p><code class="docutils literal notranslate"><span class="pre">torchaudio.prototype</span></code> provides prototype features;
 they are at an early stage for feedback and testing.
 Their interfaces might be changed without prior notice.</p>
@@ -444,7 +448,7 @@ Please refer to <a class="reference external" href="https://pytorch.org/audio">h
 more information on prototype features.</p>
 <p>The modules under <code class="docutils literal notranslate"><span class="pre">torchaudio.prototype</span></code> must be
 imported explicitly, e.g.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torchaudio.prototype.models</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torchaudio.prototype.models</span>
 </pre></div>
 </div>
 <div class="toctree-wrapper compound">
@@ -599,7 +603,7 @@ imported explicitly, e.g.</p>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="prototype.pipelines.html#vggish">VGGish</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#id3">Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#id2">Interface</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.html">VGGishBundle</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.html#properties">Properties</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGishBundle.html#sample-rate">sample_rate</a></li>
@@ -628,7 +632,7 @@ imported explicitly, e.g.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#id6">Pretrained Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="prototype.pipelines.html#id3">Pretrained Models</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="generated/torchaudio.prototype.pipelines.VGGISH.html">VGGISH</a></li>
 </ul>
 </li>
@@ -672,7 +676,7 @@ imported explicitly, e.g.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -714,9 +718,6 @@ imported explicitly, e.g.</p>
          <script src="_static/underscore.js"></script>
          <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="_static/katex_autorenderer.js"></script>
      
 
   

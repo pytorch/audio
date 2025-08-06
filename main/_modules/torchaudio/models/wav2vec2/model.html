@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.models.wav2vec2.model &mdash; Torchaudio 2.5.0.dev20241105 documentation</title>
+  <title>torchaudio.models.wav2vec2.model &mdash; Torchaudio 2.8.0 documentation</title>
   
 
   
@@ -31,8 +31,6 @@
   <!-- <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" /> -->
   <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/katex-math.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-binder.css" type="text/css" />
   <link rel="stylesheet" href="../../../../_static/sg_gallery-dataframe.css" type="text/css" />
@@ -221,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../../../../versions.html"><span style="font-size:110%">2.5.0.dev20241105 &#x25BC</span></a>
+      <a href="../../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
     </div>
     
 
@@ -394,7 +392,7 @@
         
       <li>torchaudio.models.wav2vec2.model &gt;</li>
       
-      <li>Nightly (unstable)</li>
+      <li>Old version (stable)</li>
       
     
     
@@ -430,17 +428,17 @@
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
   <h1>Source code for torchaudio.models.wav2vec2.model</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">Module</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">Module</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">components</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">components</span>
 
 
-<div class="viewcode-block" id="Wav2Vec2Model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model">[docs]</a><span class="k">class</span> <span class="nc">Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="Wav2Vec2Model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Wav2Vec2Model</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Acoustic model used in *wav2vec 2.0* :cite:`baevski2020wav2vec`.</span>
 
 <span class="sd">    Note:</span>
@@ -462,7 +460,7 @@
 <span class="sd">            Auxiliary module. If provided, the output from encoder is passed to this module.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">feature_extractor</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
         <span class="n">encoder</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
@@ -474,7 +472,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">aux</span> <span class="o">=</span> <span class="n">aux</span>
 
 <div class="viewcode-block" id="Wav2Vec2Model.extract_features"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model.extract_features">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
-    <span class="k">def</span> <span class="nf">extract_features</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">extract_features</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -516,7 +514,7 @@
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">extract_features</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span></div>
 
-<div class="viewcode-block" id="Wav2Vec2Model.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="Wav2Vec2Model.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.models.Wav2Vec2Model.html#torchaudio.models.Wav2Vec2Model.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -552,7 +550,7 @@
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">lengths</span></div></div>
 
 
-<div class="viewcode-block" id="HuBERTPretrainModel"><a class="viewcode-back" href="../../../../generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel">[docs]</a><span class="k">class</span> <span class="nc">HuBERTPretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="HuBERTPretrainModel"><a class="viewcode-back" href="../../../../generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">HuBERTPretrainModel</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;HuBERTPretrainModel()</span>
 
 <span class="sd">    HuBERT model used for pretraining in *HuBERT* :cite:`hsu2021hubert`.</span>
@@ -580,7 +578,7 @@
 <span class="sd">            The scale factor will not affect the forward pass.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">wav2vec2</span><span class="p">:</span> <span class="n">Wav2Vec2Model</span><span class="p">,</span>
         <span class="n">mask_generator</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span>
@@ -597,7 +595,7 @@
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_grad_mult</span> <span class="o">=</span> <span class="n">feature_grad_mult</span>
 
-<div class="viewcode-block" id="HuBERTPretrainModel.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+<div class="viewcode-block" id="HuBERTPretrainModel.forward"><a class="viewcode-back" href="../../../../generated/torchaudio.models.HuBERTPretrainModel.html#torchaudio.models.HuBERTPretrainModel.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">waveforms</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
@@ -655,7 +653,7 @@
         <span class="k">return</span> <span class="n">logit_m</span><span class="p">,</span> <span class="n">logit_u</span><span class="p">,</span> <span class="n">features_pen</span></div></div>
 
 
-<div class="viewcode-block" id="wav2vec2_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_model.html#torchaudio.models.wav2vec2_model">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_model</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_model.html#torchaudio.models.wav2vec2_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wav2vec2_model</span><span class="p">(</span>
     <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
     <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -821,7 +819,7 @@
     <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_base.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_base</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_base.html#torchaudio.models.wav2vec2_base">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wav2vec2_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -869,7 +867,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_large.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_large.html#torchaudio.models.wav2vec2_large">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wav2vec2_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -917,7 +915,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_large_lv60k.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_large_lv60k"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_large_lv60k.html#torchaudio.models.wav2vec2_large_lv60k">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wav2vec2_large_lv60k</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -965,7 +963,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_base.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_base</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_base.html#torchaudio.models.hubert_base">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">hubert_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1013,7 +1011,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_large.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_large</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_large.html#torchaudio.models.hubert_large">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">hubert_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1061,7 +1059,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_xlarge.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_xlarge</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_xlarge"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_xlarge.html#torchaudio.models.hubert_xlarge">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">hubert_xlarge</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1109,7 +1107,7 @@
     <span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_init_hubert_pretrain_model</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_init_hubert_pretrain_model</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">components</span><span class="o">.</span><span class="n">ConvLayerBlock</span><span class="p">):</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">kaiming_normal_</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">conv</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">components</span><span class="o">.</span><span class="n">ConvolutionalPositionalEmbedding</span><span class="p">):</span>
@@ -1130,7 +1128,7 @@
         <span class="k">pass</span>
 
 
-<div class="viewcode-block" id="hubert_pretrain_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_model.html#torchaudio.models.hubert_pretrain_model">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_model</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_model.html#torchaudio.models.hubert_pretrain_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">hubert_pretrain_model</span><span class="p">(</span>
     <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
     <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1423,7 +1421,7 @@
     <span class="k">return</span> <span class="n">model</span></div>
 
 
-<div class="viewcode-block" id="hubert_pretrain_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_base.html#torchaudio.models.hubert_pretrain_base">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_base</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_base.html#torchaudio.models.hubert_pretrain_base">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">hubert_pretrain_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1499,7 +1497,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_pretrain_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_large.html#torchaudio.models.hubert_pretrain_large">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_large</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_large.html#torchaudio.models.hubert_pretrain_large">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">hubert_pretrain_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1572,7 +1570,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="hubert_pretrain_xlarge"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_xlarge.html#torchaudio.models.hubert_pretrain_xlarge">[docs]</a><span class="k">def</span> <span class="nf">hubert_pretrain_xlarge</span><span class="p">(</span>
+<div class="viewcode-block" id="hubert_pretrain_xlarge"><a class="viewcode-back" href="../../../../generated/torchaudio.models.hubert_pretrain_xlarge.html#torchaudio.models.hubert_pretrain_xlarge">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">hubert_pretrain_xlarge</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1645,7 +1643,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wavlm_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_model.html#torchaudio.models.wavlm_model">[docs]</a><span class="k">def</span> <span class="nf">wavlm_model</span><span class="p">(</span>
+<div class="viewcode-block" id="wavlm_model"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_model.html#torchaudio.models.wavlm_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wavlm_model</span><span class="p">(</span>
     <span class="n">extractor_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">extractor_conv_layer_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]],</span>
     <span class="n">extractor_conv_bias</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -1757,7 +1755,7 @@
     <span class="k">return</span> <span class="n">Wav2Vec2Model</span><span class="p">(</span><span class="n">feature_extractor</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">aux</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wavlm_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_base.html#torchaudio.models.wavlm_base">[docs]</a><span class="k">def</span> <span class="nf">wavlm_base</span><span class="p">(</span>
+<div class="viewcode-block" id="wavlm_base"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_base.html#torchaudio.models.wavlm_base">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wavlm_base</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
@@ -1809,7 +1807,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wavlm_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_large.html#torchaudio.models.wavlm_large">[docs]</a><span class="k">def</span> <span class="nf">wavlm_large</span><span class="p">(</span>
+<div class="viewcode-block" id="wavlm_large"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wavlm_large.html#torchaudio.models.wavlm_large">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wavlm_large</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1861,7 +1859,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_xlsr_300m"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_300m.html#torchaudio.models.wav2vec2_xlsr_300m">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_xlsr_300m</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_xlsr_300m"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_300m.html#torchaudio.models.wav2vec2_xlsr_300m">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wav2vec2_xlsr_300m</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1911,7 +1909,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_xlsr_1b"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_1b.html#torchaudio.models.wav2vec2_xlsr_1b">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_xlsr_1b</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_xlsr_1b"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_1b.html#torchaudio.models.wav2vec2_xlsr_1b">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wav2vec2_xlsr_1b</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -1961,7 +1959,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="wav2vec2_xlsr_2b"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_2b.html#torchaudio.models.wav2vec2_xlsr_2b">[docs]</a><span class="k">def</span> <span class="nf">wav2vec2_xlsr_2b</span><span class="p">(</span>
+<div class="viewcode-block" id="wav2vec2_xlsr_2b"><a class="viewcode-back" href="../../../../generated/torchaudio.models.wav2vec2_xlsr_2b.html#torchaudio.models.wav2vec2_xlsr_2b">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">wav2vec2_xlsr_2b</span><span class="p">(</span>
     <span class="n">encoder_projection_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
     <span class="n">encoder_attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="n">encoder_ff_interm_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -2025,7 +2023,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2024, Torchaudio Contributors.
+        &copy; Copyright 2025, Torchaudio Contributors.
 
     </p>
   </div>
@@ -2064,9 +2062,6 @@
          <script src="../../../../_static/underscore.js"></script>
          <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
          <script src="../../../../_static/doctools.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js"></script>
-         <script src="https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/contrib/auto-render.min.js"></script>
-         <script src="../../../../_static/katex_autorenderer.js"></script>
      
 
   

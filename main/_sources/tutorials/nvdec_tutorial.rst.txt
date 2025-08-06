@@ -25,10 +25,20 @@ Accelerated video decoding with NVDEC
 
 **Author**: `Moto Hira <moto@meta.com>`__
 
+.. warning::
+    Starting with version 2.8, we are refactoring TorchAudio to transition it
+    into a maintenance phase. As a result:
+
+    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The decoding and encoding capabilities of PyTorch for both audio and video
+      are being consolidated into TorchCodec.
+
+    Please see https://github.com/pytorch/audio/issues/3902 for more information.
+
 This tutorial shows how to use NVIDIA’s hardware video decoder (NVDEC)
 with TorchAudio, and how it improves the performance of video decoding.
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-23
+.. GENERATED FROM PYTHON SOURCE LINES 24-33
 
 .. note::
 
@@ -40,7 +50,7 @@ with TorchAudio, and how it improves the performance of video decoding.
    for how to build FFmpeg with HW acceleration.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-31
+.. GENERATED FROM PYTHON SOURCE LINES 34-41
 
 .. code-block:: default
 
@@ -59,13 +69,13 @@ with TorchAudio, and how it improves the performance of video decoding.
 
  .. code-block:: none
 
-    2.6.0.dev20241104
-    2.5.0.dev20241105
+    2.8.0+cu126
+    2.8.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-39
+.. GENERATED FROM PYTHON SOURCE LINES 43-49
 
 .. code-block:: default
 
@@ -82,7 +92,7 @@ with TorchAudio, and how it improves the performance of video decoding.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-46
+.. GENERATED FROM PYTHON SOURCE LINES 50-56
 
 Check the prerequisites
 -----------------------
@@ -91,7 +101,7 @@ First, we check that TorchAudio correctly detects FFmpeg libraries
 that support HW decoder/encoder.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-50
+.. GENERATED FROM PYTHON SOURCE LINES 57-60
 
 .. code-block:: default
 
@@ -105,7 +115,7 @@ that support HW decoder/encoder.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-57
+.. GENERATED FROM PYTHON SOURCE LINES 62-67
 
 .. code-block:: default
 
@@ -123,6 +133,8 @@ that support HW decoder/encoder.
  .. code-block:: none
 
     FFmpeg Library versions:
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:64: UserWarning: torio.utils.ffmpeg_utils.get_versions has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      for k, ver in ffmpeg_utils.get_versions().items():
       libavcodec:   60.3.100
       libavdevice:  60.1.100
       libavfilter:  9.3.100
@@ -132,7 +144,7 @@ that support HW decoder/encoder.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-65
+.. GENERATED FROM PYTHON SOURCE LINES 69-75
 
 .. code-block:: default
 
@@ -151,6 +163,8 @@ that support HW decoder/encoder.
  .. code-block:: none
 
     Available NVDEC Decoders:
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:71: UserWarning: torio.utils.ffmpeg_utils.get_video_decoders has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      for k in ffmpeg_utils.get_video_decoders().keys():
      - av1_cuvid
      - h264_cuvid
      - hevc_cuvid
@@ -165,7 +179,7 @@ that support HW decoder/encoder.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-71
+.. GENERATED FROM PYTHON SOURCE LINES 77-81
 
 .. code-block:: default
 
@@ -182,12 +196,12 @@ that support HW decoder/encoder.
  .. code-block:: none
 
     Avaialbe GPU:
-    _CudaDeviceProperties(name='NVIDIA A10G', major=8, minor=6, total_memory=22502MB, multi_processor_count=80, uuid=c2ea4597-4a2d-78c5-bb14-b396bfc31024, L2_cache_size=6MB)
+    _CudaDeviceProperties(name='NVIDIA A10G', major=8, minor=6, total_memory=22598MB, multi_processor_count=80, uuid=566db26d-0405-a011-4198-2699df443f87, pci_bus_id=0, pci_device_id=30, pci_domain_id=0, L2_cache_size=6MB)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-84
+.. GENERATED FROM PYTHON SOURCE LINES 82-94
 
 We will use the following video which has the following properties;
 
@@ -202,7 +216,7 @@ We will use the following video which has the following properties;
      <source src="https://download.pytorch.org/torchaudio/tutorial-assets/stream-api/NASAs_Most_Scientifically_Complex_Space_Observatory_Requires_Precision-MP4_small.mp4" type="video/mp4">
    </video>
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-93
+.. GENERATED FROM PYTHON SOURCE LINES 98-103
 
 .. code-block:: default
 
@@ -219,12 +233,14 @@ We will use the following video which has the following properties;
 
  .. code-block:: none
 
-      0%|          | 0.00/31.8M [00:00<?, ?B/s]     79%|#######9  | 25.2M/31.8M [00:00<00:00, 263MB/s]    100%|##########| 31.8M/31.8M [00:00<00:00, 265MB/s]
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:99: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      src = torchaudio.utils.download_asset(
+      0%|          | 0.00/31.8M [00:00<?, ?B/s]     88%|########7 | 27.9M/31.8M [00:00<00:00, 291MB/s]    100%|##########| 31.8M/31.8M [00:00<00:00, 291MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-101
+.. GENERATED FROM PYTHON SOURCE LINES 104-111
 
 Decoding videos with NVDEC
 --------------------------
@@ -234,7 +250,7 @@ defining the output video stream by passing ``decoder`` option to
 :py:meth:`~torchaudio.io.StreamReader.add_video_stream` method.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-107
+.. GENERATED FROM PYTHON SOURCE LINES 111-117
 
 .. code-block:: default
 
@@ -248,14 +264,21 @@ defining the output video stream by passing ``decoder`` option to
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:112: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-109
+
+.. GENERATED FROM PYTHON SOURCE LINES 118-119
 
 The video frames are decoded and returned as tensor of NCHW format.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-113
+.. GENERATED FROM PYTHON SOURCE LINES 120-123
 
 .. code-block:: default
 
@@ -275,12 +298,12 @@ The video frames are decoded and returned as tensor of NCHW format.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-116
+.. GENERATED FROM PYTHON SOURCE LINES 124-126
 
 By default, the decoded frames are sent back to CPU memory, and
 CPU tensors are created.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-120
+.. GENERATED FROM PYTHON SOURCE LINES 127-130
 
 .. code-block:: default
 
@@ -300,7 +323,7 @@ CPU tensors are created.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-134
+.. GENERATED FROM PYTHON SOURCE LINES 131-144
 
 By specifying ``hw_accel`` option, you can convert the decoded frames
 to CUDA tensor.
@@ -316,7 +339,7 @@ to :py:class:`torch.device`.
    Please use :py:meth:`~torchaudio.io.StreamReader.add_video_stream`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-144
+.. GENERATED FROM PYTHON SOURCE LINES 145-154
 
 .. code-block:: default
 
@@ -337,12 +360,14 @@ to :py:class:`torch.device`.
 
  .. code-block:: none
 
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:146: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
     torch.Size([5, 3, 540, 960]) torch.uint8 cuda:0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-180
+.. GENERATED FROM PYTHON SOURCE LINES 155-190
 
 .. note::
 
@@ -380,7 +405,7 @@ to :py:class:`torch.device`.
        hw_accel="cuda:1",
    )
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-190
+.. GENERATED FROM PYTHON SOURCE LINES 192-200
 
 Visualization
 -------------
@@ -391,7 +416,7 @@ against equivalent results from software decoders.
 The following function seeks into the given timestamp and decode one
 frame with the specificed decoder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-201
+.. GENERATED FROM PYTHON SOURCE LINES 200-211
 
 .. code-block:: default
 
@@ -413,7 +438,7 @@ frame with the specificed decoder.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-209
+.. GENERATED FROM PYTHON SOURCE LINES 213-219
 
 .. code-block:: default
 
@@ -427,10 +452,17 @@ frame with the specificed decoder.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:203: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 210-216
+
+.. GENERATED FROM PYTHON SOURCE LINES 220-226
 
 .. note::
 
@@ -439,7 +471,7 @@ frame with the specificed decoder.
    The following function performs YUV to RGB covnersion
    (and axis shuffling for plotting).
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-238
+.. GENERATED FROM PYTHON SOURCE LINES 227-248
 
 .. code-block:: default
 
@@ -471,12 +503,12 @@ frame with the specificed decoder.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-241
+.. GENERATED FROM PYTHON SOURCE LINES 249-251
 
 Now we visualize the resutls.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 242-259
+.. GENERATED FROM PYTHON SOURCE LINES 252-269
 
 .. code-block:: default
 
@@ -509,13 +541,13 @@ Now we visualize the resutls.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 260-263
+.. GENERATED FROM PYTHON SOURCE LINES 270-273
 
 They are indistinguishable to the eyes of the author.
 Feel free to let us know if you spot something. :)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 267-285
+.. GENERATED FROM PYTHON SOURCE LINES 277-295
 
 HW resizing and cropping
 ------------------------
@@ -536,7 +568,7 @@ For other available options, please run
 ``ffmpeg -h decoder=h264_cuvid``.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 285-297
+.. GENERATED FROM PYTHON SOURCE LINES 295-307
 
 .. code-block:: default
 
@@ -559,7 +591,7 @@ For other available options, please run
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 299-306
+.. GENERATED FROM PYTHON SOURCE LINES 309-316
 
 .. code-block:: default
 
@@ -578,6 +610,8 @@ For other available options, please run
 
  .. code-block:: none
 
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:298: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
     Option: None:   torch.Size([1, 3, 540, 960])
     Option: {'resize': '480x270'}:  torch.Size([1, 3, 270, 480])
     Option: {'crop': '135x135x240x240'}:    torch.Size([1, 3, 270, 480])
@@ -586,7 +620,7 @@ For other available options, please run
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-327
+.. GENERATED FROM PYTHON SOURCE LINES 318-337
 
 .. code-block:: default
 
@@ -627,7 +661,7 @@ For other available options, please run
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 328-350
+.. GENERATED FROM PYTHON SOURCE LINES 338-360
 
 Comparing resizing methods
 --------------------------
@@ -652,7 +686,7 @@ generated using the following command.
      <source src="https://download.pytorch.org/torchaudio/tutorial-assets/mptestsrc.mp4" type="video/mp4">
    </video>
 
-.. GENERATED FROM PYTHON SOURCE LINES 354-358
+.. GENERATED FROM PYTHON SOURCE LINES 364-368
 
 .. code-block:: default
 
@@ -668,18 +702,20 @@ generated using the following command.
 
  .. code-block:: none
 
-      0%|          | 0.00/232k [00:00<?, ?B/s]    100%|##########| 232k/232k [00:00<00:00, 67.9MB/s]
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:365: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      test_src = torchaudio.utils.download_asset("tutorial-assets/mptestsrc.mp4")
+      0%|          | 0.00/232k [00:00<?, ?B/s]    100%|##########| 232k/232k [00:00<00:00, 128MB/s]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 359-362
+.. GENERATED FROM PYTHON SOURCE LINES 369-372
 
 The following function decodes video and
 apply the specified scaling algorithm.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 362-374
+.. GENERATED FROM PYTHON SOURCE LINES 372-384
 
 .. code-block:: default
 
@@ -702,12 +738,12 @@ apply the specified scaling algorithm.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 375-377
+.. GENERATED FROM PYTHON SOURCE LINES 385-387
 
 The following function uses HW decoder to decode video and resize.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 377-388
+.. GENERATED FROM PYTHON SOURCE LINES 387-398
 
 .. code-block:: default
 
@@ -729,11 +765,11 @@ The following function uses HW decoder to decode video and resize.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 389-390
+.. GENERATED FROM PYTHON SOURCE LINES 399-400
 
 Now we execute them and visualize the resulting frames.
 
-.. GENERATED FROM PYTHON SOURCE LINES 390-406
+.. GENERATED FROM PYTHON SOURCE LINES 400-416
 
 .. code-block:: default
 
@@ -757,10 +793,19 @@ Now we execute them and visualize the resulting frames.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:376: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(test_src)
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:390: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(test_src)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 408-432
+
+.. GENERATED FROM PYTHON SOURCE LINES 418-442
 
 .. code-block:: default
 
@@ -800,13 +845,13 @@ Now we execute them and visualize the resulting frames.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 433-436
+.. GENERATED FROM PYTHON SOURCE LINES 443-446
 
 None of them is exactly the same. To the eyes of authors, lanczos(1)
 appears to be most similar to NVDEC.
 The bicubic looks close as well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 438-444
+.. GENERATED FROM PYTHON SOURCE LINES 448-454
 
 Benchmark NVDEC with StreamReader
 ---------------------------------
@@ -815,7 +860,7 @@ In this section, we compare the performace of software video
 decoding and HW video decoding.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 447-466
+.. GENERATED FROM PYTHON SOURCE LINES 457-476
 
 Decode as CUDA frames
 ---------------------
@@ -837,11 +882,11 @@ The procedures to test look like the following
    software decoder as well.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 469-470
+.. GENERATED FROM PYTHON SOURCE LINES 479-480
 
 The following function implements the hardware decoder test case.
 
-.. GENERATED FROM PYTHON SOURCE LINES 470-488
+.. GENERATED FROM PYTHON SOURCE LINES 480-498
 
 .. code-block:: default
 
@@ -870,11 +915,11 @@ The following function implements the hardware decoder test case.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 489-490
+.. GENERATED FROM PYTHON SOURCE LINES 499-500
 
 The following function implements the software decoder test case.
 
-.. GENERATED FROM PYTHON SOURCE LINES 490-510
+.. GENERATED FROM PYTHON SOURCE LINES 500-520
 
 .. code-block:: default
 
@@ -905,12 +950,12 @@ The following function implements the software decoder test case.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 511-513
+.. GENERATED FROM PYTHON SOURCE LINES 521-523
 
 For each resolution of video, we run multiple software decoder test
 cases with different number of threads.
 
-.. GENERATED FROM PYTHON SOURCE LINES 513-526
+.. GENERATED FROM PYTHON SOURCE LINES 523-536
 
 .. code-block:: default
 
@@ -934,14 +979,14 @@ cases with different number of threads.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 527-531
+.. GENERATED FROM PYTHON SOURCE LINES 537-541
 
 Now we run the tests with videos of different resolutions.
 
 QVGA
 ----
 
-.. GENERATED FROM PYTHON SOURCE LINES 531-535
+.. GENERATED FROM PYTHON SOURCE LINES 541-545
 
 .. code-block:: default
 
@@ -957,33 +1002,39 @@ QVGA
 
  .. code-block:: none
 
-      0%|          | 0.00/1.06M [00:00<?, ?B/s]    100%|##########| 1.06M/1.06M [00:00<00:00, 178MB/s]
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:542: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      src_qvga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_qvga.h264.mp4")
+      0%|          | 0.00/1.06M [00:00<?, ?B/s]    100%|##########| 1.06M/1.06M [00:00<00:00, 267MB/s]
     Testing: testsrc2_qvga.h264.mp4
     * Software decoding (num_threads=1)
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:503: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 0.50 seconds. (1806.62 fps)
+     - Processed 900 frames in 0.50 seconds. (1792.93 fps)
     * Software decoding (num_threads=4)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 0.33 seconds. (2745.66 fps)
+     - Processed 900 frames in 0.35 seconds. (2551.90 fps)
     * Software decoding (num_threads=8)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 0.34 seconds. (2618.36 fps)
+     - Processed 900 frames in 0.34 seconds. (2662.90 fps)
     * Software decoding (num_threads=16)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 895 frames in 0.38 seconds. (2373.79 fps)
+     - Processed 895 frames in 0.35 seconds. (2551.38 fps)
     * Hardware decoding
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:483: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 240, 320])
-     - Processed 900 frames in 1.96 seconds. (459.49 fps)
+     - Processed 900 frames in 2.01 seconds. (447.51 fps)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 536-538
+.. GENERATED FROM PYTHON SOURCE LINES 546-548
 
 VGA
 ---
 
-.. GENERATED FROM PYTHON SOURCE LINES 538-542
+.. GENERATED FROM PYTHON SOURCE LINES 548-552
 
 .. code-block:: default
 
@@ -999,33 +1050,39 @@ VGA
 
  .. code-block:: none
 
-      0%|          | 0.00/3.59M [00:00<?, ?B/s]    100%|##########| 3.59M/3.59M [00:00<00:00, 387MB/s]
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:549: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      src_vga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_vga.h264.mp4")
+      0%|          | 0.00/3.59M [00:00<?, ?B/s]    100%|##########| 3.59M/3.59M [00:00<00:00, 407MB/s]
     Testing: testsrc2_vga.h264.mp4
     * Software decoding (num_threads=1)
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:503: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 1.21 seconds. (742.50 fps)
+     - Processed 900 frames in 1.26 seconds. (711.65 fps)
     * Software decoding (num_threads=4)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 0.62 seconds. (1451.09 fps)
+     - Processed 900 frames in 0.69 seconds. (1302.73 fps)
     * Software decoding (num_threads=8)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 0.60 seconds. (1491.94 fps)
+     - Processed 900 frames in 0.73 seconds. (1239.85 fps)
     * Software decoding (num_threads=16)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 895 frames in 0.62 seconds. (1454.80 fps)
+     - Processed 895 frames in 0.66 seconds. (1353.78 fps)
     * Hardware decoding
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:483: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 480, 640])
-     - Processed 900 frames in 0.34 seconds. (2636.78 fps)
+     - Processed 900 frames in 0.34 seconds. (2639.67 fps)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 543-545
+.. GENERATED FROM PYTHON SOURCE LINES 553-555
 
 XGA
 ---
 
-.. GENERATED FROM PYTHON SOURCE LINES 545-550
+.. GENERATED FROM PYTHON SOURCE LINES 555-560
 
 .. code-block:: default
 
@@ -1042,35 +1099,41 @@ XGA
 
  .. code-block:: none
 
-      0%|          | 0.00/9.22M [00:00<?, ?B/s]    100%|##########| 9.22M/9.22M [00:00<00:00, 377MB/s]
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:556: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      src_xga = torchaudio.utils.download_asset("tutorial-assets/testsrc2_xga.h264.mp4")
+      0%|          | 0.00/9.22M [00:00<?, ?B/s]    100%|##########| 9.22M/9.22M [00:00<00:00, 319MB/s]
     Testing: testsrc2_xga.h264.mp4
     * Software decoding (num_threads=1)
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:503: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 2.68 seconds. (336.20 fps)
+     - Processed 900 frames in 2.68 seconds. (335.81 fps)
     * Software decoding (num_threads=4)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 1.27 seconds. (710.09 fps)
+     - Processed 900 frames in 1.17 seconds. (771.75 fps)
     * Software decoding (num_threads=8)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 1.25 seconds. (718.68 fps)
+     - Processed 900 frames in 1.07 seconds. (838.61 fps)
     * Software decoding (num_threads=16)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 895 frames in 1.28 seconds. (696.98 fps)
+     - Processed 895 frames in 1.01 seconds. (881.89 fps)
     * Hardware decoding
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:483: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 768, 1024])
-     - Processed 900 frames in 0.61 seconds. (1473.75 fps)
+     - Processed 900 frames in 0.61 seconds. (1473.41 fps)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 551-555
+.. GENERATED FROM PYTHON SOURCE LINES 561-565
 
 Result
 ------
 
 Now we plot the result.
 
-.. GENERATED FROM PYTHON SOURCE LINES 555-580
+.. GENERATED FROM PYTHON SOURCE LINES 565-590
 
 .. code-block:: default
 
@@ -1111,7 +1174,7 @@ Now we plot the result.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 581-599
+.. GENERATED FROM PYTHON SOURCE LINES 591-609
 
 We observe couple of things
 
@@ -1132,7 +1195,7 @@ hardware decoders are slower than software decoders. But using A10
 GPU hardware deocder is faster than software decodr.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 602-626
+.. GENERATED FROM PYTHON SOURCE LINES 612-636
 
 Decode and resize
 -----------------
@@ -1159,7 +1222,7 @@ The pipeline 3 has the minimum amount of data transfer from CPU to
 CUDA, which significantly contribute to performant data loading.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 629-634
+.. GENERATED FROM PYTHON SOURCE LINES 639-644
 
 The following function implements the pipeline 1. It uses PyTorch's
 :py:func:`torch.nn.functional.interpolate`.
@@ -1167,7 +1230,7 @@ We use ``bincubic`` mode, as we saw that the resulting frames are
 closest to NVDEC resizing.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 634-655
+.. GENERATED FROM PYTHON SOURCE LINES 644-665
 
 .. code-block:: default
 
@@ -1199,7 +1262,7 @@ closest to NVDEC resizing.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 656-662
+.. GENERATED FROM PYTHON SOURCE LINES 666-672
 
 The following function implements the pipeline 2. Frames are resized
 as part of decoding process, then sent to CUDA device.
@@ -1208,7 +1271,7 @@ We use ``bincubic`` mode, to make the result comparable with
 PyTorch-based implementation above.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 662-684
+.. GENERATED FROM PYTHON SOURCE LINES 672-694
 
 .. code-block:: default
 
@@ -1241,12 +1304,12 @@ PyTorch-based implementation above.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 685-687
+.. GENERATED FROM PYTHON SOURCE LINES 695-697
 
 The following function implements the pipeline 3. Resizing is
 performed by NVDEC and the resulting tensor is placed on CUDA memory.
 
-.. GENERATED FROM PYTHON SOURCE LINES 687-705
+.. GENERATED FROM PYTHON SOURCE LINES 697-715
 
 .. code-block:: default
 
@@ -1275,12 +1338,12 @@ performed by NVDEC and the resulting tensor is placed on CUDA memory.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 706-708
+.. GENERATED FROM PYTHON SOURCE LINES 716-718
 
 The following function run the benchmark functions on given sources.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 709-723
+.. GENERATED FROM PYTHON SOURCE LINES 719-733
 
 .. code-block:: default
 
@@ -1305,16 +1368,16 @@ The following function run the benchmark functions on given sources.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 724-725
+.. GENERATED FROM PYTHON SOURCE LINES 734-735
 
 Now we run the tests.
 
-.. GENERATED FROM PYTHON SOURCE LINES 728-730
+.. GENERATED FROM PYTHON SOURCE LINES 738-740
 
 QVGA
 ----
 
-.. GENERATED FROM PYTHON SOURCE LINES 730-733
+.. GENERATED FROM PYTHON SOURCE LINES 740-743
 
 .. code-block:: default
 
@@ -1331,24 +1394,30 @@ QVGA
 
     Testing: testsrc2_qvga.h264.mp4
     * Software decoding with PyTorch interpolate
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:647: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.68 seconds. (1331.12 fps)
+     - Processed 900 frames in 0.59 seconds. (1517.03 fps)
     * Software decoding with FFmpeg scale
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:675: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.39 seconds. (2337.60 fps)
+     - Processed 900 frames in 0.38 seconds. (2391.42 fps)
     * Hardware decoding with resize
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:700: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 2.02 seconds. (446.63 fps)
+     - Processed 900 frames in 2.01 seconds. (447.62 fps)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 734-736
+.. GENERATED FROM PYTHON SOURCE LINES 744-746
 
 VGA
 ---
 
-.. GENERATED FROM PYTHON SOURCE LINES 736-739
+.. GENERATED FROM PYTHON SOURCE LINES 746-749
 
 .. code-block:: default
 
@@ -1365,24 +1434,30 @@ VGA
 
     Testing: testsrc2_vga.h264.mp4
     * Software decoding with PyTorch interpolate
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:647: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 1.47 seconds. (611.65 fps)
+     - Processed 900 frames in 1.36 seconds. (659.64 fps)
     * Software decoding with FFmpeg scale
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:675: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.68 seconds. (1328.66 fps)
+     - Processed 900 frames in 0.68 seconds. (1333.05 fps)
     * Hardware decoding with resize
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:700: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.34 seconds. (2654.48 fps)
+     - Processed 900 frames in 1.47 seconds. (611.88 fps)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 740-742
+.. GENERATED FROM PYTHON SOURCE LINES 750-752
 
 XGA
 ---
 
-.. GENERATED FROM PYTHON SOURCE LINES 742-745
+.. GENERATED FROM PYTHON SOURCE LINES 752-755
 
 .. code-block:: default
 
@@ -1399,26 +1474,32 @@ XGA
 
     Testing: testsrc2_xga.h264.mp4
     * Software decoding with PyTorch interpolate
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:647: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 3.07 seconds. (293.05 fps)
+     - Processed 900 frames in 2.55 seconds. (352.97 fps)
     * Software decoding with FFmpeg scale
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:675: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 1.02 seconds. (884.01 fps)
+     - Processed 900 frames in 1.06 seconds. (847.18 fps)
     * Hardware decoding with resize
+    /pytorch/audio/examples/tutorials/nvdec_tutorial.py:700: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
+      s = StreamReader(src)
      - Shape: torch.Size([5, 3, 224, 224])
-     - Processed 900 frames in 0.61 seconds. (1481.19 fps)
+     - Processed 900 frames in 0.61 seconds. (1480.00 fps)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 746-750
+.. GENERATED FROM PYTHON SOURCE LINES 756-760
 
 Result
 ------
 Now we plot the result.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 750-774
+.. GENERATED FROM PYTHON SOURCE LINES 760-784
 
 .. code-block:: default
 
@@ -1458,7 +1539,7 @@ Now we plot the result.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 775-787
+.. GENERATED FROM PYTHON SOURCE LINES 785-797
 
 Hardware deocder shows a similar trend as previous experiment.
 In fact, the performance is almost the same. Hardware resizing has
@@ -1473,14 +1554,14 @@ manipulated and copied are smaller than the case where applying
 resizing after frames are converted to Tensor.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 790-791
+.. GENERATED FROM PYTHON SOURCE LINES 800-801
 
 Tag: :obj:`torchaudio.io`
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  30.868 seconds)
+   **Total running time of the script:** ( 0 minutes  30.874 seconds)
 
 
 .. _sphx_glr_download_tutorials_nvdec_tutorial.py:
