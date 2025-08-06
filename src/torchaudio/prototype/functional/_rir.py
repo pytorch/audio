@@ -1,5 +1,6 @@
 import math
 from typing import Optional, Tuple, Union
+from torchaudio._internal.module_utils import dropping_support
 
 import torch
 import torchaudio
@@ -176,6 +177,7 @@ def _validate_inputs(
         raise ValueError(f"`mic_array` must be a 2D Tensor with shape (num_channels, 3). Found {mic_array.shape}.")
 
 
+@dropping_support
 def simulate_rir_ism(
     room: torch.Tensor,
     source: torch.Tensor,
@@ -276,6 +278,7 @@ def simulate_rir_ism(
     return rir
 
 
+@dropping_support
 def ray_tracing(
     room: torch.Tensor,
     source: torch.Tensor,

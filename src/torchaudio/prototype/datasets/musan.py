@@ -4,12 +4,13 @@ from typing import Tuple, Union
 import torch
 from torch.utils.data import Dataset
 from torchaudio.datasets.utils import _load_waveform
+from torchaudio._internal.module_utils import dropping_support, dropping_class_support
 
 
 _SUBSETS = ["music", "noise", "speech"]
 _SAMPLE_RATE = 16_000
 
-
+@dropping_class_support
 class Musan(Dataset):
     r"""*MUSAN* :cite:`musan2015` dataset.
 

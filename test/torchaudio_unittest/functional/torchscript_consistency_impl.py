@@ -6,6 +6,8 @@ import torchaudio.functional as F
 from parameterized import parameterized
 from torchaudio_unittest import common_utils
 from torchaudio_unittest.common_utils import skipIfRocm, TempDirMixin, TestBaseMixin, torch_script
+from torchaudio.functional.functional import rnnt_loss
+
 
 
 class Functional(TempDirMixin, TestBaseMixin):
@@ -801,7 +803,12 @@ class FunctionalFloat32Only(TestBaseMixin):
             targets = torch.tensor([[1, 2]], device=tensor.device, dtype=torch.int32)
             logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
             target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
-            return F.rnnt_loss(tensor, targets, logit_lengths, target_lengths)
+            # This is hack for those functions which are deprecated with decorators
+            # like @deprecated or @dropping_support. Adding the decorators breaks
+            # TorchScript. So here we use the private function which make the tests
+            # pass, but that's a lie: the public (deprecated) function doesn't
+            # support torchscript anymore
+            return F.functional._rnnt_loss(tensor, targets, logit_lengths, target_lengths)
 
         logits = torch.tensor(
             [

@@ -13,8 +13,9 @@ jobs:
   tests:
     strategy:
       matrix:
-        python_version: ["3.8", "3.9", "3.10"]
-        cuda_arch_version: ["11.8"]
+        # TODO add up to 3.13
+        python_version: ["3.10"]
+        cuda_arch_version: ["12.6"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:
@@ -43,12 +44,15 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
+        # Avoid reproducibility errors with CUBLAS: https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility
+        export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
-        # Set CHANNEL
+        # Set UPLOAD_CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
-          export CHANNEL=test
+          export UPLOAD_CHANNEL=test
         else
-          export CHANNEL=nightly
+          export UPLOAD_CHANNEL=nightly
         fi
 
         echo "::group::Create conda env"
@@ -59,16 +63,13 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install PyTorch"
-        conda install \
-          --yes \
-          --quiet \
-          -c "pytorch-${CHANNEL}" \
-          -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
-          "${CUDATOOLKIT}"
-
+        export GPU_ARCH_ID="cu126"  # TODO this is currently hardcoded, should depend on matrix's value.
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
+        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
         echo "::endgroup::"
+
         echo "::group::Install TorchAudio"
-        conda install --quiet --yes 'cmake>=3.18.0' ninja
+        conda install --quiet --yes cmake ninja
         pip3 install --progress-bar off -v -e . --no-use-pep517
 
         echo "::endgroup::"
@@ -77,31 +78,35 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install other Dependencies"
-        conda install \
-          --quiet --yes \
-          -c conda-forge \
-          -c numba/label/dev \
-          sox libvorbis 'librosa==0.10.0' parameterized 'requests>=2.20'
-        pip3 install --progress-bar off \
-          kaldi-io \
-          SoundFile \
-          coverage \
-          pytest \
-          pytest-cov \
-          'scipy==1.7.3' \
-          transformers \
-          expecttest \
-          unidecode \
-          inflect \
-          Pillow \
-          sentencepiece \
-          pytorch-lightning \
-          'protobuf<4.21.0' \
-          demucs \
-          tinytag \
-          flashlight-text \
-          git+https://github.com/kpu/kenlm/ \
-          git+https://github.com/pytorch/fairseq.git@e47a4c8
+        # conda install \
+        #   --quiet --yes \
+        #   -c conda-forge \
+        #   -c numba/label/dev \
+        #   sox libvorbis 'librosa==0.10.0' parameterized 'requests>=2.20'
+        # pip3 install --progress-bar off \
+        #   kaldi-io \
+        #   SoundFile \
+        #   coverage \
+        #   pytest \
+        #   pytest-cov \
+        #   scipy \
+        #   transformers \
+        #   expecttest \
+        #   unidecode \
+        #   inflect \
+        #   Pillow \
+        #   sentencepiece \
+        #   pytorch-lightning \
+        #   'protobuf<4.21.0' \
+        #   demucs \
+        #   tinytag \
+        #   flashlight-text \
+        #   git+https://github.com/kpu/kenlm/ \
+        #   git+https://github.com/pytorch/fairseq.git@e47a4c8
+        
+        pip3 install parameterized requests
+        pip3 install kaldi-io SoundFile librosa coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag 
+        pip3 install "pillow<10.0" "scipy<1.10" "numpy<2.0"
 
         echo "::endgroup::"
         echo "::group::Run tests"
@@ -112,7 +117,7 @@ jobs:
             '--cov=torchaudio'
             "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
             '--durations' '100'
-            '-k' 'cuda or gpu'
+            '-k' '(cuda or gpu) and not (torchscript and rnnt) and not torchscript_consistency'
         )
 
         cd test

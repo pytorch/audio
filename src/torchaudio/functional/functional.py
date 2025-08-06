@@ -9,7 +9,8 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal.module_utils import deprecated
+from torchaudio._internal.module_utils import deprecated, dropping_support
+
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -1759,8 +1760,21 @@ def _fix_waveform_shape(
     waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
     return waveform_shift
 
+class RnntLoss(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, *args):
+        output, saved = torch.ops.torchaudio.rnnt_loss_forward(*args)
+        ctx.save_for_backward(saved)
+        return output
 
-def rnnt_loss(
+    @staticmethod
+    def backward(ctx, dy):
+        grad = ctx.saved_tensors[0]
+        grad_out = dy.view((-1, 1, 1, 1))
+        result = grad * grad_out;
+        return (result, None, None, None, None, None, None, None)
+
+def _rnnt_loss(
     logits: Tensor,
     targets: Tensor,
     logit_lengths: Tensor,
@@ -1802,14 +1816,14 @@ def rnnt_loss(
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
 
-    costs, _ = torch.ops.torchaudio.rnnt_loss(
-        logits=logits,
-        targets=targets,
-        logit_lengths=logit_lengths,
-        target_lengths=target_lengths,
-        blank=blank,
-        clamp=clamp,
-        fused_log_softmax=fused_log_softmax,
+    costs = RnntLoss.apply(
+        logits,
+        targets,
+        logit_lengths,
+        target_lengths,
+        blank,
+        clamp,
+        fused_log_softmax
     )
 
     if reduction == "mean":
@@ -1864,6 +1878,9 @@ def psd(
     psd = psd.sum(dim=-3)
     return psd
 
+# Expose both deprecated wrapper as well as original because torchscript breaks on
+# wrapped functions.
+rnnt_loss = dropping_support(_rnnt_loss)
 
 def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
     r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.
@@ -2494,7 +2511,7 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
     """
     a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
-    return torchaudio.functional.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+    return torchaudio.functional.filtering.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
 
 
 def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):

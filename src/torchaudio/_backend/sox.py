@@ -41,7 +41,7 @@ class SoXBackend(Backend):
                 "Please use an alternative backend that does support loading from file-like objects, e.g. FFmpeg.",
             )
         else:
-            ret = sox_ext.load_audio_file(uri, frame_offset, num_frames, normalize, channels_first, format)
+            ret = sox_ext.load_audio_file(str(uri), frame_offset, num_frames, normalize, channels_first, format)
             if not ret:
                 raise RuntimeError(f"Failed to load audio from {uri}.")
             return ret
@@ -70,7 +70,7 @@ class SoXBackend(Backend):
             )
         else:
             sox_ext.save_audio_file(
-                uri,
+                str(uri),
                 src,
                 sample_rate,
                 channels_first,

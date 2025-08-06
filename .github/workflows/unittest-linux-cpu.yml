@@ -13,7 +13,8 @@ jobs:
   tests:
     strategy:
       matrix:
-        python_version: ["3.8", "3.9", "3.10"]
+        # TODO all from 3.9 to 3.13
+        python_version: ["3.11"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:
@@ -55,6 +56,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
         echo '::endgroup::'
 
         set -euxo pipefail

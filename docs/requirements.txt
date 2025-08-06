@@ -13,7 +13,8 @@ breathe==4.34.0
 -e git+https://github.com/pytorch/pytorch_sphinx_theme.git@32a6550#egg=pytorch_sphinx_theme
 sphinx==5.1.1
 sphinxcontrib.katex==0.8.6
-sphinxcontrib.bibtex==2.4.2
+# sphinxcontrib.bibtex==2.4.2
+sphinxcontrib.bibtex
 sphinx_gallery==0.11.1
 nbsphinx==0.8.8
 

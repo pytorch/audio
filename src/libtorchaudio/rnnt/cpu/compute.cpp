@@ -116,8 +116,8 @@ std::tuple<torch::Tensor, std::optional<torch::Tensor>> compute(
           /*workspace=*/workspace,
           /*logits=*/logits.data_ptr<float>(),
           /*targets=*/targets.data_ptr<int>(),
-          /*logit_lengths=*/logit_lengths.data_ptr<int>(),
-          /*target_lengths=*/target_lengths.data_ptr<int>(),
+          /*srcLengths=*/logit_lengths.data_ptr<int>(),
+          /*tgtLengths=*/target_lengths.data_ptr<int>(),
           /*costs=*/costs.data_ptr<float>(),
           /*gradients=*/gradients->data_ptr<float>());
       break;
@@ -127,8 +127,8 @@ std::tuple<torch::Tensor, std::optional<torch::Tensor>> compute(
           /*workspace=*/workspace,
           /*logits=*/logits.data_ptr<c10::Half>(),
           /*targets=*/targets.data_ptr<int>(),
-          /*logit_lengths=*/logit_lengths.data_ptr<int>(),
-          /*target_lengths=*/target_lengths.data_ptr<int>(),
+          /*srcLengths=*/logit_lengths.data_ptr<int>(),
+          /*tgtLengths=*/target_lengths.data_ptr<int>(),
           /*costs=*/costs.data_ptr<c10::Half>(),
           /*gradients=*/gradients->data_ptr<c10::Half>());
       break;

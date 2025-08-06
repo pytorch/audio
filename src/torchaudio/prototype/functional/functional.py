@@ -4,6 +4,7 @@ from typing import Optional
 
 import torch
 from torchaudio.functional.functional import _create_triangular_filterbank
+from torchaudio._internal.module_utils import dropping_support
 
 
 def _hz_to_bark(freqs: float, bark_scale: str = "traunmuller") -> float:
@@ -72,6 +73,7 @@ def _hz_to_octs(freqs, tuning=0.0, bins_per_octave=12):
     return torch.log2(freqs / (a440 / 16))
 
 
+@dropping_support
 def barkscale_fbanks(
     n_freqs: int,
     f_min: float,
@@ -129,6 +131,7 @@ def barkscale_fbanks(
     return fb
 
 
+@dropping_support
 def chroma_filterbank(
     sample_rate: int,
     n_freqs: int,
