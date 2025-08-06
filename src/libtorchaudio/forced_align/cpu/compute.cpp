@@ -6,6 +6,7 @@
 #include <torch/csrc/inductor/aoti_torch/c/shim.h>
 #include <torch/csrc/inductor/aoti_torch/utils.h>
 #include <libtorchaudio/accessor.h>
+#include <torch/headeronly/util/Half.h>
 
 
 using namespace std;
@@ -22,7 +23,7 @@ template <typename scalar_t, typename target_t>
 void forced_align_impl(
     const Tensor logProbs,
     const Tensor targets,
-    const Tensor blank,
+    target_t blank,
     Tensor paths) {
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   const auto batchIndex =
@@ -143,15 +144,15 @@ std::tuple<Tensor, Tensor> compute(
   TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
   TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
   TORCH_CHECK(
-      logProbs.device() == targets.device(),
+      logProbs.get_device() == targets.get_device(),
       "log_probs and targets need to be on the same device");
   TORCH_CHECK(
-      logProbs.dtype() == torch::kFloat64 ||
-          logProbs.dtype() == torch::kFloat32 ||
-          logProbs.dtype() == torch::kFloat16,
+      logProbs.dtype() == aoti_torch_dtype_float64() ||
+          logProbs.dtype() == aoti_torch_dtype_float32() ||
+          logProbs.dtype() == aoti_torch_dtype_float16(),
       "log_probs must be float64, float32 or float16 (half) type");
   TORCH_CHECK(
-      targets.dtype() == torch::kInt32 || targets.dtype() == torch::kInt64,
+      targets.dtype() == aoti_torch_dtype_int32() || targets.dtype() == aoti_torch_dtype_int64(),
       "targets must be int32 or int64 type");
   TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
   TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
@@ -174,12 +175,13 @@ std::tuple<Tensor, Tensor> compute(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
 
-  TORCH_CHECK(
-      logProbs.size(1) == at::max(inputLengths).item().toInt(),
-      "input length mismatch");
-  TORCH_CHECK(
-      targets.size(1) == at::max(targetLengths).item().toInt(),
-      "target length mismatch");
+  // TODO: Requires port of `max` operator.
+  // TORCH_CHECK(
+  //     logProbs.size(1) == at::max(inputLengths).item().toInt(),
+  //     "input length mismatch");
+  // TORCH_CHECK(
+  //     targets.size(1) == at::max(targetLengths).item().toInt(),
+  //     "target length mismatch");
 
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
@@ -187,25 +189,27 @@ std::tuple<Tensor, Tensor> compute(
   int64_t paths_size[2] = {B, T};
   int64_t paths_stride[2] = {T, 1};
   AtenTensorHandle paths_h;
-  aoti_torch_empty_strided(1, paths_size, paths_stride, targets_dtype, targets_device, targets_device_index, &paths_h);
+  int32_t targets_device;
+  aoti_torch_get_device_type(targets.get(), &targets_device);
+  aoti_torch_empty_strided(1, paths_size, paths_stride, targets.dtype(), targets_device, targets.get_device(), &paths_h);
   auto paths = Tensor(paths_h);
 
 
   if (targets.dtype() == aoti_torch_dtype_int64()) {
-    if (logProbs.scalar_type() == aoti_torch_dtype_float64()) {
-      forced_align_impl<float64, int64>(logProbs, targets, blank, paths);
-    } else if (logProbs.scalar_type() == aoti_torch_dtype_float32()) {
-      forced_align_impl<float32, int64>(logProbs, targets, blank, paths);
-    } else if (logProbs.scalar_type() == aoti_torch_dtype_float16()) {
-      forced_align_impl<float16, int64>(logProbs, targets, blank, paths);
+    if (logProbs.dtype() == aoti_torch_dtype_float64()) {
+      forced_align_impl<double, int64_t>(logProbs, targets, blank, paths);
+    } else if (logProbs.dtype() == aoti_torch_dtype_float32()) {
+      forced_align_impl<float, int64_t>(logProbs, targets, blank, paths);
+    } else if (logProbs.dtype() == aoti_torch_dtype_float16()) {
+      forced_align_impl<c10::Half, int64_t>(logProbs, targets, blank, paths);
     }
-  } else if (targets.scalar_type() == aoti_torch_dtype_int32()) {
-    if (logProbs.scalar_type() == aoti_torch_dtype_float64()) {
-      forced_align_impl<float64, int32>(logProbs, targets, blank, paths);
-    } else if (logProbs.scalar_type() == aoti_torch_dtype_float32()) {
-      forced_align_impl<float32, int32>(logProbs, targets, blank, paths);
-    } else if (logProbs.scalar_type() == aoti_torch_dtype_float16()) {
-      forced_align_impl<float16, int32>(logProbs, targets, blank, paths);
+  } else if (targets.dtype() == aoti_torch_dtype_int32()) {
+    if (logProbs.dtype() == aoti_torch_dtype_float64()) {
+      forced_align_impl<double, int32_t>(logProbs, targets, blank, paths);
+    } else if (logProbs.dtype() == aoti_torch_dtype_float32()) {
+      forced_align_impl<float, int32_t>(logProbs, targets, blank, paths);
+    } else if (logProbs.dtype() == aoti_torch_dtype_float16()) {
+      forced_align_impl<c10::Half, int32_t>(logProbs, targets, blank, paths);
     }
   }
   return std::make_tuple(

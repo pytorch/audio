@@ -15,8 +15,8 @@ public:
   using tensor_type = typename std::conditional<IsConst, const Tensor&, Tensor&>::type;
 
   Accessor(tensor_type tensor) {
-    data = tensor.template data_ptr<T>();
-    for (int i = 0; i < k; i++) {
+    data = (T*)tensor.template data_ptr();
+    for (unsigned int i = 0; i < k; i++) {
       strides[i] = tensor.stride(i);
     }
   }
@@ -25,7 +25,7 @@ public:
     va_list args;
     va_start(args, k);
     int64_t ix = 0;
-    for (int i = 0; i < k; i++) {
+    for (unsigned int i = 0; i < k; i++) {
         ix += strides[i] * va_arg(args, int);
     }
     va_end(args);
@@ -37,7 +37,7 @@ public:
     va_list args;
     va_start(args, value);
     int64_t ix = 0;
-    for (int i = 0; i < k; i++) {
+    for (unsigned int i = 0; i < k; i++) {
         ix += strides[i] * va_arg(args, int);
     }
     va_end(args);
