@@ -1,0 +1,1851 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>torchaudio.models.tacotron2 &mdash; Torchaudio 2.8.0 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/>
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-beta/dist/katex.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T8XT4PS');</script>
+    <!-- End Google Tag Manager -->
+  
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="../../../_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css" integrity="sha384-vSIIfh2YWi9wW0r9iZe7RJPrKwp6bG+s9QZMoITbCckVJqGCCRhc+ccxNcdpHuYu" crossorigin="anonymous">
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-orange-arrow">
+                Docs
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/docs/stable/index.html">
+                  <span class="dropdown-title">PyTorch</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/audio/stable/index.html">
+                  <span class="dropdown-title">torchaudio</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/text/stable/index.html">
+                  <span class="dropdown-title">torchtext</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/vision/stable/index.html">
+                  <span class="dropdown-title">torchvision</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torcharrow">
+                  <span class="dropdown-title">torcharrow</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/data">
+                  <span class="dropdown-title">TorchData</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchrec">
+                  <span class="dropdown-title">TorchRec</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/serve/">
+                  <span class="dropdown-title">TorchServe</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/torchx/">
+                  <span class="dropdown-title">TorchX</span>
+                  <p></p>
+                </a>
+                <a class="doc-dropdown-option nav-dropdown-item" href="https://pytorch.org/xla">
+                  <span class="dropdown-title">PyTorch on XLA Devices</span>
+                  <p></p>
+                </a>
+            </div>
+          </li>
+
+          <li>
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Resources
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://pytorch.org/features">
+                  <span class="dropdown-title">About</span>
+                  <p>Learn about PyTorch’s features and capabilities</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/foundation">
+                  <span class="dropdown-title">PyTorch Foundation</span>
+                  <p>Learn about the PyTorch foundation</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/#community-module">
+                  <span class="dropdown-title">Community</span>
+                  <p>Join the PyTorch developer community to contribute, learn, and get your questions answered.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/community-stories">
+                  <span class="dropdown-title">Community Stories</span>
+                  <p>Learn how our community solves real, everyday machine learning problems with PyTorch.</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/resources">
+                  <span class="dropdown-title">Developer Resources</span>
+                  <p>Find resources and get questions answered</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/events">
+                  <span class="dropdown-title">Events</span>
+                  <p>Find events, webinars, and podcasts</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://discuss.pytorch.org/" target="_blank">
+                  <span class="dropdown-title">Forums</span>
+                  <p>A place to discuss PyTorch code, issues, install, research</p>
+                </a>
+                <a class="nav-dropdown-item" href="https://pytorch.org/hub">
+                  <span class="dropdown-title">Models (Beta)</span>
+                  <p>Discover, publish, and reuse pre-trained models</p>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">GitHub</a>
+          </li>
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+    <div class="version">
+      <a href="../../../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
+    </div>
+    
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Torchaudio Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Index</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../supported_features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../feature_classifications.html">Feature Classifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../logo.html">TorchAudio Logo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing pre-built binaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.html">Building from source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.linux.html">Building on Linux and macOS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.windows.html">Building on Windows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.jetson.html">Building on Jetson</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/librispeech_conformer_rnnt">Conformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/asr/emformer_rnnt">Emformer RNN-T ASR</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/source_separation">Conv-TasNet Source Separation</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/hubert">HuBERT Pre-training and Fine-tuning (ASR)</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pytorch/audio/tree/main/examples/avsr">Real-time AV-ASR</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torchaudio.html">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io.html">torchaudio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../functional.html">torchaudio.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../transforms.html">torchaudio.transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">torchaudio.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">torchaudio.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.decoder.html">torchaudio.models.decoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pipelines.html">torchaudio.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../sox_effects.html">torchaudio.sox_effects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../kaldi_io.html">torchaudio.kaldi_io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils.html">torchaudio.utils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.html">torio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.io.html">torio.io</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../torio.utils.html">torio.utils</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.html">torchaudio.prototype</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.functional.html">torchaudio.prototype.functional</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.models.html">torchaudio.prototype.models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.html">libtorio</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/docs">PyTorch</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/audio">torchaudio</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/text">torchtext</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/vision">torchvision</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/elastic/">TorchElastic</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://pytorch.org/serve">TorchServe</a></li>
+<li class="toctree-l1"><a class="reference external" href="http://pytorch.org/xla/">PyTorch on XLA Devices</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="../../../index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="../../index.html">Module code</a> &gt;</li>
+        
+      <li>torchaudio.models.tacotron2 &gt;</li>
+      
+      <li>Old version (stable)</li>
+      
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+    
+    
+          <!-- Google Tag Manager (noscript) -->
+          <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T8XT4PS"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+          <!-- End Google Tag Manager (noscript) -->
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <h1>Source code for torchaudio.models.tacotron2</h1><div class="highlight"><pre>
+<span></span><span class="c1"># *****************************************************************************</span>
+<span class="c1">#  Copyright (c) 2018, NVIDIA CORPORATION.  All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1">#  Redistribution and use in source and binary forms, with or without</span>
+<span class="c1">#  modification, are permitted provided that the following conditions are met:</span>
+<span class="c1">#      * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#        notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#      * Redistributions in binary form must reproduce the above copyright</span>
+<span class="c1">#        notice, this list of conditions and the following disclaimer in the</span>
+<span class="c1">#        documentation and/or other materials provided with the distribution.</span>
+<span class="c1">#      * Neither the name of the NVIDIA CORPORATION nor the</span>
+<span class="c1">#        names of its contributors may be used to endorse or promote products</span>
+<span class="c1">#        derived from this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1">#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND</span>
+<span class="c1">#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="c1">#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="c1">#  DISCLAIMED. IN NO EVENT SHALL NVIDIA CORPORATION BE LIABLE FOR ANY</span>
+<span class="c1">#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES</span>
+<span class="c1">#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<span class="c1">#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND</span>
+<span class="c1">#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="c1">#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS</span>
+<span class="c1">#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="c1">#</span>
+<span class="c1"># *****************************************************************************</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Tacotron2&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_linear_layer</span><span class="p">(</span><span class="n">in_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Linear layer with xavier uniform initialization.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_dim (int): Size of each input sample.</span>
+<span class="sd">        out_dim (int): Size of each output sample.</span>
+<span class="sd">        bias (bool, optional): If set to ``False``, the layer will not learn an additive bias. (Default: ``True``)</span>
+<span class="sd">        w_init_gain (str, optional): Parameter passed to ``torch.nn.init.calculate_gain``</span>
+<span class="sd">            for setting the gain parameter of ``xavier_uniform_``. (Default: ``linear``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.nn.Linear): The corresponding linear layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">linear</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_dim</span><span class="p">,</span> <span class="n">out_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">linear</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="n">w_init_gain</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">linear</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_conv1d_layer</span><span class="p">(</span>
+    <span class="n">in_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">out_channels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">padding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dilation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">bias</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">w_init_gain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;1D convolution with xavier uniform initialization.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_channels (int): Number of channels in the input image.</span>
+<span class="sd">        out_channels (int): Number of channels produced by the convolution.</span>
+<span class="sd">        kernel_size (int, optional): Number of channels in the input image. (Default: ``1``)</span>
+<span class="sd">        stride (int, optional): Number of channels in the input image. (Default: ``1``)</span>
+<span class="sd">        padding (str, int or tuple, optional): Padding added to both sides of the input.</span>
+<span class="sd">            (Default: dilation * (kernel_size - 1) / 2)</span>
+<span class="sd">        dilation (int, optional): Number of channels in the input image. (Default: ``1``)</span>
+<span class="sd">        w_init_gain (str, optional): Parameter passed to ``torch.nn.init.calculate_gain``</span>
+<span class="sd">            for setting the gain parameter of ``xavier_uniform_``. (Default: ``linear``)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.nn.Conv1d): The corresponding Conv1D layer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">padding</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">kernel_size</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;kernel_size must be odd&quot;</span><span class="p">)</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dilation</span> <span class="o">*</span> <span class="p">(</span><span class="n">kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">conv1d</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv1d</span><span class="p">(</span>
+        <span class="n">in_channels</span><span class="p">,</span>
+        <span class="n">out_channels</span><span class="p">,</span>
+        <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span>
+        <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+        <span class="n">dilation</span><span class="o">=</span><span class="n">dilation</span><span class="p">,</span>
+        <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="n">conv1d</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span> <span class="n">gain</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">calculate_gain</span><span class="p">(</span><span class="n">w_init_gain</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">conv1d</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_mask_from_lengths</span><span class="p">(</span><span class="n">lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns a binary mask based on ``lengths``. The ``i``-th row and ``j``-th column of the mask</span>
+<span class="sd">    is ``1`` if ``j`` is smaller than ``i``-th element of ``lengths.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lengths (Tensor): The length of each element in the batch, with shape (n_batch, ).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        mask (Tensor): The binary mask, with shape (n_batch, max of ``lengths``).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_len</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">lengths</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">lengths</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">ids</span> <span class="o">&lt;</span> <span class="n">lengths</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">le</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mask</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_LocationLayer</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Location layer used in the Attention model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        attention_n_filter (int): Number of filters for attention model.</span>
+<span class="sd">        attention_kernel_size (int): Kernel size for attention model.</span>
+<span class="sd">        attention_hidden_dim (int): Dimension of attention hidden representation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">attention_n_filter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">padding</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">attention_kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location_conv</span> <span class="o">=</span> <span class="n">_get_conv1d_layer</span><span class="p">(</span>
+            <span class="mi">2</span><span class="p">,</span>
+            <span class="n">attention_n_filter</span><span class="p">,</span>
+            <span class="n">kernel_size</span><span class="o">=</span><span class="n">attention_kernel_size</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">dilation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location_dense</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span>
+            <span class="n">attention_n_filter</span><span class="p">,</span> <span class="n">attention_hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Location layer used in the Attention model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attention_weights_cat (Tensor): Cumulative and previous attention weights</span>
+<span class="sd">                with shape (n_batch, 2, max of ``text_lengths``).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            processed_attention (Tensor): Cumulative and previous attention weights</span>
+<span class="sd">                with shape (n_batch, ``attention_hidden_dim``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># (n_batch, attention_n_filter, text_lengths.max())</span>
+        <span class="n">processed_attention</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_conv</span><span class="p">(</span><span class="n">attention_weights_cat</span><span class="p">)</span>
+        <span class="n">processed_attention</span> <span class="o">=</span> <span class="n">processed_attention</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># (n_batch, text_lengths.max(), attention_hidden_dim)</span>
+        <span class="n">processed_attention</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_dense</span><span class="p">(</span><span class="n">processed_attention</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">processed_attention</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Attention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Locally sensitive attention model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        attention_rnn_dim (int): Number of hidden units for RNN.</span>
+<span class="sd">        encoder_embedding_dim (int): Number of embedding dimensions in the Encoder.</span>
+<span class="sd">        attention_hidden_dim (int): Dimension of attention hidden representation.</span>
+<span class="sd">        attention_location_n_filter (int): Number of filters for Attention model.</span>
+<span class="sd">        attention_location_kernel_size (int): Kernel size for Attention model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">attention_rnn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_embedding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_location_n_filter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_location_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_layer</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">attention_hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">memory_layer</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span>
+            <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">attention_hidden_dim</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;tanh&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">attention_hidden_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location_layer</span> <span class="o">=</span> <span class="n">_LocationLayer</span><span class="p">(</span>
+            <span class="n">attention_location_n_filter</span><span class="p">,</span>
+            <span class="n">attention_location_kernel_size</span><span class="p">,</span>
+            <span class="n">attention_hidden_dim</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score_mask_value</span> <span class="o">=</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_alignment_energies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the alignment vector.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            query (Tensor): Decoder output with shape (n_batch, n_mels * n_frames_per_step).</span>
+<span class="sd">            processed_memory (Tensor): Processed Encoder outputs</span>
+<span class="sd">                with shape (n_batch, max of ``text_lengths``, attention_hidden_dim).</span>
+<span class="sd">            attention_weights_cat (Tensor): Cumulative and previous attention weights</span>
+<span class="sd">                with shape (n_batch, 2, max of ``text_lengths``).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            alignment (Tensor): attention weights, it is a tensor with shape (batch, max of ``text_lengths``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">processed_query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_layer</span><span class="p">(</span><span class="n">query</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">processed_attention_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">location_layer</span><span class="p">(</span><span class="n">attention_weights_cat</span><span class="p">)</span>
+        <span class="n">energies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">processed_query</span> <span class="o">+</span> <span class="n">processed_attention_weights</span> <span class="o">+</span> <span class="n">processed_memory</span><span class="p">))</span>
+
+        <span class="n">alignment</span> <span class="o">=</span> <span class="n">energies</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alignment</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">attention_hidden_state</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">processed_memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attention_weights_cat</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through the Attention model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attention_hidden_state (Tensor): Attention rnn last output with shape (n_batch, ``attention_rnn_dim``).</span>
+<span class="sd">            memory (Tensor): Encoder outputs with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).</span>
+<span class="sd">            processed_memory (Tensor): Processed Encoder outputs</span>
+<span class="sd">                with shape (n_batch, max of ``text_lengths``, ``attention_hidden_dim``).</span>
+<span class="sd">            attention_weights_cat (Tensor): Previous and cumulative attention weights</span>
+<span class="sd">                with shape (n_batch, current_num_frames * 2, max of ``text_lengths``).</span>
+<span class="sd">            mask (Tensor): Binary mask for padded data with shape (n_batch, current_num_frames).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).</span>
+<span class="sd">            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alignment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_alignment_energies</span><span class="p">(</span><span class="n">attention_hidden_state</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">)</span>
+
+        <span class="n">alignment</span> <span class="o">=</span> <span class="n">alignment</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_mask_value</span><span class="p">)</span>
+
+        <span class="n">attention_weights</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">alignment</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">attention_context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bmm</span><span class="p">(</span><span class="n">attention_weights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">memory</span><span class="p">)</span>
+        <span class="n">attention_context</span> <span class="o">=</span> <span class="n">attention_context</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">attention_context</span><span class="p">,</span> <span class="n">attention_weights</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Prenet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prenet Module. It is consists of ``len(output_size)`` linear layers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        in_dim (int): The size of each input sample.</span>
+<span class="sd">        output_sizes (list): The output dimension of each linear layers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">out_sizes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">in_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="n">in_dim</span><span class="p">]</span> <span class="o">+</span> <span class="n">out_sizes</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">in_size</span><span class="p">,</span> <span class="n">out_size</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">in_sizes</span><span class="p">,</span> <span class="n">out_sizes</span><span class="p">)]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through Prenet.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (Tensor): The input sequence to Prenet with shape (n_batch, in_dim).</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            x (Tensor): Tensor with shape (n_batch, sizes[-1])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">linear</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Postnet</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Postnet Module.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n_mels (int): Number of mel bins.</span>
+<span class="sd">        postnet_embedding_dim (int): Postnet embedding dimension.</span>
+<span class="sd">        postnet_kernel_size (int): Postnet kernel size.</span>
+<span class="sd">        postnet_n_convolution (int): Number of postnet convolutions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">postnet_embedding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">postnet_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">postnet_n_convolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convolutions</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">postnet_n_convolution</span><span class="p">):</span>
+            <span class="n">in_channels</span> <span class="o">=</span> <span class="n">n_mels</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">postnet_embedding_dim</span>
+            <span class="n">out_channels</span> <span class="o">=</span> <span class="n">n_mels</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="p">(</span><span class="n">postnet_n_convolution</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="n">postnet_embedding_dim</span>
+            <span class="n">init_gain</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="p">(</span><span class="n">postnet_n_convolution</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;tanh&quot;</span>
+            <span class="n">num_features</span> <span class="o">=</span> <span class="n">n_mels</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="p">(</span><span class="n">postnet_n_convolution</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">else</span> <span class="n">postnet_embedding_dim</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convolutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                    <span class="n">_get_conv1d_layer</span><span class="p">(</span>
+                        <span class="n">in_channels</span><span class="p">,</span>
+                        <span class="n">out_channels</span><span class="p">,</span>
+                        <span class="n">kernel_size</span><span class="o">=</span><span class="n">postnet_kernel_size</span><span class="p">,</span>
+                        <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">padding</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">postnet_kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                        <span class="n">dilation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">w_init_gain</span><span class="o">=</span><span class="n">init_gain</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">num_features</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_convs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convolutions</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through Postnet.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (Tensor): The input sequence with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``).</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            x (Tensor): Tensor with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">conv</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">convolutions</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_convs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Encoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encoder Module.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_embedding_dim (int): Number of embedding dimensions in the encoder.</span>
+<span class="sd">        encoder_n_convolution (int): Number of convolution layers in the encoder.</span>
+<span class="sd">        encoder_kernel_size (int): The kernel size in the encoder.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">        &gt;&gt;&gt; encoder = _Encoder(3, 512, 5)</span>
+<span class="sd">        &gt;&gt;&gt; input = torch.rand(10, 20, 30)</span>
+<span class="sd">        &gt;&gt;&gt; output = encoder(input)  # shape: (10, 30, 512)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">encoder_embedding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_n_convolution</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">convolutions</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">encoder_n_convolution</span><span class="p">):</span>
+            <span class="n">conv_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                <span class="n">_get_conv1d_layer</span><span class="p">(</span>
+                    <span class="n">encoder_embedding_dim</span><span class="p">,</span>
+                    <span class="n">encoder_embedding_dim</span><span class="p">,</span>
+                    <span class="n">kernel_size</span><span class="o">=</span><span class="n">encoder_kernel_size</span><span class="p">,</span>
+                    <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">padding</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">encoder_kernel_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">dilation</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">encoder_embedding_dim</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convolutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conv_layer</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span>
+            <span class="n">encoder_embedding_dim</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">encoder_embedding_dim</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">bidirectional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="o">.</span><span class="n">flatten_parameters</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through the Encoder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            x (Tensor): The input sequences with shape (n_batch, encoder_embedding_dim, n_seq).</span>
+<span class="sd">            input_lengths (Tensor): The length of each input sequence with shape (n_batch, ).</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            x (Tensor): A tensor with shape (n_batch, n_seq, encoder_embedding_dim).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">conv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">convolutions</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="mf">0.5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">input_lengths</span> <span class="o">=</span> <span class="n">input_lengths</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">rnn</span><span class="o">.</span><span class="n">pack_padded_sequence</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">outputs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lstm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">outputs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">rnn</span><span class="o">.</span><span class="n">pad_packed_sequence</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outputs</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Decoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder with Attention model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n_mels (int): number of mel bins</span>
+<span class="sd">        n_frames_per_step (int): number of frames processed per step, only 1 is supported</span>
+<span class="sd">        encoder_embedding_dim (int): the number of embedding dimensions in the encoder.</span>
+<span class="sd">        decoder_rnn_dim (int): number of units in decoder LSTM</span>
+<span class="sd">        decoder_max_step (int): maximum number of output mel spectrograms</span>
+<span class="sd">        decoder_dropout (float): dropout probability for decoder LSTM</span>
+<span class="sd">        decoder_early_stopping (bool): stop decoding when all samples are finished</span>
+<span class="sd">        attention_rnn_dim (int): number of units in attention LSTM</span>
+<span class="sd">        attention_hidden_dim (int): dimension of attention hidden representation</span>
+<span class="sd">        attention_location_n_filter (int): number of filters for attention model</span>
+<span class="sd">        attention_location_kernel_size (int): kernel size for attention model</span>
+<span class="sd">        attention_dropout (float): dropout probability for attention LSTM</span>
+<span class="sd">        prenet_dim (int): number of ReLU units in prenet layers</span>
+<span class="sd">        gate_threshold (float): probability threshold for stop token</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">n_frames_per_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">encoder_embedding_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">decoder_rnn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">decoder_max_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">decoder_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">decoder_early_stopping</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">attention_rnn_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_location_n_filter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_location_kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">attention_dropout</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">prenet_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">gate_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">=</span> <span class="n">n_mels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span> <span class="o">=</span> <span class="n">n_frames_per_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_embedding_dim</span> <span class="o">=</span> <span class="n">encoder_embedding_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn_dim</span> <span class="o">=</span> <span class="n">attention_rnn_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn_dim</span> <span class="o">=</span> <span class="n">decoder_rnn_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prenet_dim</span> <span class="o">=</span> <span class="n">prenet_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_max_step</span> <span class="o">=</span> <span class="n">decoder_max_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_threshold</span> <span class="o">=</span> <span class="n">gate_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_dropout</span> <span class="o">=</span> <span class="n">attention_dropout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_dropout</span> <span class="o">=</span> <span class="n">decoder_dropout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_early_stopping</span> <span class="o">=</span> <span class="n">decoder_early_stopping</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prenet</span> <span class="o">=</span> <span class="n">_Prenet</span><span class="p">(</span><span class="n">n_mels</span> <span class="o">*</span> <span class="n">n_frames_per_step</span><span class="p">,</span> <span class="p">[</span><span class="n">prenet_dim</span><span class="p">,</span> <span class="n">prenet_dim</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTMCell</span><span class="p">(</span><span class="n">prenet_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">attention_rnn_dim</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention_layer</span> <span class="o">=</span> <span class="n">_Attention</span><span class="p">(</span>
+            <span class="n">attention_rnn_dim</span><span class="p">,</span>
+            <span class="n">encoder_embedding_dim</span><span class="p">,</span>
+            <span class="n">attention_hidden_dim</span><span class="p">,</span>
+            <span class="n">attention_location_n_filter</span><span class="p">,</span>
+            <span class="n">attention_location_kernel_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTMCell</span><span class="p">(</span><span class="n">attention_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear_projection</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span><span class="n">decoder_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">n_mels</span> <span class="o">*</span> <span class="n">n_frames_per_step</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gate_layer</span> <span class="o">=</span> <span class="n">_get_linear_layer</span><span class="p">(</span>
+            <span class="n">decoder_rnn_dim</span> <span class="o">+</span> <span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">w_init_gain</span><span class="o">=</span><span class="s2">&quot;sigmoid&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_initial_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Gets all zeros frames to use as the first decoder input.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (Tensor): Encoder outputs with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            decoder_input (Tensor): all zeros frames with shape</span>
+<span class="sd">                (n_batch, max of ``text_lengths``, ``n_mels * n_frames_per_step``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_batch</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">device</span>
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decoder_input</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_decoder_states</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initializes attention rnn states, decoder rnn states, attention</span>
+<span class="sd">        weights, attention cumulative weights, attention context, stores memory</span>
+<span class="sd">        and stores processed memory.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (Tensor): Encoder outputs with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).</span>
+<span class="sd">            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).</span>
+<span class="sd">            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).</span>
+<span class="sd">            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).</span>
+<span class="sd">            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).</span>
+<span class="sd">            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, max of ``text_lengths``).</span>
+<span class="sd">            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).</span>
+<span class="sd">            processed_memory (Tensor): Processed encoder outputs</span>
+<span class="sd">                with shape (n_batch, max of ``text_lengths``, ``attention_hidden_dim``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_batch</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">max_time</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">device</span>
+
+        <span class="n">attention_hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">attention_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">decoder_cell</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">attention_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">attention_weights_cum</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="n">max_time</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">attention_context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">processed_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_layer</span><span class="o">.</span><span class="n">memory_layer</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">attention_hidden</span><span class="p">,</span>
+            <span class="n">attention_cell</span><span class="p">,</span>
+            <span class="n">decoder_hidden</span><span class="p">,</span>
+            <span class="n">decoder_cell</span><span class="p">,</span>
+            <span class="n">attention_weights</span><span class="p">,</span>
+            <span class="n">attention_weights_cum</span><span class="p">,</span>
+            <span class="n">attention_context</span><span class="p">,</span>
+            <span class="n">processed_memory</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_decoder_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">decoder_inputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepares decoder inputs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            decoder_inputs (Tensor): Inputs used for teacher-forced training, i.e. mel-specs,</span>
+<span class="sd">                with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            inputs (Tensor): Processed decoder inputs with shape (max of ``mel_specgram_lengths``, n_batch, ``n_mels``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># (n_batch, n_mels, mel_specgram_lengths.max()) -&gt; (n_batch, mel_specgram_lengths.max(), n_mels)</span>
+        <span class="n">decoder_inputs</span> <span class="o">=</span> <span class="n">decoder_inputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">decoder_inputs</span> <span class="o">=</span> <span class="n">decoder_inputs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+            <span class="n">decoder_inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">decoder_inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span><span class="p">),</span>
+            <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># (n_batch, mel_specgram_lengths.max(), n_mels) -&gt; (mel_specgram_lengths.max(), n_batch, n_mels)</span>
+        <span class="n">decoder_inputs</span> <span class="o">=</span> <span class="n">decoder_inputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decoder_inputs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_decoder_outputs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">mel_specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">alignments</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepares decoder outputs for output</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mel_specgram (Tensor): mel spectrogram with shape (max of ``mel_specgram_lengths``, n_batch, ``n_mels``)</span>
+<span class="sd">            gate_outputs (Tensor): predicted stop token with shape (max of ``mel_specgram_lengths``, n_batch)</span>
+<span class="sd">            alignments (Tensor): sequence of attention weights from the decoder</span>
+<span class="sd">                with shape (max of ``mel_specgram_lengths``, n_batch, max of ``text_lengths``)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mel_specgram (Tensor): mel spectrogram with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``)</span>
+<span class="sd">            gate_outputs (Tensor): predicted stop token with shape (n_batch, max of ``mel_specgram_lengths``)</span>
+<span class="sd">            alignments (Tensor): sequence of attention weights from the decoder</span>
+<span class="sd">                with shape (n_batch, max of ``mel_specgram_lengths``, max of ``text_lengths``)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># (mel_specgram_lengths.max(), n_batch, text_lengths.max())</span>
+        <span class="c1"># -&gt; (n_batch, mel_specgram_lengths.max(), text_lengths.max())</span>
+        <span class="n">alignments</span> <span class="o">=</span> <span class="n">alignments</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="c1"># (mel_specgram_lengths.max(), n_batch) -&gt; (n_batch, mel_specgram_lengths.max())</span>
+        <span class="n">gate_outputs</span> <span class="o">=</span> <span class="n">gate_outputs</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="c1"># (mel_specgram_lengths.max(), n_batch, n_mels) -&gt; (n_batch, mel_specgram_lengths.max(), n_mels)</span>
+        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span>
+        <span class="c1"># decouple frames per step</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">mel_specgram</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">)</span>
+        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">)</span>
+        <span class="c1"># (n_batch, mel_specgram_lengths.max(), n_mels) -&gt; (n_batch, n_mels, T_out)</span>
+        <span class="n">mel_specgram</span> <span class="o">=</span> <span class="n">mel_specgram</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">decoder_input</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attention_hidden</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attention_cell</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">decoder_hidden</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">decoder_cell</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attention_weights</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attention_weights_cum</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attention_context</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">processed_memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">mask</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder step using stored states, attention and memory</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            decoder_input (Tensor): Output of the Prenet with shape (n_batch, ``prenet_dim``).</span>
+<span class="sd">            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).</span>
+<span class="sd">            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).</span>
+<span class="sd">            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).</span>
+<span class="sd">            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).</span>
+<span class="sd">            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).</span>
+<span class="sd">            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, max of ``text_lengths``).</span>
+<span class="sd">            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).</span>
+<span class="sd">            memory (Tensor): Encoder output with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).</span>
+<span class="sd">            processed_memory (Tensor): Processed Encoder outputs</span>
+<span class="sd">                with shape (n_batch, max of ``text_lengths``, ``attention_hidden_dim``).</span>
+<span class="sd">            mask (Tensor): Binary mask for padded data with shape (n_batch, current_num_frames).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            decoder_output: Predicted mel spectrogram for the current frame with shape (n_batch, ``n_mels``).</span>
+<span class="sd">            gate_prediction (Tensor): Prediction of the stop token with shape (n_batch, ``1``).</span>
+<span class="sd">            attention_hidden (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).</span>
+<span class="sd">            attention_cell (Tensor): Hidden state of the attention LSTM with shape (n_batch, ``attention_rnn_dim``).</span>
+<span class="sd">            decoder_hidden (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).</span>
+<span class="sd">            decoder_cell (Tensor): Hidden state of the decoder LSTM with shape (n_batch, ``decoder_rnn_dim``).</span>
+<span class="sd">            attention_weights (Tensor): Attention weights with shape (n_batch, max of ``text_lengths``).</span>
+<span class="sd">            attention_weights_cum (Tensor): Cumulated attention weights with shape (n_batch, max of ``text_lengths``).</span>
+<span class="sd">            attention_context (Tensor): Context vector with shape (n_batch, ``encoder_embedding_dim``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cell_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">decoder_input</span><span class="p">,</span> <span class="n">attention_context</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_rnn</span><span class="p">(</span><span class="n">cell_input</span><span class="p">,</span> <span class="p">(</span><span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_cell</span><span class="p">))</span>
+        <span class="n">attention_hidden</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">attention_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_dropout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+
+        <span class="n">attention_weights_cat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">attention_weights</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">attention_weights_cum</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">attention_context</span><span class="p">,</span> <span class="n">attention_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention_layer</span><span class="p">(</span>
+            <span class="n">attention_hidden</span><span class="p">,</span> <span class="n">memory</span><span class="p">,</span> <span class="n">processed_memory</span><span class="p">,</span> <span class="n">attention_weights_cat</span><span class="p">,</span> <span class="n">mask</span>
+        <span class="p">)</span>
+
+        <span class="n">attention_weights_cum</span> <span class="o">+=</span> <span class="n">attention_weights</span>
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">attention_hidden</span><span class="p">,</span> <span class="n">attention_context</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_rnn</span><span class="p">(</span><span class="n">decoder_input</span><span class="p">,</span> <span class="p">(</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">decoder_cell</span><span class="p">))</span>
+        <span class="n">decoder_hidden</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_dropout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">)</span>
+
+        <span class="n">decoder_hidden_attention_context</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">decoder_hidden</span><span class="p">,</span> <span class="n">attention_context</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">decoder_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear_projection</span><span class="p">(</span><span class="n">decoder_hidden_attention_context</span><span class="p">)</span>
+
+        <span class="n">gate_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate_layer</span><span class="p">(</span><span class="n">decoder_hidden_attention_context</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">decoder_output</span><span class="p">,</span>
+            <span class="n">gate_prediction</span><span class="p">,</span>
+            <span class="n">attention_hidden</span><span class="p">,</span>
+            <span class="n">attention_cell</span><span class="p">,</span>
+            <span class="n">decoder_hidden</span><span class="p">,</span>
+            <span class="n">decoder_cell</span><span class="p">,</span>
+            <span class="n">attention_weights</span><span class="p">,</span>
+            <span class="n">attention_weights_cum</span><span class="p">,</span>
+            <span class="n">attention_context</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">mel_specgram_truth</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">memory_lengths</span><span class="p">:</span> <span class="n">Tensor</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decoder forward pass for training.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (Tensor): Encoder outputs</span>
+<span class="sd">                with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).</span>
+<span class="sd">            mel_specgram_truth (Tensor): Decoder ground-truth mel-specs for teacher forcing</span>
+<span class="sd">                with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``).</span>
+<span class="sd">            memory_lengths (Tensor): Encoder output lengths for attention masking</span>
+<span class="sd">                (the same as ``text_lengths``) with shape (n_batch, ).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mel_specgram (Tensor): Predicted mel spectrogram</span>
+<span class="sd">                with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``).</span>
+<span class="sd">            gate_outputs (Tensor): Predicted stop token for each timestep</span>
+<span class="sd">                with shape (n_batch,  max of ``mel_specgram_lengths``).</span>
+<span class="sd">            alignments (Tensor): Sequence of attention weights from the decoder</span>
+<span class="sd">                with shape (n_batch,  max of ``mel_specgram_lengths``, max of ``text_lengths``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_initial_frame</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">decoder_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_decoder_inputs</span><span class="p">(</span><span class="n">mel_specgram_truth</span><span class="p">)</span>
+        <span class="n">decoder_inputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">decoder_input</span><span class="p">,</span> <span class="n">decoder_inputs</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">decoder_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prenet</span><span class="p">(</span><span class="n">decoder_inputs</span><span class="p">)</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">_get_mask_from_lengths</span><span class="p">(</span><span class="n">memory_lengths</span><span class="p">)</span>
+        <span class="p">(</span>
+            <span class="n">attention_hidden</span><span class="p">,</span>
+            <span class="n">attention_cell</span><span class="p">,</span>
+            <span class="n">decoder_hidden</span><span class="p">,</span>
+            <span class="n">decoder_cell</span><span class="p">,</span>
+            <span class="n">attention_weights</span><span class="p">,</span>
+            <span class="n">attention_weights_cum</span><span class="p">,</span>
+            <span class="n">attention_context</span><span class="p">,</span>
+            <span class="n">processed_memory</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_decoder_states</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span>
+
+        <span class="n">mel_outputs</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">mel_outputs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">decoder_inputs</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">decoder_inputs</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">mel_outputs</span><span class="p">)]</span>
+            <span class="p">(</span>
+                <span class="n">mel_output</span><span class="p">,</span>
+                <span class="n">gate_output</span><span class="p">,</span>
+                <span class="n">attention_hidden</span><span class="p">,</span>
+                <span class="n">attention_cell</span><span class="p">,</span>
+                <span class="n">decoder_hidden</span><span class="p">,</span>
+                <span class="n">decoder_cell</span><span class="p">,</span>
+                <span class="n">attention_weights</span><span class="p">,</span>
+                <span class="n">attention_weights_cum</span><span class="p">,</span>
+                <span class="n">attention_context</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">decoder_input</span><span class="p">,</span>
+                <span class="n">attention_hidden</span><span class="p">,</span>
+                <span class="n">attention_cell</span><span class="p">,</span>
+                <span class="n">decoder_hidden</span><span class="p">,</span>
+                <span class="n">decoder_cell</span><span class="p">,</span>
+                <span class="n">attention_weights</span><span class="p">,</span>
+                <span class="n">attention_weights_cum</span><span class="p">,</span>
+                <span class="n">attention_context</span><span class="p">,</span>
+                <span class="n">memory</span><span class="p">,</span>
+                <span class="n">processed_memory</span><span class="p">,</span>
+                <span class="n">mask</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">mel_outputs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">mel_output</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">gate_outputs</span> <span class="o">+=</span> <span class="p">[</span><span class="n">gate_output</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">alignments</span> <span class="o">+=</span> <span class="p">[</span><span class="n">attention_weights</span><span class="p">]</span>
+
+        <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_decoder_outputs</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">mel_outputs</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">gate_outputs</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">alignments</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_go_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets all zeros frames to use as the first decoder input</span>
+
+<span class="sd">        args:</span>
+<span class="sd">            memory (Tensor): Encoder outputs</span>
+<span class="sd">                with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).</span>
+
+<span class="sd">        returns:</span>
+<span class="sd">            decoder_input (Tensor): All zeros frames with shape(n_batch, ``n_mels`` * ``n_frame_per_step``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_batch</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">device</span>
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decoder_input</span>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">memory_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decoder inference</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            memory (Tensor): Encoder outputs</span>
+<span class="sd">                with shape (n_batch, max of ``text_lengths``, ``encoder_embedding_dim``).</span>
+<span class="sd">            memory_lengths (Tensor): Encoder output lengths for attention masking</span>
+<span class="sd">                (the same as ``text_lengths``) with shape (n_batch, ).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            mel_specgram (Tensor): Predicted mel spectrogram</span>
+<span class="sd">                with shape (n_batch, ``n_mels``, max of ``mel_specgram_lengths``).</span>
+<span class="sd">            mel_specgram_lengths (Tensor): the length of the predicted mel spectrogram (n_batch, ))</span>
+<span class="sd">            gate_outputs (Tensor): Predicted stop token for each timestep</span>
+<span class="sd">                with shape (n_batch,  max of ``mel_specgram_lengths``).</span>
+<span class="sd">            alignments (Tensor): Sequence of attention weights from the decoder</span>
+<span class="sd">                with shape (n_batch,  max of ``mel_specgram_lengths``, max of ``text_lengths``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">batch_size</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">memory</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">memory</span><span class="o">.</span><span class="n">device</span>
+
+        <span class="n">decoder_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_go_frame</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">_get_mask_from_lengths</span><span class="p">(</span><span class="n">memory_lengths</span><span class="p">)</span>
+        <span class="p">(</span>
+            <span class="n">attention_hidden</span><span class="p">,</span>
+            <span class="n">attention_cell</span><span class="p">,</span>
+            <span class="n">decoder_hidden</span><span class="p">,</span>
+            <span class="n">decoder_cell</span><span class="p">,</span>
+            <span class="n">attention_weights</span><span class="p">,</span>
+            <span class="n">attention_weights_cum</span><span class="p">,</span>
+            <span class="n">attention_context</span><span class="p">,</span>
+            <span class="n">processed_memory</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_decoder_states</span><span class="p">(</span><span class="n">memory</span><span class="p">)</span>
+
+        <span class="n">mel_specgram_lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">finished</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">batch_size</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">mel_specgrams</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gate_outputs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">alignments</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder_max_step</span><span class="p">):</span>
+            <span class="n">decoder_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prenet</span><span class="p">(</span><span class="n">decoder_input</span><span class="p">)</span>
+            <span class="p">(</span>
+                <span class="n">mel_specgram</span><span class="p">,</span>
+                <span class="n">gate_output</span><span class="p">,</span>
+                <span class="n">attention_hidden</span><span class="p">,</span>
+                <span class="n">attention_cell</span><span class="p">,</span>
+                <span class="n">decoder_hidden</span><span class="p">,</span>
+                <span class="n">decoder_cell</span><span class="p">,</span>
+                <span class="n">attention_weights</span><span class="p">,</span>
+                <span class="n">attention_weights_cum</span><span class="p">,</span>
+                <span class="n">attention_context</span><span class="p">,</span>
+            <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="n">decoder_input</span><span class="p">,</span>
+                <span class="n">attention_hidden</span><span class="p">,</span>
+                <span class="n">attention_cell</span><span class="p">,</span>
+                <span class="n">decoder_hidden</span><span class="p">,</span>
+                <span class="n">decoder_cell</span><span class="p">,</span>
+                <span class="n">attention_weights</span><span class="p">,</span>
+                <span class="n">attention_weights_cum</span><span class="p">,</span>
+                <span class="n">attention_context</span><span class="p">,</span>
+                <span class="n">memory</span><span class="p">,</span>
+                <span class="n">processed_memory</span><span class="p">,</span>
+                <span class="n">mask</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">mel_specgrams</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mel_specgram</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">gate_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gate_output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">alignments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attention_weights</span><span class="p">)</span>
+            <span class="n">mel_specgram_lengths</span><span class="p">[</span><span class="o">~</span><span class="n">finished</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">finished</span> <span class="o">|=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">gate_output</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">gate_threshold</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_early_stopping</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">finished</span><span class="p">):</span>
+                <span class="k">break</span>
+
+            <span class="n">decoder_input</span> <span class="o">=</span> <span class="n">mel_specgram</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mel_specgrams</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_max_step</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Reached max decoder steps. The generated spectrogram might not cover &quot;</span> <span class="s2">&quot;the whole transcript.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">mel_specgrams</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">gate_outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">gate_outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">alignments</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">alignments</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_decoder_outputs</span><span class="p">(</span><span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mel_specgrams</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span>
+
+
+<div class="viewcode-block" id="Tacotron2"><a class="viewcode-back" href="../../../generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Tacotron2</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Tacotron2 model from *Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions*</span>
+<span class="sd">    :cite:`shen2018natural` based on the implementation from</span>
+<span class="sd">    `Nvidia Deep Learning Examples &lt;https://github.com/NVIDIA/DeepLearningExamples/&gt;`_.</span>
+
+<span class="sd">    See Also:</span>
+<span class="sd">        * :class:`torchaudio.pipelines.Tacotron2TTSBundle`: TTS pipeline with pretrained model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mask_padding (bool, optional): Use mask padding (Default: ``False``).</span>
+<span class="sd">        n_mels (int, optional): Number of mel bins (Default: ``80``).</span>
+<span class="sd">        n_symbol (int, optional): Number of symbols for the input text (Default: ``148``).</span>
+<span class="sd">        n_frames_per_step (int, optional): Number of frames processed per step, only 1 is supported (Default: ``1``).</span>
+<span class="sd">        symbol_embedding_dim (int, optional): Input embedding dimension (Default: ``512``).</span>
+<span class="sd">        encoder_n_convolution (int, optional): Number of encoder convolutions (Default: ``3``).</span>
+<span class="sd">        encoder_kernel_size (int, optional): Encoder kernel size (Default: ``5``).</span>
+<span class="sd">        encoder_embedding_dim (int, optional): Encoder embedding dimension (Default: ``512``).</span>
+<span class="sd">        decoder_rnn_dim (int, optional): Number of units in decoder LSTM (Default: ``1024``).</span>
+<span class="sd">        decoder_max_step (int, optional): Maximum number of output mel spectrograms (Default: ``2000``).</span>
+<span class="sd">        decoder_dropout (float, optional): Dropout probability for decoder LSTM (Default: ``0.1``).</span>
+<span class="sd">        decoder_early_stopping (bool, optional): Continue decoding after all samples are finished (Default: ``True``).</span>
+<span class="sd">        attention_rnn_dim (int, optional): Number of units in attention LSTM (Default: ``1024``).</span>
+<span class="sd">        attention_hidden_dim (int, optional): Dimension of attention hidden representation (Default: ``128``).</span>
+<span class="sd">        attention_location_n_filter (int, optional): Number of filters for attention model (Default: ``32``).</span>
+<span class="sd">        attention_location_kernel_size (int, optional): Kernel size for attention model (Default: ``31``).</span>
+<span class="sd">        attention_dropout (float, optional): Dropout probability for attention LSTM (Default: ``0.1``).</span>
+<span class="sd">        prenet_dim (int, optional): Number of ReLU units in prenet layers (Default: ``256``).</span>
+<span class="sd">        postnet_n_convolution (int, optional): Number of postnet convolutions (Default: ``5``).</span>
+<span class="sd">        postnet_kernel_size (int, optional): Postnet kernel size (Default: ``5``).</span>
+<span class="sd">        postnet_embedding_dim (int, optional): Postnet embedding dimension (Default: ``512``).</span>
+<span class="sd">        gate_threshold (float, optional): Probability threshold for stop token (Default: ``0.5``).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mask_padding</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">n_mels</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span>
+        <span class="n">n_symbol</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">148</span><span class="p">,</span>
+        <span class="n">n_frames_per_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">symbol_embedding_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">encoder_embedding_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">encoder_n_convolution</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">encoder_kernel_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">decoder_rnn_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">decoder_max_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">,</span>
+        <span class="n">decoder_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">decoder_early_stopping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">attention_rnn_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="n">attention_hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
+        <span class="n">attention_location_n_filter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">attention_location_kernel_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">31</span><span class="p">,</span>
+        <span class="n">attention_dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">prenet_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">postnet_n_convolution</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">postnet_kernel_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">postnet_embedding_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+        <span class="n">gate_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mask_padding</span> <span class="o">=</span> <span class="n">mask_padding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span> <span class="o">=</span> <span class="n">n_mels</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_frames_per_step</span> <span class="o">=</span> <span class="n">n_frames_per_step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">n_symbol</span><span class="p">,</span> <span class="n">symbol_embedding_dim</span><span class="p">)</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">init</span><span class="o">.</span><span class="n">xavier_uniform_</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">_Encoder</span><span class="p">(</span><span class="n">encoder_embedding_dim</span><span class="p">,</span> <span class="n">encoder_n_convolution</span><span class="p">,</span> <span class="n">encoder_kernel_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">_Decoder</span><span class="p">(</span>
+            <span class="n">n_mels</span><span class="p">,</span>
+            <span class="n">n_frames_per_step</span><span class="p">,</span>
+            <span class="n">encoder_embedding_dim</span><span class="p">,</span>
+            <span class="n">decoder_rnn_dim</span><span class="p">,</span>
+            <span class="n">decoder_max_step</span><span class="p">,</span>
+            <span class="n">decoder_dropout</span><span class="p">,</span>
+            <span class="n">decoder_early_stopping</span><span class="p">,</span>
+            <span class="n">attention_rnn_dim</span><span class="p">,</span>
+            <span class="n">attention_hidden_dim</span><span class="p">,</span>
+            <span class="n">attention_location_n_filter</span><span class="p">,</span>
+            <span class="n">attention_location_kernel_size</span><span class="p">,</span>
+            <span class="n">attention_dropout</span><span class="p">,</span>
+            <span class="n">prenet_dim</span><span class="p">,</span>
+            <span class="n">gate_threshold</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span> <span class="o">=</span> <span class="n">_Postnet</span><span class="p">(</span><span class="n">n_mels</span><span class="p">,</span> <span class="n">postnet_embedding_dim</span><span class="p">,</span> <span class="n">postnet_kernel_size</span><span class="p">,</span> <span class="n">postnet_n_convolution</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Tacotron2.forward"><a class="viewcode-back" href="../../../generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2.forward">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tokens</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">token_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">mel_specgram</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">mel_specgram_lengths</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pass the input through the Tacotron2 model. This is in teacher</span>
+<span class="sd">        forcing mode, which is generally used for training.</span>
+
+<span class="sd">        The input ``tokens`` should be padded with zeros to length max of ``token_lengths``.</span>
+<span class="sd">        The input ``mel_specgram`` should be padded with zeros to length max of ``mel_specgram_lengths``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of token_lengths)`.</span>
+<span class="sd">            token_lengths (Tensor): The valid length of each sample in ``tokens`` with shape `(n_batch, )`.</span>
+<span class="sd">            mel_specgram (Tensor): The target mel spectrogram</span>
+<span class="sd">                with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">            mel_specgram_lengths (Tensor): The length of each mel spectrogram with shape `(n_batch, )`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [Tensor, Tensor, Tensor, Tensor]:</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Mel spectrogram before Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Mel spectrogram after Postnet with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    The output for stop token at each time step with shape `(n_batch, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Sequence of attention weights from the decoder with</span>
+<span class="sd">                    shape `(n_batch, max of mel_specgram_lengths, max of token_lengths)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">token_lengths</span><span class="p">)</span>
+        <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span>
+            <span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">memory_lengths</span><span class="o">=</span><span class="n">token_lengths</span>
+        <span class="p">)</span>
+
+        <span class="n">mel_specgram_postnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span><span class="p">(</span><span class="n">mel_specgram</span><span class="p">)</span>
+        <span class="n">mel_specgram_postnet</span> <span class="o">=</span> <span class="n">mel_specgram</span> <span class="o">+</span> <span class="n">mel_specgram_postnet</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mask_padding</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">_get_mask_from_lengths</span><span class="p">(</span><span class="n">mel_specgram_lengths</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mels</span><span class="p">,</span> <span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">mask</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">mel_specgram</span><span class="o">.</span><span class="n">masked_fill_</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">mel_specgram_postnet</span><span class="o">.</span><span class="n">masked_fill_</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">gate_outputs</span><span class="o">.</span><span class="n">masked_fill_</span><span class="p">(</span><span class="n">mask</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="mf">1e3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">mel_specgram_postnet</span><span class="p">,</span> <span class="n">gate_outputs</span><span class="p">,</span> <span class="n">alignments</span></div>
+
+<div class="viewcode-block" id="Tacotron2.infer"><a class="viewcode-back" href="../../../generated/torchaudio.models.Tacotron2.html#torchaudio.models.Tacotron2.infer">[docs]</a>    <span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">export</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">lengths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Using Tacotron2 for inference. The input is a batch of encoded</span>
+<span class="sd">        sentences (``tokens``) and its corresponding lengths (``lengths``). The</span>
+<span class="sd">        output is the generated mel spectrograms, its corresponding lengths, and</span>
+<span class="sd">        the attention weights from the decoder.</span>
+
+<span class="sd">        The input `tokens` should be padded with zeros to length max of ``lengths``.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tokens (Tensor): The input tokens to Tacotron2 with shape `(n_batch, max of lengths)`.</span>
+<span class="sd">            lengths (Tensor or None, optional):</span>
+<span class="sd">                The valid length of each sample in ``tokens`` with shape `(n_batch, )`.</span>
+<span class="sd">                If ``None``, it is assumed that the all the tokens are valid. Default: ``None``</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Tensor, Tensor, Tensor):</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    The predicted mel spectrogram with shape `(n_batch, n_mels, max of mel_specgram_lengths)`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    The length of the predicted mel spectrogram with shape `(n_batch, )`.</span>
+<span class="sd">                Tensor</span>
+<span class="sd">                    Sequence of attention weights from the decoder with shape</span>
+<span class="sd">                    `(n_batch, max of mel_specgram_lengths, max of lengths)`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_batch</span><span class="p">,</span> <span class="n">max_length</span> <span class="o">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lengths</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">max_length</span><span class="p">])</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">tokens</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">tokens</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">lengths</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>  <span class="c1"># For TorchScript compiler</span>
+        <span class="n">embedded_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">encoder_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">embedded_inputs</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+        <span class="n">mel_specgram</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">alignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">infer</span><span class="p">(</span><span class="n">encoder_outputs</span><span class="p">,</span> <span class="n">lengths</span><span class="p">)</span>
+
+        <span class="n">mel_outputs_postnet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postnet</span><span class="p">(</span><span class="n">mel_specgram</span><span class="p">)</span>
+        <span class="n">mel_outputs_postnet</span> <span class="o">=</span> <span class="n">mel_specgram</span> <span class="o">+</span> <span class="n">mel_outputs_postnet</span>
+
+        <span class="n">alignments</span> <span class="o">=</span> <span class="n">alignments</span><span class="o">.</span><span class="n">unfold</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mel_outputs_postnet</span><span class="p">,</span> <span class="n">mel_specgram_lengths</span><span class="p">,</span> <span class="n">alignments</span></div></div>
+</pre></div>
+
+             </article>
+             
+            </div>
+            <footer>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2025, Torchaudio Contributors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+
+
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+         <script src="../../../_static/jquery.js"></script>
+         <script src="../../../_static/underscore.js"></script>
+         <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+         <script src="../../../_static/doctools.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+    <script type="text/javascript">
+    var collapsedSections = ['API Tutorials', 'Pipeline Tutorials', 'Training Recipes']
+    </script>
+     
+    <script type="text/javascript">
+      $(document).ready(function() {
+	  var downloadNote = $(".sphx-glr-download-link-note.admonition.note");
+	  if (downloadNote.length >= 1) {
+	      var tutorialUrl = $("#tutorial-type").text();
+	      var githubLink = "https://github.com/pytorch/audio/blob/main/examples/"  + tutorialUrl + ".py",
+		  notebookLink = $(".reference.download")[1].href,
+		  notebookDownloadPath = notebookLink.split('_downloads')[1],
+		  colabLink = "https://colab.research.google.com/github/pytorch/audio/blob/gh-pages/main/_downloads" + notebookDownloadPath;
+
+	      $(".pytorch-call-to-action-links a[data-response='Run in Google Colab']").attr("href", colabLink);
+	      $(".pytorch-call-to-action-links a[data-response='View on Github']").attr("href", githubLink);
+	  }
+
+          var overwrite = function(_) {
+              if ($(this).length > 0) {
+                  $(this)[0].href = "https://github.com/pytorch/audio"
+              }
+          }
+          // PC
+          $(".main-menu a:contains('GitHub')").each(overwrite);
+          // Mobile
+          $(".main-menu a:contains('Github')").each(overwrite);
+      });
+
+      
+       $(window).ready(function() {
+           var original = window.sideMenus.bind;
+           var startup = true;
+           window.sideMenus.bind = function() {
+               original();
+               if (startup) {
+                   $("#pytorch-right-menu a.reference.internal").each(function(i) {
+                       if (this.classList.contains("not-expanded")) {
+                           this.nextElementSibling.style.display = "block";
+                           this.classList.remove("not-expanded");
+                           this.classList.add("expanded");
+                       }
+                   });
+                   startup = false;
+               }
+           };
+       });
+    </script>
+
+    
+
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="https://pytorch.org/docs/stable/index.html">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="https://pytorch.org/tutorials">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="https://pytorch.org/resources">View Resources</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="https://pytorch.org/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/">PyTorch</a></li>
+            <li><a href="https://pytorch.org/get-started">Get Started</a></li>
+            <li><a href="https://pytorch.org/features">Features</a></li>
+            <li><a href="https://pytorch.org/ecosystem">Ecosystem</a></li>
+            <li><a href="https://pytorch.org/blog/">Blog</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/blob/master/CONTRIBUTING.md">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="https://pytorch.org/resources">Resources</a></li>
+            <li><a href="https://pytorch.org/tutorials">Tutorials</a></li>
+            <li><a href="https://pytorch.org/docs/stable/index.html">Docs</a></li>
+            <li><a href="https://discuss.pytorch.org" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/pytorch/pytorch/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://pytorch.org/assets/brand-guidelines/PyTorch-Brand-Guidelines.pdf" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">Stay up to date</li>
+            <li><a href="https://www.facebook.com/pytorch" target="_blank">Facebook</a></li>
+            <li><a href="https://twitter.com/pytorch" target="_blank">Twitter</a></li>
+            <li><a href="https://www.youtube.com/pytorch" target="_blank">YouTube</a></li>
+            <li><a href="https://www.linkedin.com/company/pytorch" target="_blank">LinkedIn</a></li>
+          </ul>  
+          </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title">PyTorch Podcasts</li>
+            <li><a href="https://open.spotify.com/show/6UzHKeiy368jKfQMKKvJY5" target="_blank">Spotify</a></li>
+            <li><a href="https://podcasts.apple.com/us/podcast/pytorch-developer-podcast/id1566080008" target="_blank">Apple</a></li>
+            <li><a href="https://www.google.com/podcasts?feed=aHR0cHM6Ly9mZWVkcy5zaW1wbGVjYXN0LmNvbS9PQjVGa0lsOA%3D%3D" target="_blank">Google</a></li>
+            <li><a href="https://music.amazon.com/podcasts/7a4e6f0e-26c2-49e9-a478-41bd244197d0/PyTorch-Developer-Podcast?" target="_blank">Amazon</a></li>
+          </ul>
+         </div>
+        </div>
+        
+        <div class="privacy-policy">
+          <ul>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/terms/" target="_blank">Terms</a></li>
+            <li class="privacy-policy-links">|</li>
+            <li class="privacy-policy-links"><a href="https://www.linuxfoundation.org/privacy-policy/" target="_blank">Privacy</a></li>
+          </ul>
+        </div>
+        <div class="copyright">
+        <p>© Copyright The Linux Foundation. The PyTorch Foundation is a project of The Linux Foundation.
+          For web site terms of use, trademark policy and other policies applicable to The PyTorch Foundation please see
+          <a href="www.linuxfoundation.org/policies/">www.linuxfoundation.org/policies/</a>. The PyTorch Foundation supports the PyTorch open source
+          project, which has been established as PyTorch Project a Series of LF Projects, LLC. For policies applicable to the PyTorch Project a Series of LF Projects, LLC,
+          please see <a href="www.lfprojects.org/policies/">www.lfprojects.org/policies/</a>.</p>
+      </div>
+     </div>
+
+  </footer>
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. As the current maintainers of this site, Facebook’s Cookies Policy applies. Learn more, including about available controls: <a href="https://www.facebook.com/policies/cookies/">Cookies Policy</a>.</p>
+    <img class="close-button" src="../../../_static/images/pytorch-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="https://pytorch.org/" aria-label="PyTorch"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="https://pytorch.org/get-started">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/ecosystem">Ecosystem</a>
+          </li>
+            
+          <li>
+            <a href="https://pytorch.org/mobile">Mobile</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/blog/">Blog</a>
+          </li>
+
+          <li>
+            <a href="https://pytorch.org/tutorials">Tutorials</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Docs
+          </li>
+
+          <ul class="resources-mobile-menu-items">
+            <li>
+              <a href="https://pytorch.org/docs/stable/index.html">PyTorch</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/audio/stable/index.html">torchaudio</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/text/stable/index.html">torchtext</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/vision/stable/index.html">torchvision</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torcharrow">torcharrow</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/data">TorchData</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchrec">TorchRec</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/serve/">TorchServe</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/torchx/">TorchX</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/xla">PyTorch on XLA Devices</a>
+            </li>
+          </ul>
+
+          <li class="resources-mobile-menu-title">
+            Resources
+          </li>
+            
+           <ul class="resources-mobile-menu-items">
+
+            <li>
+              <a href="https://pytorch.org/features">About</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/foundation">PyTorch Foundation</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/#community-module">Community</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/community-stories">Community Stories</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/resources">Developer Resources</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/events">Events</a>
+            </li>
+
+            <li>
+              <a href="https://discuss.pytorch.org/">Forums</a>
+            </li>
+
+            <li>
+              <a href="https://pytorch.org/hub">Models (Beta)</a>
+            </li>
+          </ul>
+
+          <li>
+            <a href="https://github.com/pytorch/pytorch">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="../../../_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })
+  </script>
+</body>
+</html>

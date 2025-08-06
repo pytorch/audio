@@ -1,0 +1,6 @@
+﻿torchaudio.prototype.functional.frequency\_impulse\_response
+============================================================
+
+.. currentmodule:: torchaudio.prototype.functional
+
+.. autofunction:: frequency_impulse_response
