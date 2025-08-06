@@ -6,6 +6,7 @@
 #include <torch/csrc/inductor/aoti_torch/c/shim.h>
 #include <torch/csrc/inductor/aoti_torch/utils.h>
 #include <cstdarg>
+#include <type_traits>
 
 
 using namespace std;
@@ -14,14 +15,16 @@ namespace torchaudio {
 namespace alignment {
 namespace cpu {
 
-template<unsigned int k, typename T>
+template<unsigned int k, typename T, bool IsConst = true>
 class Accessor {
   int64_t strides[k];
   T *data;
 
 public:
-  Accessor(const torch::Tensor& tensor) {
-    data = tensor.data_ptr<T>();
+  using tensor_type = typename std::conditional<IsConst, const torch::Tensor&, torch::Tensor&>::type;
+  
+  Accessor(tensor_type tensor) {
+    data = tensor.template data_ptr<T>();
     for (int i = 0; i < k; i++) {
       strides[i] = tensor.stride(i);
     }
@@ -37,22 +40,9 @@ public:
     va_end(args);
     return data[ix];
   }
-};
 
-template<unsigned int k, typename T>
-class MutAccessor {
-  int64_t strides[k];
-  T *data;
-
-public:
-  MutAccessor(torch::Tensor& tensor) {
-    data = tensor.data_ptr<T>();
-    for (int i = 0; i < k; i++) {
-      strides[i] = tensor.stride(i);
-    }
-  }
-
-  void set_index(T value, ...) {
+  template<bool C = IsConst>
+  typename std::enable_if<!C, void>::type set_index(T value, ...) {
     va_list args;
     va_start(args, value);
     int64_t ix = 0;
@@ -92,9 +82,9 @@ void forced_align_impl(
     backPtr_a[i] = -1;
   }
 
-  auto logProbs_a = Accessor<3, scalar_t>(logProbs);
-  auto targets_a = Accessor<2, target_t>(targets);
-  auto paths_a = MutAccessor<2, target_t>(paths);
+  auto logProbs_a = Accessor<3, scalar_t, true>(logProbs);
+  auto targets_a = Accessor<2, target_t, true>(targets);
+  auto paths_a = Accessor<2, target_t, false>(paths);
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a.index(batchIndex, i) == targets_a.index(batchIndex, i - 1)) {
