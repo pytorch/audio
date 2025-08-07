@@ -119,6 +119,7 @@ void forced_align_impl(
   }
   auto idx1 = (T - 1) % 2;
   auto ltrIdx = alphas_a[S - 1][idx1] > alphas_a[S - 2][idx1] ? S - 1 : S - 2;
+  delete[] alphas_a;
   // path stores the token index for each time step after force alignment.
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
