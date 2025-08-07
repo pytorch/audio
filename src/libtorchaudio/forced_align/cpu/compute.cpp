@@ -32,7 +32,7 @@ void forced_align_impl(
   const auto L = targets.size(1);
   const auto S = 2 * L + 1;
 
-  auto alphas_a = new scalar_t[S][2];
+  auto alphas_a = new scalar_t[S][2]; // scalar_t is just logProbs.dtype()
   for (int i = 0; i < S; i++) {
     alphas_a[i][0] = kNegInfinity;
     alphas_a[i][1] = kNegInfinity;
@@ -91,8 +91,13 @@ void forced_align_impl(
     }
     if (start == 0) {
       alphas_a[0][curIdxOffset] =
+<<<<<<< HEAD
           alphas_a[0][prevIdxOffset] + logProbs_a.index(batchIndex, t, blank);
       backPtr_a[S * t] = 0;
+=======
+          alphas_a[0][prevIdxOffset] + logProbs_a[batchIndex][t][blank];
+      backPtr_a[S * t] = 0; // backPtr_a[t][0] = 0
+>>>>>>> forced_align_backptr
       startloop += 1;
     }
 
@@ -114,25 +119,27 @@ void forced_align_impl(
       scalar_t result = 0.0;
       if (x2 > x1 && x2 > x0) {
         result = x2;
-        backPtr_a[t * S + i] = 2;
+        backPtr_a[t * S + i] = 2; // backPtr_a[t][i] = 2
       } else if (x1 > x0 && x1 > x2) {
         result = x1;
-        backPtr_a[t * S + i] = 1;
+        backPtr_a[t * S + i] = 1; // backPtr_a[t][i] = 1
       } else {
         result = x0;
-        backPtr_a[t * S + i] = 0;
+        backPtr_a[t * S + i] = 0; // backPtr_a[t][i] = 0
       }
       alphas_a[i][curIdxOffset] = result + logProbs_a.index(batchIndex, t, labelIdx);
     }
   }
   auto idx1 = (T - 1) % 2;
   auto ltrIdx = alphas_a[S - 1][idx1] > alphas_a[S - 2][idx1] ? S - 1 : S - 2;
+  delete[] alphas_a;
   // path stores the token index for each time step after force alignment.
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a.index(batchIndex, ltrIdx / 2);
     paths_a.set_index(lbl_idx, batchIndex, t);
-    ltrIdx -= backPtr_a[t * S + ltrIdx];
+    ltrIdx -= backPtr_a[t * S + ltrIdx]; // backPtr_a[t][ltrIdx]
   }
+  delete[] backPtr_a;
 }
 
 std::tuple<Tensor, Tensor> compute(
