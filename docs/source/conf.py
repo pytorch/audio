@@ -123,10 +123,8 @@ def _get_pattern():
     ret = {"filename_pattern": "tutorial.py"}
     if os.getenv("GALLERY_PATTERN"):
         # See https://github.com/pytorch/tutorials/blob/cbf2238df0e78d84c15bd94288966d2f4b2e83ae/conf.py#L75-L83
-        ret["ignore_pattern"] = r"(/(?!" + re.escape(os.getenv("GALLERY_PATTERN")) + r")[^/]+$)" + r"|(asr_inference_with_cuda_ctc_decoder_tutorial)"
-        print("\n======")
-        print("IGNORE PATTERN IS ", ret["ignore_pattern"])
-        print("======\n")
+        # r"(/(?!" + re.escape(os.getenv("GALLERY_PATTERN")) + r")[^/]+$)" +
+        ret["ignore_pattern"] = r"|(asr_inference_with_cuda_ctc_decoder_tutorial)"
 
     return ret
 
