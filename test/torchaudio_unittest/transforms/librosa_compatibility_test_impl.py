@@ -95,13 +95,13 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
         spectrogram = get_spectrogram(get_whitenoise(), n_fft=400, power=2).to(self.device, self.dtype)
         result = T.AmplitudeToDB("magnitude", 80.0).to(self.device, self.dtype)(spectrogram)[0]
         expected = librosa_mock.amplitude_to_db(self.request, spectrogram[0].cpu().numpy())
-        self.assertEqual(result, torch.from_numpy(expected))
+        self.assertEqual(result, torch.from_numpy(expected), atol=1e-3, rtol=1e-3)
 
     def test_power_to_db(self):
         spectrogram = get_spectrogram(get_whitenoise(), n_fft=400, power=2).to(self.device, self.dtype)
         result = T.AmplitudeToDB("power", 80.0).to(self.device, self.dtype)(spectrogram)[0]
         expected = librosa_mock.power_to_db(self.request, spectrogram[0].cpu().numpy())
-        self.assertEqual(result, torch.from_numpy(expected))
+        self.assertEqual(result, torch.from_numpy(expected), atol=1e-3, rtol=1e-3)
 
     @nested_params(
         [

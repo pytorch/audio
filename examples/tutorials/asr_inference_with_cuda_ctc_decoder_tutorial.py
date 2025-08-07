@@ -67,7 +67,7 @@ from pathlib import Path
 import IPython
 import sentencepiece as spm
 from torchaudio.models.decoder import cuda_ctc_decoder
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 ######################################################################
 #
@@ -95,7 +95,7 @@ model_path = download_asset_external(model_link, "cuda_ctc_decoder/cpu_jit.pt")
 # We will load a sample from the LibriSpeech test-other dataset.
 #
 
-speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
+speech_file = _download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 waveform, sample_rate = torchaudio.load(speech_file)
 assert sample_rate == 16000
 IPython.display.Audio(speech_file)

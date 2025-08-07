@@ -4,18 +4,24 @@ from pathlib import Path
 import torch
 
 def mock_function(f):
+    """
+    Create a mocked version of a function from the librosa library that loads a precomputed result
+    if it exists. The commented out part otherwise computes the result and saves it for future use.
+    This is used to compare torchaudio functionality to the equivalent functionalty in librosa without
+    depending on librosa after results are precomputed.
+    """
     prefix = "torchaudio_unittest/assets/librosa_expected_results/"
     def wrapper(request, *args, **kwargs):
         if request is not None:
             if os.path.exists(f"{prefix}{request}.pt"):
                 return torch.load(f"{prefix}{request}.pt", weights_only=False)
-        import librosa
-        result = eval(f)(*args, **kwargs)
-        if request is not None:
-            path = Path(f"{prefix}{request}.pt")
-            path.parent.mkdir(parents=True, exist_ok=True)
-            torch.save(result, path)
-        return result
+        # import librosa
+        # result = eval(f)(*args, **kwargs)
+        # if request is not None:
+        #     path = Path(f"{prefix}{request}.pt")
+        #     path.parent.mkdir(parents=True, exist_ok=True)
+        #     torch.save(result, path)
+        # return result
     return wrapper
 
 griffinlim = mock_function("librosa.griffinlim")

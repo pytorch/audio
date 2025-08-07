@@ -50,7 +50,7 @@ class SquimObjectiveBundle:
             Variation of :py:class:`~torchaudio.models.SquimObjective`.
         """
         model = squim_objective_base()
-        path = torchaudio.utils.download_asset(f"models/{self._path}")
+        path = torchaudio.utils._download_asset(f"models/{self._path}")
         state_dict = torch.load(path, weights_only=True)
         model.load_state_dict(state_dict)
         model.eval()
@@ -125,7 +125,7 @@ class SquimSubjectiveBundle:
             Variation of :py:class:`~torchaudio.models.SquimObjective`.
         """
         model = squim_subjective_base()
-        path = torchaudio.utils.download_asset(f"models/{self._path}")
+        path = torchaudio.utils._download_asset(f"models/{self._path}")
         state_dict = torch.load(path, weights_only=True)
         model.load_state_dict(state_dict)
         model.eval()

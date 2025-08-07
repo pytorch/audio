@@ -70,7 +70,7 @@ def forced_align(
     assert target_lengths is not None
 
     paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
-    return paths, scores
+    return paths, scores[:, torch.arange(scores.shape[1]), paths[0]]
 
 
 @dataclass

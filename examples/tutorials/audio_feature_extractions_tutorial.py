@@ -48,11 +48,11 @@ import matplotlib.pyplot as plt
 
 from IPython.display import Audio
 from matplotlib.patches import Rectangle
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 torch.random.manual_seed(0)
 
-SAMPLE_SPEECH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SAMPLE_SPEECH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 def plot_waveform(waveform, sr, title="Waveform", ax=None):

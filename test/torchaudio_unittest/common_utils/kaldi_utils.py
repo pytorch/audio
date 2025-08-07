@@ -18,8 +18,10 @@ def convert_args(**kwargs):
 
 def run_kaldi(request, command, input_type, input_value):
     """Get the precomputed result of running a Kaldi command.
-    If the result has not yet been computed, run the provided Kaldi command,
-    pass a tensor and get the resulting tensor
+    In the commented out code, if the result has not yet been computed,
+    run the provided Kaldi command (passing a tensor and getting the result).
+    This is used to check that torchaudio functionality matches corresponding
+    Kaldi functionality.
 
     Args:
         command (list of str): The command with arguments
@@ -30,19 +32,19 @@ def run_kaldi(request, command, input_type, input_value):
     path = Path(f"torchaudio_unittest/assets/kaldi_expected_results/{request}.pt")
     if os.path.exists(path):
         return torch.load(path)
-    import kaldi_io
 
-    key = "foo"
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-    if input_type == "ark":
-        kaldi_io.write_mat(process.stdin, input_value.cpu().numpy(), key=key)
-    elif input_type == "scp":
-        process.stdin.write(f"{key} {input_value}".encode("utf8"))
-    else:
-        raise NotImplementedError("Unexpected type")
-    process.stdin.close()
-    result = dict(kaldi_io.read_mat_ark(process.stdout))["foo"]
-    torch_result = torch.from_numpy(result.copy())  # copy supresses some torch warning
-    path.parent.mkdir(parents=True, exist_ok=True)
-    torch.save(torch_result, path)
-    return torch_result
+    # import kaldi_io
+    # key = "foo"
+    # process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    # if input_type == "ark":
+    #     kaldi_io.write_mat(process.stdin, input_value.cpu().numpy(), key=key)
+    # elif input_type == "scp":
+    #     process.stdin.write(f"{key} {input_value}".encode("utf8"))
+    # else:
+    #     raise NotImplementedError("Unexpected type")
+    # process.stdin.close()
+    # result = dict(kaldi_io.read_mat_ark(process.stdout))["foo"]
+    # torch_result = torch.from_numpy(result.copy())  # copy supresses some torch warning
+    # path.parent.mkdir(parents=True, exist_ok=True)
+    # torch.save(torch_result, path)
+    # return torch_result
