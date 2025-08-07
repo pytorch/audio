@@ -129,6 +129,7 @@ void forced_align_impl(
     paths_a[batchIndex][t] = lbl_idx;
     ltrIdx -= backPtr_a[t * S + ltrIdx]; // backPtr_a[t][ltrIdx]
   }
+  delete[] backPtr_a;
 }
 
 std::tuple<torch::Tensor, torch::Tensor> compute(
