@@ -91,13 +91,8 @@ void forced_align_impl(
     }
     if (start == 0) {
       alphas_a[0][curIdxOffset] =
-<<<<<<< HEAD
           alphas_a[0][prevIdxOffset] + logProbs_a.index(batchIndex, t, blank);
-      backPtr_a[S * t] = 0;
-=======
-          alphas_a[0][prevIdxOffset] + logProbs_a[batchIndex][t][blank];
-      backPtr_a[S * t] = 0; // backPtr_a[t][0] = 0
->>>>>>> forced_align_backptr
+      backPtr_a[S * t] = 0;  // backPtr_a[t][0] = 0
       startloop += 1;
     }
 
