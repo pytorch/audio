@@ -177,7 +177,7 @@ std::tuple<Tensor, Tensor> compute(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
 
-  // TODO: Requires port of `max` operator.
+  // TODO: Requires port of `max` and `item` operators.
   // TORCH_CHECK(
   //     logProbs.size(1) == at::max(inputLengths).item().toInt(),
   //     "input length mismatch");
@@ -193,7 +193,7 @@ std::tuple<Tensor, Tensor> compute(
   AtenTensorHandle paths_h;
   int32_t targets_device;
   aoti_torch_get_device_type(targets.get(), &targets_device);
-  aoti_torch_empty_strided(1, paths_size, paths_stride, targets.dtype(), targets_device, targets.get_device(), &paths_h);
+  aoti_torch_empty_strided(2, paths_size, paths_stride, targets.dtype(), targets_device, targets.get_device(), &paths_h);
   auto paths = Tensor(paths_h);
 
 
