@@ -82,7 +82,7 @@ conda install --quiet -y ninja cmake
 
 printf "* Installing torchaudio\n"
 export BUILD_CPP_TEST=1
-python setup.py install
+pip install . -v --no-build-isolation
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
@@ -102,13 +102,7 @@ fi
     pip install kaldi-io SoundFile librosa coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 
     # TODO: might be better to fix the single call to `pip install` above
-    pip install pillow scipy numpy
-    echo
-    echo  ====================
-    echo HERE ARE ALL THE PACKAGES INSTALLED:
-    pip list
-    echo ====================
-
+    pip install pillow scipy "numpy>=1.26"
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq

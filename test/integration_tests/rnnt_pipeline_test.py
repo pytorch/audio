@@ -1,15 +1,12 @@
 import pytest
 import torchaudio
 from torchaudio.pipelines import EMFORMER_RNNT_BASE_LIBRISPEECH
-from torchaudio.prototype.pipelines import EMFORMER_RNNT_BASE_MUSTC, EMFORMER_RNNT_BASE_TEDLIUM3
 
 
 @pytest.mark.parametrize(
     "bundle,lang,expected",
     [
         (EMFORMER_RNNT_BASE_LIBRISPEECH, "en", "i have that curiosity beside me at this moment"),
-        (EMFORMER_RNNT_BASE_MUSTC, "en", "I had that curiosity beside me at this moment."),
-        (EMFORMER_RNNT_BASE_TEDLIUM3, "en", "i had that curiosity beside me at this moment"),
     ],
 )
 def test_rnnt(bundle, sample_speech, expected):

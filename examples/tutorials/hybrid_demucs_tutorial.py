@@ -51,7 +51,7 @@ import matplotlib.pyplot as plt
 
 from IPython.display import Audio
 from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 ######################################################################
 # 3. Construct the pipeline
@@ -181,7 +181,7 @@ def plot_spectrogram(stft, title="Spectrogram"):
 #
 
 # We download the audio file from our storage. Feel free to download another file and use audio from a specific path
-SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
+SAMPLE_SONG = _download_asset("tutorial-assets/hdemucs_mix.wav")
 waveform, sample_rate = torchaudio.load(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
 waveform = waveform.to(device)
 mixture = waveform
@@ -254,10 +254,10 @@ segment_end = 155
 frame_start = segment_start * sample_rate
 frame_end = segment_end * sample_rate
 
-drums_original = download_asset("tutorial-assets/hdemucs_drums_segment.wav")
-bass_original = download_asset("tutorial-assets/hdemucs_bass_segment.wav")
-vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
-other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
+drums_original = _download_asset("tutorial-assets/hdemucs_drums_segment.wav")
+bass_original = _download_asset("tutorial-assets/hdemucs_bass_segment.wav")
+vocals_original = _download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
+other_original = _download_asset("tutorial-assets/hdemucs_other_segment.wav")
 
 drums_spec = audios["drums"][:, frame_start:frame_end].cpu()
 drums, sample_rate = torchaudio.load(drums_original)

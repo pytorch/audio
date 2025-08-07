@@ -118,6 +118,7 @@ class Functional(TestBaseMixin, RequestMixin):
 class FunctionalComplex(TestBaseMixin, RequestMixin):
     @nested_params([0.5, 1.01, 1.3])
     def test_phase_vocoder(self, rate):
+        torch.manual_seed(0)
         hop_length = 256
         num_freq = 1025
         num_frames = 400
@@ -125,7 +126,7 @@ class FunctionalComplex(TestBaseMixin, RequestMixin):
         # Due to cummulative sum, numerical error in using torch.float32 will
         # result in bottom right values of the stretched sectrogram to not
         # match with librosa.
-        spec = torch.randn(num_freq, num_frames, device=self.device, dtype=torch.complex128)
+        spec = torch.randn(num_freq, num_frames, dtype=torch.complex128).to(self.device,)
         phase_advance = torch.linspace(0, np.pi * hop_length, num_freq, device=self.device, dtype=torch.float64)[
             ..., None
         ]
