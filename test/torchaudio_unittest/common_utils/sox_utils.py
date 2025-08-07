@@ -106,20 +106,23 @@ def _flattern(effects):
 
 
 def run_sox_effect(request, input_file, output_file, effect, *, output_sample_rate=None, output_bitdepth=None):
-    """Save or load the result of running sox effects for the test-id `request`."""
+    """
+    Save or load the result of running sox effects for the test-id `request`. Saving code is currently commented out.
+    This is used to compare torchaudio functionality with corresponding sox functionality.
+    """
 
     path = Path(f"torchaudio_unittest/assets/sox_expected_results/{request}.wav")
     if os.path.exists(path):
         shutil.copyfile(path, output_file)
 
-    effect = _flattern(effect)
-    command = ["sox", "-V", "--no-dither", input_file]
-    if output_bitdepth:
-        command += ["--bits", str(output_bitdepth)]
-    command += [output_file] + effect
-    if output_sample_rate:
-        command += ["rate", str(output_sample_rate)]
-    print(" ".join(command))
-    subprocess.run(command, check=True)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(output_file, path)
+    # effect = _flattern(effect)
+    # command = ["sox", "-V", "--no-dither", input_file]
+    # if output_bitdepth:
+    #     command += ["--bits", str(output_bitdepth)]
+    # command += [output_file] + effect
+    # if output_sample_rate:
+    #     command += ["rate", str(output_sample_rate)]
+    # print(" ".join(command))
+    # subprocess.run(command, check=True)
+    # path.parent.mkdir(parents=True, exist_ok=True)
+    # shutil.copyfile(output_file, path)
