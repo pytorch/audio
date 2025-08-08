@@ -817,7 +817,7 @@ def _get_mask_param(mask_param: int, p: float, axis_length: int) -> int:
 def mask_along_axis_iid(
     specgrams: Tensor,
     mask_param: int,
-    mask_value: float,
+    mask_value: Union[float, Tensor],
     axis: int,
     p: float = 1.0,
 ) -> Tensor:
@@ -874,7 +874,12 @@ def mask_along_axis_iid(
 
     # Per batch example masking
     specgrams = specgrams.transpose(axis, -1)
-    specgrams = specgrams.masked_fill((mask >= mask_start) & (mask < mask_end), mask_value)
+    # this aims to avoid CPU-GPU sync from upstream
+    specgrams = (
+        torch.where((mask >= mask_start) & (mask < mask_end), mask_value.repeat(*specgrams.shape), specgrams)
+        if isinstance(mask_value, Tensor)
+        else specgrams.masked_fill((mask >= mask_start) & (mask < mask_end), mask_value)
+    )
     specgrams = specgrams.transpose(axis, -1)
 
     return specgrams
