@@ -6,18 +6,14 @@ import torchaudio.functional as F
 from parameterized import param
 from torchaudio._internal.module_utils import is_module_available
 
-LIBROSA_AVAILABLE = is_module_available("librosa")
-
-if LIBROSA_AVAILABLE:
-    import librosa
-    import numpy as np
+import librosa_mock
+import numpy as np
+import pytest
 
 
-from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin, RequestMixin
 
-
-@unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
-class Functional(TestBaseMixin):
+class Functional(TestBaseMixin, RequestMixin):
     """Test suite for functions in `functional` module."""
 
     dtype = torch.float64
@@ -50,7 +46,8 @@ class Functional(TestBaseMixin):
             length=waveform.size(1),
             rand_init=False,
         )
-        expected = librosa.griffinlim(
+        expected = librosa_mock.griffinlim(
+            self.request,
             specgram[0].cpu().numpy(),
             n_iter=n_iter,
             hop_length=hop_length,
@@ -77,12 +74,11 @@ class Functional(TestBaseMixin):
     def test_create_mel_fb(
         self, n_mels=40, sample_rate=22050, n_fft=2048, fmin=0.0, fmax=8000.0, norm=None, mel_scale="htk"
     ):
-        if norm == "slaney" and StrictVersion(librosa.__version__) < StrictVersion("0.7.2"):
-            self.skipTest("Test is known to fail with older versions of librosa.")
         if self.device != "cpu":
             self.skipTest("No need to run this test on CUDA")
 
-        expected = librosa.filters.mel(
+        expected = librosa_mock.mel(
+            self.request,
             sr=sample_rate, n_fft=n_fft, n_mels=n_mels, fmax=fmax, fmin=fmin, htk=mel_scale == "htk", norm=norm
         ).T
         result = F.melscale_fbanks(
@@ -104,7 +100,7 @@ class Functional(TestBaseMixin):
 
         spec = get_spectrogram(get_whitenoise(device=self.device, dtype=self.dtype), power=2)
         result = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
-        expected = librosa.core.power_to_db(spec[0].cpu().numpy())[None, ...]
+        expected = librosa_mock.power_to_db(self.request, spec[0].cpu().numpy())[None, ...]
         self.assertEqual(result, torch.from_numpy(expected))
 
     def test_amplitude_to_DB(self):
@@ -115,14 +111,14 @@ class Functional(TestBaseMixin):
 
         spec = get_spectrogram(get_whitenoise(device=self.device, dtype=self.dtype), power=1)
         result = F.amplitude_to_DB(spec, multiplier, amin, db_multiplier, top_db)
-        expected = librosa.core.amplitude_to_db(spec[0].cpu().numpy())[None, ...]
+        expected = librosa_mock.amplitude_to_db(self.request, spec[0].cpu().numpy())[None, ...]
         self.assertEqual(result, torch.from_numpy(expected))
 
 
-@unittest.skipIf(not LIBROSA_AVAILABLE, "Librosa not available")
-class FunctionalComplex(TestBaseMixin):
+class FunctionalComplex(TestBaseMixin, RequestMixin):
     @nested_params([0.5, 1.01, 1.3])
     def test_phase_vocoder(self, rate):
+        torch.manual_seed(0)
         hop_length = 256
         num_freq = 1025
         num_frames = 400
@@ -130,13 +126,13 @@ class FunctionalComplex(TestBaseMixin):
         # Due to cummulative sum, numerical error in using torch.float32 will
         # result in bottom right values of the stretched sectrogram to not
         # match with librosa.
-        spec = torch.randn(num_freq, num_frames, device=self.device, dtype=torch.complex128)
+        spec = torch.randn(num_freq, num_frames, dtype=torch.complex128).to(self.device,)
         phase_advance = torch.linspace(0, np.pi * hop_length, num_freq, device=self.device, dtype=torch.float64)[
             ..., None
         ]
 
         stretched = F.phase_vocoder(spec, rate=rate, phase_advance=phase_advance)
 
-        expected_stretched = librosa.phase_vocoder(spec.cpu().numpy(), rate=rate, hop_length=hop_length)
+        expected_stretched = librosa_mock.phase_vocoder(self.request, spec.cpu().numpy(), rate=rate, hop_length=hop_length)
 
         self.assertEqual(stretched, torch.from_numpy(expected_stretched))
