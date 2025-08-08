@@ -13,20 +13,16 @@ def mock_function(f):
     this_file = Path(__file__).parent.resolve()
     expected_results_folder = this_file / "torchaudio_unittest" / "assets" / "librosa_expected_results"
     def wrapper(request, *args, **kwargs):
-        mocked_results = f"{expected_results_folder / request}.pt"
+        mocked_results = expected_results_folder / f"{request}.pt"
         return torch.load(mocked_results, weights_only=False)
 
         # Old definition used for generation:
-        # Note that we need the check for 'None' as sometimes during generation
-        # we don't want to associate a call with a cached file.
-        #
-        # if request is not None:
-        #     if os.path.exists(mocked_results):
-        #         return torch.load(mocked_results, weights_only=False)
+        # if os.path.exists(mocked_results):
+        #     return torch.load(mocked_results, weights_only=False)
         # import librosa
         # result = eval(f)(*args, **kwargs)
         # if request is not None:
-        #     path.parent.mkdir(parents=True, exist_ok=True)
+        #     mocked_results.parent.mkdir(parents=True, exist_ok=True)
         #     torch.save(result, mocked_results)
         # return result
     return wrapper
@@ -45,6 +41,22 @@ spectrogram = mock_function("librosa.core.spectrum._spectrogram")
 
 mel_spectrogram = mock_function("librosa.feature.melspectrogram")
 
-mfcc = mock_function("librosa.feature.mfcc")
+def _mfcc_from_waveform(waveform, sample_rate, n_fft, hop_length, n_mels, n_mfcc):
+    import librosa
+    melspec = librosa.feature.melspectrogram(
+        y=waveform[0].cpu().numpy(),
+        sr=sample_rate,
+        n_fft=n_fft,
+        win_length=n_fft,
+        hop_length=hop_length,
+        n_mels=n_mels,
+        htk=True,
+        norm=None,
+        pad_mode="reflect",
+    )
+    return librosa.feature.mfcc(S=librosa.core.power_to_db(melspec), n_mfcc=n_mfcc, dct_type=2, norm="ortho")
+
+mfcc_from_waveform = mock_function("_mfcc_from_waveform")
+
 
 spectral_centroid = mock_function("librosa.feature.spectral_centroid")
