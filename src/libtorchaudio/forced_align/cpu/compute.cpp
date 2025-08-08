@@ -32,11 +32,14 @@ void forced_align_impl(
     alphas_a[i] = kNegInfinity;
   }
 
-  torch::Tensor backPtr = torch::empty({T, S}, torch::kInt8).fill_(-1);
+  auto backPtr_a = new int8_t[T * S];
+  for (int i = 0; i < T * S; i++) {
+    backPtr_a[i] = -1;
+  }
+
   auto logProbs_a = logProbs.accessor<scalar_t, 3>();
   auto targets_a = targets.accessor<target_t, 2>();
   auto paths_a = paths.accessor<target_t, 2>();
-  auto backPtr_a = backPtr.accessor<int8_t, 2>();
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
@@ -82,8 +85,8 @@ void forced_align_impl(
     }
     if (start == 0) {
       alphas_a[curIdxOffset * S] =
-          alphas_a[prevIdxOffset * S] + logProbs_a[batchIndex][t][blank];
-      backPtr_a[t][0] = 0;
+          alphas_a[prevIdxOffset * S] + logProbs_a[batchIndex][t][blank]; // alphas_a[curIdxOffset][0]
+      backPtr_a[S * t] = 0; // backPtr_a[t][0] = 0
       startloop += 1;
     }
 
@@ -105,13 +108,13 @@ void forced_align_impl(
       scalar_t result = 0.0;
       if (x2 > x1 && x2 > x0) {
         result = x2;
-        backPtr_a[t][i] = 2;
+        backPtr_a[t * S + i] = 2; // backPtr_a[t][i] = 2
       } else if (x1 > x0 && x1 > x2) {
         result = x1;
-        backPtr_a[t][i] = 1;
+        backPtr_a[t * S + i] = 1; // backPtr_a[t][i] = 1
       } else {
         result = x0;
-        backPtr_a[t][i] = 0;
+        backPtr_a[t * S + i] = 0; // backPtr_a[t][i] = 0
       }
       alphas_a[curIdxOffset * S + i] = result + logProbs_a[batchIndex][t][labelIdx]; // alphas_a[curIdxOffset][i]
     }
@@ -124,8 +127,9 @@ void forced_align_impl(
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
-    ltrIdx -= backPtr_a[t][ltrIdx];
+    ltrIdx -= backPtr_a[t * S + ltrIdx]; // backPtr_a[t][ltrIdx]
   }
+  delete[] backPtr_a;
 }
 
 std::tuple<torch::Tensor, torch::Tensor> compute(
