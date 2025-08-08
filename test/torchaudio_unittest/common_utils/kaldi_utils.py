@@ -31,10 +31,12 @@ def run_kaldi(request, command, input_type, input_value):
     """
     test_dir = Path(__file__).parent.parent.resolve()
     expected_results_folder = test_dir / "assets" / "kaldi_expected_results"
-    mocked_results = f"{expected_results_folder / request}.pt"
-    if os.path.exists(mocked_results):
-        return torch.load(mocked_results)
+    mocked_results = expected_results_folder / f"{request}.pt"
+    return torch.load(mocked_results)
 
+    # To generate, uncomment the following and remove the return statement above.
+    # if os.path.exists(mocked_results):
+    #     return torch.load(mocked_results)
     # import kaldi_io
     # key = "foo"
     # process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
