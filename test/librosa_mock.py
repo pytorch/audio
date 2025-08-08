@@ -12,9 +12,7 @@ def mock_function(f):
     """
     prefix = "torchaudio_unittest/assets/librosa_expected_results/"
     def wrapper(request, *args, **kwargs):
-        if request is not None:
-            if os.path.exists(f"{prefix}{request}.pt"):
-                return torch.load(f"{prefix}{request}.pt", weights_only=False)
+        return torch.load(f"{prefix}{request}.pt", weights_only=False)
         # import librosa
         # result = eval(f)(*args, **kwargs)
         # if request is not None:
