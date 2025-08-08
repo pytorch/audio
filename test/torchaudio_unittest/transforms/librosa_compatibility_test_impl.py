@@ -120,21 +120,14 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
             melkwargs={"hop_length": hop_length, "n_fft": n_fft, "n_mels": n_mels},
         ).to(self.device, self.dtype)(waveform)[0]
 
-        melspec = librosa_mock.mel_spectrogram(
-            f"{self.request}_0",
-            y=waveform[0].cpu().numpy(),
-            sr=sample_rate,
-            n_fft=n_fft,
-            win_length=n_fft,
-            hop_length=hop_length,
-            n_mels=n_mels,
-            htk=True,
-            norm=None,
-            pad_mode="reflect",
-        )
-        expected = librosa_mock.mfcc(
-            f"{self.request}_1",
-            S=librosa_mock.power_to_db(None,melspec), n_mfcc=n_mfcc, dct_type=2, norm="ortho"
+        expected = librosa_mock.mfcc_from_waveform(
+            f"{self.request}",
+            waveform,
+            sample_rate,
+            n_fft,
+            hop_length,
+            n_mels,
+            n_mfcc
         )
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-4, rtol=1e-5)
 
