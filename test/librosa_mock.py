@@ -10,17 +10,24 @@ def mock_function(f):
     This is used to compare torchaudio functionality to the equivalent functionalty in librosa without
     depending on librosa after results are precomputed.
     """
-    prefix = "torchaudio_unittest/assets/librosa_expected_results/"
+    this_file = Path(__file__).parent.resolve()
+    expected_results_folder = this_file / "torchaudio_unittest" / "assets" / "librosa_expected_results"
     def wrapper(request, *args, **kwargs):
-        if request is not None:
-            if os.path.exists(f"{prefix}{request}.pt"):
-                return torch.load(f"{prefix}{request}.pt", weights_only=False)
+        mocked_results = f"{expected_results_folder / request}.pt"
+        return torch.load(mocked_results, weights_only=False)
+
+        # Old definition used for generation:
+        # Note that we need the check for 'None' as sometimes during generation
+        # we don't want to associate a call with a cached file.
+        #
+        # if request is not None:
+        #     if os.path.exists(mocked_results):
+        #         return torch.load(mocked_results, weights_only=False)
         # import librosa
         # result = eval(f)(*args, **kwargs)
         # if request is not None:
-        #     path = Path(f"{prefix}{request}.pt")
         #     path.parent.mkdir(parents=True, exist_ok=True)
-        #     torch.save(result, path)
+        #     torch.save(result, mocked_results)
         # return result
     return wrapper
 
