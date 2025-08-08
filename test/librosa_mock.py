@@ -15,6 +15,14 @@ def mock_function(f):
     def wrapper(request, *args, **kwargs):
         mocked_results = f"{expected_results_folder / request}.pt"
         return torch.load(mocked_results, weights_only=False)
+
+        # Old definition used for generation:
+        # Note that we need the check for 'None' as sometimes during generation
+        # we don't want to associate a call with a cached file.
+        #
+        # if request is not None:
+        #     if os.path.exists(mocked_results):
+        #         return torch.load(mocked_results, weights_only=False)
         # import librosa
         # result = eval(f)(*args, **kwargs)
         # if request is not None:
