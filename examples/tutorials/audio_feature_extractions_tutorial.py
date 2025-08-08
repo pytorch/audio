@@ -75,7 +75,8 @@ def plot_spectrogram(specgram, title=None, ylabel="freq_bin", ax=None):
     if title is not None:
         ax.set_title(title)
     ax.set_ylabel(ylabel)
-    ax.imshow(librosa.power_to_db(specgram), origin="lower", aspect="auto", interpolation="nearest")
+    power_to_db = T.AmplitudeToDB("power", 80.0)
+    ax.imshow(power_to_db(specgram), origin="lower", aspect="auto", interpolation="nearest")
 
 
 def plot_fbank(fbank, title=None):
