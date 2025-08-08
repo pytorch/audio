@@ -1,7 +1,9 @@
 import subprocess
 import sys
 import warnings
-
+import shutil
+from pathlib import Path
+import os
 
 def get_encoding(dtype):
     encodings = {
@@ -103,14 +105,29 @@ def _flattern(effects):
     return [item for sublist in effects for item in sublist]
 
 
-def run_sox_effect(input_file, output_file, effect, *, output_sample_rate=None, output_bitdepth=None):
-    """Run sox effects"""
-    effect = _flattern(effect)
-    command = ["sox", "-V", "--no-dither", input_file]
-    if output_bitdepth:
-        command += ["--bits", str(output_bitdepth)]
-    command += [output_file] + effect
-    if output_sample_rate:
-        command += ["rate", str(output_sample_rate)]
-    print(" ".join(command))
-    subprocess.run(command, check=True)
+def run_sox_effect(request, input_file, output_file, effect, *, output_sample_rate=None, output_bitdepth=None):
+    """
+    Save or load the result of running sox effects for the test-id `request`. Saving code is currently commented out.
+    This is used to compare torchaudio functionality with corresponding sox functionality.
+    """
+    test_dir = Path(__file__).parent.parent.resolve()
+    expected_results_folder = test_dir / "assets" / "sox_expected_results"
+    mocked_results = expected_results_folder / f"{request}.wav"
+
+    shutil.copyfile(mocked_results, output_file)
+
+    # To do generation, remove the `copyfile` line above and uncomment the following:
+    #
+    # if os.path.exists(mocked_results):
+    #     shutil.copyfile(mocked_results, output_file)
+    # effect = _flattern(effect)
+    # command = ["sox", "-V", "--no-dither", input_file]
+    # if output_bitdepth:
+    #     command += ["--bits", str(output_bitdepth)]
+    # command += [output_file] + effect
+    # if output_sample_rate:
+    #     command += ["rate", str(output_sample_rate)]
+    # print(" ".join(command))
+    # subprocess.run(command, check=True)
+    # mocked_results.parent.mkdir(parents=True, exist_ok=True)
+    # shutil.copyfile(output_file, mocked_results)

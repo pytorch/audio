@@ -13,15 +13,16 @@ from torchaudio_unittest.common_utils import (
     sox_utils,
     TempDirMixin,
     TorchaudioTestCase,
+    RequestMixin
 )
 
 
 @skipIfNoSox
 @skipIfNoExec("sox")
-class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase):
+class TestFunctionalFiltering(TempDirMixin, TorchaudioTestCase, RequestMixin):
     def run_sox_effect(self, input_file, effect):
         output_file = self.get_temp_path("expected.wav")
-        sox_utils.run_sox_effect(input_file, output_file, [str(e) for e in effect])
+        sox_utils.run_sox_effect(self.request, input_file, output_file, [str(e) for e in effect])
         return load_wav(output_file)
 
     def assert_sox_effect(self, result, input_path, effects, atol=1e-04, rtol=1e-5):
