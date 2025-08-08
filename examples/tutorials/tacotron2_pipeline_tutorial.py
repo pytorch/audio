@@ -19,7 +19,7 @@ Text-to-Speech with Tacotron2
 # 1. Text preprocessing
 #
 #    First, the input text is encoded into a list of symbols. In this
-#    tutorial, we will use English characters and phonemes as the symbols.
+#    tutorial, we will use English characters as the symbols.
 #
 # 2. Spectrogram generation
 #
@@ -47,16 +47,6 @@ Text-to-Speech with Tacotron2
 # Preparation
 # -----------
 #
-# First, we install the necessary dependencies. In addition to
-# ``torchaudio``, ``DeepPhonemizer`` is required to perform phoneme-based
-# encoding.
-#
-
-# %%
-#  .. code-block:: bash
-#
-#      %%bash
-#      pip3 install deep_phonemizer
 
 import torch
 import torchaudio
@@ -141,49 +131,6 @@ print([processor.tokens[i] for i in processed[0, : lengths[0]]])
 
 
 ######################################################################
-# Phoneme-based encoding
-# ~~~~~~~~~~~~~~~~~~~~~~
-#
-# Phoneme-based encoding is similar to character-based encoding, but it
-# uses a symbol table based on phonemes and a G2P (Grapheme-to-Phoneme)
-# model.
-#
-# The detail of the G2P model is out of the scope of this tutorial, we will
-# just look at what the conversion looks like.
-#
-# Similar to the case of character-based encoding, the encoding process is
-# expected to match what a pretrained Tacotron2 model is trained on.
-# ``torchaudio`` has an interface to create the process.
-#
-# The following code illustrates how to make and use the process. Behind
-# the scene, a G2P model is created using ``DeepPhonemizer`` package, and
-# the pretrained weights published by the author of ``DeepPhonemizer`` is
-# fetched.
-#
-
-bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
-
-processor = bundle.get_text_processor()
-
-text = "Hello world! Text to speech!"
-with torch.inference_mode():
-    processed, lengths = processor(text)
-
-print(processed)
-print(lengths)
-
-
-######################################################################
-# Notice that the encoded values are different from the example of
-# character-based encoding.
-#
-# The intermediate representation looks like the following.
-#
-
-print([processor.tokens[i] for i in processed[0, : lengths[0]]])
-
-
-######################################################################
 # Spectrogram Generation
 # ----------------------
 #
@@ -256,7 +203,7 @@ plot()
 # WaveRNN model from the same bundle.
 #
 
-bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
+bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH
 
 processor = bundle.get_text_processor()
 tacotron2 = bundle.get_tacotron2().to(device)
@@ -299,7 +246,7 @@ plot(waveforms, spec, vocoder.sample_rate)
 # method and pass the spectrogram.
 #
 
-bundle = torchaudio.pipelines.TACOTRON2_GRIFFINLIM_PHONE_LJSPEECH
+bundle = torchaudio.pipelines.TACOTRON2_GRIFFINLIM_CHAR_LJSPEECH
 
 processor = bundle.get_text_processor()
 tacotron2 = bundle.get_tacotron2().to(device)
