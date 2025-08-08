@@ -29,8 +29,8 @@ def run_kaldi(request, command, input_type, input_value):
         input_value (Tensor for 'ark', string for 'scp'): The input to pass.
             Must be a path to an audio file for 'scp'.
     """
-    this_file = Path(__file__).parent.resolve()
-    expected_results_folder = this_file / "torchaudio_unittest" / "assets" / "librosa_expected_results"
+    test_dir = Path(__file__).parent.parent.resolve()
+    expected_results_folder = test_dir / "assets" / "kaldi_expected_results"
     mocked_results = f"{expected_results_folder / request}.pt"
     if os.path.exists(mocked_results):
         return torch.load(mocked_results)
