@@ -112,7 +112,7 @@ def run_sox_effect(request, input_file, output_file, effect, *, output_sample_ra
     """
     test_dir = Path(__file__).parent.parent.resolve()
     expected_results_folder = test_dir / "assets" / "sox_expected_results"
-    mocked_results = f"{expected_results_folder / request}.wav"
+    mocked_results = expected_results_folder / f"{request}.wav"
 
     shutil.copyfile(mocked_results, output_file)
 
