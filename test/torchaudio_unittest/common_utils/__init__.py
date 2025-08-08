@@ -33,13 +33,15 @@ from .wav_utils import get_wav_data, load_wav, normalize_wav, save_wav
 import pytest
 
 class RequestMixin:
-    # This mixin adds the `self.request` attribute to a test instance, which uniquely identifies the test.
-    # It looks like, e.g.:
-    # test/torchaudio_unittest/functional/librosa_compatibility_cpu_test.py__TestFunctionalCPU__test_create_mel_fb_13
+    """
+    Adds the `self.request` attribute to a test instance, which uniquely identifies the test.
+    It looks like, e.g.:
+    test/torchaudio_unittest/functional/librosa_compatibility_cpu_test.py__TestFunctionalCPU__test_create_mel_fb_13
+    """
 
     @pytest.fixture(autouse=True)
     def inject_request(self, request):
-        self.request = request.node.nodeid.replace(":", "_")
+        self.request = request.node.nodeid.replace(":", "_").replace("_cpu_", "_").replace("_cuda_", "_")
 
 __all__ = [
     "get_asset_path",

@@ -14,17 +14,17 @@ def mock_function(f):
     expected_results_folder = this_file / "torchaudio_unittest" / "assets" / "librosa_expected_results"
     def wrapper(request, *args, **kwargs):
         mocked_results = expected_results_folder / f"{request}.pt"
-        return torch.load(mocked_results, weights_only=False)
+        # return torch.load(mocked_results, weights_only=False)
 
         # Old definition used for generation:
-        # if os.path.exists(mocked_results):
-        #     return torch.load(mocked_results, weights_only=False)
-        # import librosa
-        # result = eval(f)(*args, **kwargs)
-        # if request is not None:
-        #     mocked_results.parent.mkdir(parents=True, exist_ok=True)
-        #     torch.save(result, mocked_results)
-        # return result
+        if os.path.exists(mocked_results):
+            return torch.load(mocked_results, weights_only=False)
+        import librosa
+        result = eval(f)(*args, **kwargs)
+        if request is not None:
+            mocked_results.parent.mkdir(parents=True, exist_ok=True)
+            torch.save(result, mocked_results)
+        return result
     return wrapper
 
 griffinlim = mock_function("librosa.griffinlim")
