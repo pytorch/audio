@@ -1,6 +1,6 @@
 import torch
 import torchaudio.functional as F
-from torchaudio_unittest.common_utils import skipIfNoExec, TempDirMixin, TestBaseMixin, RequestMixin
+from torchaudio_unittest.common_utils import TempDirMixin, TestBaseMixin, RequestMixin
 from torchaudio_unittest.common_utils.kaldi_utils import convert_args, run_kaldi
 
 
@@ -9,7 +9,6 @@ class Kaldi(TempDirMixin, TestBaseMixin, RequestMixin):
         expected = expected.to(dtype=self.dtype, device=self.device)
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
 
-    @skipIfNoExec("apply-cmvn-sliding")
     def test_sliding_window_cmn(self):
         """sliding_window_cmn should be numerically compatible with apply-cmvn-sliding"""
         kwargs = {
