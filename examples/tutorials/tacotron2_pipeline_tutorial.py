@@ -149,7 +149,7 @@ print([processor.tokens[i] for i in processed[0, : lengths[0]]])
 # :py:class:`~torchaudio.pipelines.Tacotron2TTSBundle`.
 #
 
-bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_PHONE_LJSPEECH
+bundle = torchaudio.pipelines.TACOTRON2_WAVERNN_CHAR_LJSPEECH
 processor = bundle.get_text_processor()
 tacotron2 = bundle.get_tacotron2().to(device)
 
