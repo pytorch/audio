@@ -97,7 +97,8 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
     {func.__doc__}
     """
 
-        UNSUPPORTED.append(wrapped)
+        if 'sox' not in func.__module__:
+            UNSUPPORTED.append(wrapped)
         return wrapped
 
     return decorator
