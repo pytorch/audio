@@ -3,7 +3,7 @@ import pytest
 import torch
 
 from torchaudio._internal.module_utils import UNSUPPORTED
-from torchaudio.sox_effects import apply_effects_tensor
+from torchaudio.prototype.functional import exp_sigmoid
 
 # Importing prototype modules is needed to trigger the registration of the
 # corresponding APIs in the UNSUPPORTED register.
@@ -25,10 +25,9 @@ def test_deprecations(func):
 # deprecated for years.
 @pytest.mark.parametrize("scripted", (True, False))
 def test_torchscript_fails(scripted):
-    f = apply_effects_tensor
+    f = exp_sigmoid
     if scripted:
         pytest.xfail("Deprecation decorator breaks torchscript")
         f = torch.jit.script(f)
     _, out_sample_rate = f(torch.rand(2, 1000), sample_rate=16_000, effects=[["rate", "8000"]])
     assert out_sample_rate == 8000
-
