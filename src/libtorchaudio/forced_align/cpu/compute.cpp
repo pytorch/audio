@@ -1,5 +1,9 @@
 #include <torch/script.h>
 #include <torch/torch.h>
+#include <torch/csrc/stable/library.h>
+#include <torch/csrc/stable/tensor.h>
+#include <torch/csrc/stable/ops.h>
+#include <torch/csrc/inductor/aoti_torch/c/shim.h>
 
 using namespace std;
 
@@ -22,17 +26,16 @@ void forced_align_impl(
   const auto T = logProbs.size(1);
   const auto L = targets.size(1);
   const auto S = 2 * L + 1;
-  torch::Tensor alphas = torch::empty(
-                             {2, S},
-                             torch::TensorOptions()
-                                 .device(logProbs.device())
-                                 .dtype(logProbs.dtype()))
-                             .fill_(kNegInfinity);
+
+  auto alphas_a = new scalar_t[2 * S]; // scalar_t is just logProbs.dtype()
+  for (int i = 0; i < 2 * S; i++) {
+    alphas_a[i] = kNegInfinity;
+  }
+
   torch::Tensor backPtr = torch::empty({T, S}, torch::kInt8).fill_(-1);
   auto logProbs_a = logProbs.accessor<scalar_t, 3>();
   auto targets_a = targets.accessor<target_t, 2>();
   auto paths_a = paths.accessor<target_t, 2>();
-  auto alphas_a = alphas.accessor<scalar_t, 2>();
   auto backPtr_a = backPtr.accessor<int8_t, 2>();
   auto R = 0;
   for (auto i = 1; i < L; i++) {
@@ -52,7 +55,7 @@ void forced_align_impl(
   auto end = (S == 1) ? 1 : 2;
   for (auto i = start; i < end; i++) {
     auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
-    alphas_a[0][i] = logProbs_a[batchIndex][0][labelIdx];
+    alphas_a[i] = logProbs_a[batchIndex][0][labelIdx]; // alphas_a[0, i]
   }
   for (auto t = 1; t < T; t++) {
     if (T - t <= L + R) {
@@ -75,18 +78,18 @@ void forced_align_impl(
     auto curIdxOffset = t % 2;
     auto prevIdxOffset = (t - 1) % 2;
     for (auto j = 0; j < S; ++j) {
-      alphas_a[curIdxOffset][j] = -std::numeric_limits<scalar_t>::infinity();
+      alphas_a[curIdxOffset * S + j] = -std::numeric_limits<scalar_t>::infinity(); // alphas_a[curIdxOffset][j]
     }
     if (start == 0) {
-      alphas_a[curIdxOffset][0] =
-          alphas_a[prevIdxOffset][0] + logProbs_a[batchIndex][t][blank];
+      alphas_a[curIdxOffset * S] =
+          alphas_a[prevIdxOffset * S] + logProbs_a[batchIndex][t][blank];
       backPtr_a[t][0] = 0;
       startloop += 1;
     }
 
     for (auto i = startloop; i < end; i++) {
-      auto x0 = alphas_a[prevIdxOffset][i];
-      auto x1 = alphas_a[prevIdxOffset][i - 1];
+      auto x0 = alphas_a[prevIdxOffset * S + i]; // alphas_a[prevIdxOffset][i];
+      auto x1 = alphas_a[prevIdxOffset * S + i - 1]; // alphas_a[prevIdxOffset][i - 1];
       auto x2 = -std::numeric_limits<scalar_t>::infinity();
 
       auto labelIdx = (i % 2 == 0) ? blank : targets_a[batchIndex][i / 2];
@@ -97,7 +100,7 @@ void forced_align_impl(
       // (i != 1) just ensures we don't access targets[i - 2] if its i < 2
       if (i % 2 != 0 && i != 1 &&
           targets_a[batchIndex][i / 2] != targets_a[batchIndex][i / 2 - 1]) {
-        x2 = alphas_a[prevIdxOffset][i - 2];
+        x2 = alphas_a[prevIdxOffset * S + i - 2]; // alphas_a[prevIdxOffset][i - 2];
       }
       scalar_t result = 0.0;
       if (x2 > x1 && x2 > x0) {
@@ -110,11 +113,13 @@ void forced_align_impl(
         result = x0;
         backPtr_a[t][i] = 0;
       }
-      alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
+      alphas_a[curIdxOffset * S + i] = result + logProbs_a[batchIndex][t][labelIdx]; // alphas_a[curIdxOffset][i]
     }
   }
   auto idx1 = (T - 1) % 2;
-  auto ltrIdx = alphas_a[idx1][S - 1] > alphas_a[idx1][S - 2] ? S - 1 : S - 2;
+  auto ltrIdx = alphas_a[S * idx1 + S - 1] >
+    alphas_a[S * idx1 + S - 2] ? S - 1 : S - 2; // alphas_a[idx1][S - 1], alphas_a[idx1][S - 2]
+  delete[] alphas_a;
   // path stores the token index for each time step after force alignment.
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
