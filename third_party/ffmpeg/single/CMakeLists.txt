@@ -20,12 +20,12 @@ if(MULTIARCH_TRIPLET)
 endif()
 
 add_library(ffmpeg INTERFACE)
-target_include_directories(ffmpeg INTERFACE "${include_dir}")
+target_include_directories(ffmpeg INTERFACE ${include_dir})
 
 function (_find_ffmpeg_lib component)
   find_path("${component}_header"
     NAMES "lib${component}/${component}.h"
-    PATHS "${include_dir}"
+    PATHS ${include_dir}
     DOC "The include directory for ${component}"
     REQUIRED)
   find_library("lib${component}"
