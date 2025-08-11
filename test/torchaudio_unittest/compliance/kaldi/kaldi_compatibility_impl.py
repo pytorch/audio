@@ -8,11 +8,12 @@ from torchaudio_unittest.common_utils import (
     skipIfNoExec,
     TempDirMixin,
     TestBaseMixin,
+    RequestMixin
 )
 from torchaudio_unittest.common_utils.kaldi_utils import convert_args, run_kaldi
 
 
-class Kaldi(TempDirMixin, TestBaseMixin):
+class Kaldi(TempDirMixin, TestBaseMixin, RequestMixin):
     def assert_equal(self, output, *, expected, rtol=None, atol=None):
         expected = expected.to(dtype=self.dtype, device=self.device)
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
@@ -25,7 +26,7 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         waveform = load_wav(wave_file, normalize=False)[0].to(dtype=self.dtype, device=self.device)
         result = torchaudio.compliance.kaldi.fbank(waveform, **kwargs)
         command = ["compute-fbank-feats"] + convert_args(**kwargs) + ["scp:-", "ark:-"]
-        kaldi_result = run_kaldi(command, "scp", wave_file)
+        kaldi_result = run_kaldi(self.request, command, "scp", wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
     @parameterized.expand(load_params("kaldi_test_spectrogram_args.jsonl"))
@@ -36,7 +37,7 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         waveform = load_wav(wave_file, normalize=False)[0].to(dtype=self.dtype, device=self.device)
         result = torchaudio.compliance.kaldi.spectrogram(waveform, **kwargs)
         command = ["compute-spectrogram-feats"] + convert_args(**kwargs) + ["scp:-", "ark:-"]
-        kaldi_result = run_kaldi(command, "scp", wave_file)
+        kaldi_result = run_kaldi(self.request, command, "scp", wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-6)
 
     @parameterized.expand(load_params("kaldi_test_mfcc_args.jsonl"))
@@ -47,5 +48,5 @@ class Kaldi(TempDirMixin, TestBaseMixin):
         waveform = load_wav(wave_file, normalize=False)[0].to(dtype=self.dtype, device=self.device)
         result = torchaudio.compliance.kaldi.mfcc(waveform, **kwargs)
         command = ["compute-mfcc-feats"] + convert_args(**kwargs) + ["scp:-", "ark:-"]
-        kaldi_result = run_kaldi(command, "scp", wave_file)
+        kaldi_result = run_kaldi(self.request, command, "scp", wave_file)
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-5)
