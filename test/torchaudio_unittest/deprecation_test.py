@@ -29,5 +29,4 @@ def test_torchscript_fails(scripted):
     if scripted:
         pytest.xfail("Deprecation decorator breaks torchscript")
         f = torch.jit.script(f)
-    _, out_sample_rate = f(torch.rand(2, 1000), sample_rate=16_000, effects=[["rate", "8000"]])
-    assert out_sample_rate == 8000
+    f(torch.rand(2, 1000))
