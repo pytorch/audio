@@ -68,6 +68,7 @@ import IPython
 import sentencepiece as spm
 from torchaudio.models.decoder import cuda_ctc_decoder
 from torchaudio.utils import _download_asset
+raise ValueError("OOPS THIS TUTORIAL IS BEING BUILT")
 
 ######################################################################
 #
