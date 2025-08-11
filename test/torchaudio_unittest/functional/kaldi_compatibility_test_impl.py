@@ -18,7 +18,8 @@ class Kaldi(TempDirMixin, TestBaseMixin, RequestMixin):
             "norm_vars": False,
         }
 
-        tensor = torch.randn(40, 10, dtype=self.dtype, device=self.device)
+        torch.manual_seed(0)
+        tensor = torch.randn(40, 10, dtype=self.dtype).to(self.device)
         result = F.sliding_window_cmn(tensor, **kwargs)
         command = ["apply-cmvn-sliding"] + convert_args(**kwargs) + ["ark:-", "ark:-"]
         kaldi_result = run_kaldi(self.request, command, "ark", tensor)
