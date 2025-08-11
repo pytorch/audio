@@ -34,7 +34,6 @@ __all__ = [
     "mask_along_axis_iid",
     "sliding_window_cmn",
     "spectral_centroid",
-    "apply_codec",
     "resample",
     "edit_distance",
     "loudness",
