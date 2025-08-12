@@ -3,6 +3,8 @@
 #include <torch/csrc/inductor/aoti_torch/c/shim.h>
 #include <torch/csrc/inductor/aoti_runtime/utils.h>
 #include <torch/csrc/stable/library.h>
+#include <torch/types.h>
+#include <torch/csrc/inductor/aoti_torch/utils.h>
 
 namespace torchaudio {
 namespace rnnt {
@@ -21,46 +23,46 @@ std::tuple<Tensor, Tensor> compute(
     bool fused_log_softmax = true) {
 
     int32_t logits_device;
-    aoti_torch_get_device_type(logits.get(), &logits_device);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_device_type(logits.get(), &logits_device));
     int32_t targets_device;
-    aoti_torch_get_device_type(targets.get(), &targets_device);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_device_type(targets.get(), &targets_device));
     int32_t logit_lengths_device;
-    aoti_torch_get_device_type(logit_lengths.get(), &logit_lengths_device);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_device_type(logit_lengths.get(), &logit_lengths_device));
     int32_t target_lengths_device;
-    aoti_torch_get_device_type(target_lengths.get(), &target_lengths_device);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_device_type(target_lengths.get(), &target_lengths_device));
 
     AOTI_TORCH_CHECK(logits_device == targets_device);
     AOTI_TORCH_CHECK(logits_device == logit_lengths_device);
     AOTI_TORCH_CHECK(logits_device == target_lengths_device);
 
     int32_t logits_dtype;
-    aoti_torch_get_dtype(logits.get(), &logits_dtype);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(logits.get(), &logits_dtype));
     AOTI_TORCH_CHECK(logits_dtype == aoti_torch_dtype_float32() ||
       logits_dtype == aoti_torch_dtype_float16());
 
     int32_t targets_dtype;
-    aoti_torch_get_dtype(targets.get(), &targets_dtype);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(targets.get(), &targets_dtype));
     AOTI_TORCH_CHECK(targets_dtype == aoti_torch_dtype_int32() ||
       logits_dtype == aoti_torch_dtype_float16());
 
     int32_t logit_lengths_dtype;
-    aoti_torch_get_dtype(logit_lengths.get(), &logit_lengths_dtype);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(logit_lengths.get(), &logit_lengths_dtype));
     AOTI_TORCH_CHECK(logit_lengths_dtype == aoti_torch_dtype_int32() ||
       logit_lengths_dtype == aoti_torch_dtype_float16());
 
     int32_t target_lengths_dtype;
-    aoti_torch_get_dtype(target_lengths.get(), &target_lengths_dtype);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(target_lengths.get(), &target_lengths_dtype));
     AOTI_TORCH_CHECK(target_lengths_dtype == aoti_torch_dtype_int32() ||
       target_lengths_dtype == aoti_torch_dtype_float16());
 
     bool bool_tmp;
-    aoti_torch_is_contiguous(logits.get(), &bool_tmp);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_is_contiguous(logits.get(), &bool_tmp));
     AOTI_TORCH_CHECK(bool_tmp);
-    aoti_torch_is_contiguous(targets.get(), &bool_tmp);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_is_contiguous(targets.get(), &bool_tmp));
     AOTI_TORCH_CHECK(bool_tmp);
-    aoti_torch_is_contiguous(logit_lengths.get(), &bool_tmp);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_is_contiguous(logit_lengths.get(), &bool_tmp));
     AOTI_TORCH_CHECK(bool_tmp);
-    aoti_torch_is_contiguous(target_lengths.get(), &bool_tmp);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_is_contiguous(target_lengths.get(), &bool_tmp));
 
     int64_t int_tmp;
     aoti_torch_get_dim(logits.get(), &int_tmp);
@@ -73,15 +75,15 @@ std::tuple<Tensor, Tensor> compute(
     AOTI_TORCH_CHECK(int_tmp == 1);
 
     int64_t logit_lengths_size;
-    aoti_torch_get_size(logit_lengths.get(), 0, &logit_lengths_size);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_size(logit_lengths.get(), 0, &logit_lengths_size));
     int64_t logits_size;
-    aoti_torch_get_size(logits.get(), 0, &logits_size);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_size(logits.get(), 0, &logits_size));
     AOTI_TORCH_CHECK(logit_lengths_size == logits_size);
     int64_t target_lengths_size;
-    aoti_torch_get_size(target_lengths.get(), 0, &target_lengths_size);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_size(target_lengths.get(), 0, &target_lengths_size));
     AOTI_TORCH_CHECK(target_lengths_size == logits_size);
     int64_t targets_size;
-    aoti_torch_get_size(targets.get(), 0, &targets_size);
+    TORCH_ERROR_CODE_CHECK(aoti_torch_get_size(targets.get(), 0, &targets_size));
     AOTI_TORCH_CHECK(targets_size == logits_size);
 
     // TORCH_CHECK(
@@ -116,47 +118,66 @@ std::tuple<Tensor, Tensor> compute(
   aoti_torch_get_device_index(logits.get(), &logits_device_index);
 
   TORCH_CHECK_EQ(logits_device, aoti_torch_device_type_cuda());
-  aoti_torch_get_current_cuda_stream(logits_device_index, (void**)&options.stream_);
+
+  options.stream_ = at::cuda::getCurrentCUDAStream();
+  // aoti_torch_get_current_cuda_stream(logits_device_index, (void**)&options.stream_);
   cudaSetDevice(logits_device);
   options.device_ = GPU;
 
   int64_t cost_sizes[1] = {options.batchSize_ * options.nHypos_};
   int64_t stride1[1] = {1};
   AtenTensorHandle costs;
-  aoti_torch_empty_strided(1, cost_sizes, stride1, logits_dtype, logits_device, logits_device_index, &costs);
+  TORCH_ERROR_CODE_CHECK(
+    aoti_torch_empty_strided(1, cost_sizes, stride1, logits_dtype, logits_device, logits_device_index, &costs));
   aoti_torch_zero_(costs);
-  c10::cuda::device_synchronize();
+
+
+  auto stream = at::cuda::getCurrentCUDAStream();
+  at::cuda::stream_synchronize(stream);
 
   AtenTensorHandle gradients;
   aoti_torch_clone(logits.get(), &gradients);
   aoti_torch_zero_(gradients);
 
-  AtenTensorHandle int_workspace;
-  int64_t int_sizes[1] = {IntWorkspace::ComputeSizeFromOptions(options)};
+  // AtenTensorHandle int_workspace;
+  // int64_t int_sizes[1] = {IntWorkspace::ComputeSizeFromOptions(options)};
+  // printf("INT SIZE IS %ld\n", int_sizes[0]);
   int64_t strides[1] = {1};
-  aoti_torch_empty_strided(1, int_sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace);
+  // TORCH_ERROR_CODE_CHECK(
+  //   aoti_torch_empty_strided(1, int_sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace));
+
+  torch::Tensor int_workspace = torch::empty(
+    IntWorkspace::ComputeSizeFromOptions(options),
+    torch::TensorOptions()
+              .device(torch::aot_inductor::tensor_handle_to_tensor_pointer(logits.get())->device())
+              .dtype(torch::ScalarType::Int));
 
   AtenTensorHandle float_workspace;
   int64_t float_sizes[1] = {DtypeWorkspace<float>::ComputeSizeFromOptions(options)};
-  aoti_torch_empty_strided(1, float_sizes, strides, aoti_torch_dtype_float32(), logits_device, logits_device_index, &float_workspace);
+  TORCH_ERROR_CODE_CHECK(
+    aoti_torch_empty_strided(1, float_sizes, strides, aoti_torch_dtype_float32(), logits_device, logits_device_index, &float_workspace));
 
   int64_t float_numel;
   aoti_torch_get_numel(float_workspace, &float_numel);
-  void *int_workspace_ptr;
-  aoti_torch_get_data_ptr(int_workspace, &int_workspace_ptr);
+  // void *int_workspace_ptr;
+  // TORCH_ERROR_CODE_CHECK(
+  //   aoti_torch_get_data_ptr(int_workspace, &int_workspace_ptr));
   void *float_workspace_ptr;
-  aoti_torch_get_data_ptr(float_workspace, &float_workspace_ptr);
-  int64_t int_numel;
-  aoti_torch_get_numel(int_workspace, &int_numel);
+  TORCH_ERROR_CODE_CHECK(
+    aoti_torch_get_data_ptr(float_workspace, &float_workspace_ptr));
+  // int64_t int_numel;
+  // TORCH_ERROR_CODE_CHECK(
+  //   aoti_torch_get_numel(int_workspace, &int_numel));
 
-  c10::cuda::device_synchronize();
+  at::cuda::stream_synchronize(stream);
   Workspace<float> workspace(
       /*options=*/options,
       /*dtype_data=*/(float*)float_workspace_ptr,
       /*dtype_size=*/float_numel,
-      /*int_data=*/(int*)int_workspace_ptr,
-      /*int_size=*/int_numel);
-
+      /*int_data=*/int_workspace.data_ptr<int>(), // (int*)int_workspace_ptr,
+      /*int_size=*/int_workspace.numel() // int_numel);
+  );
+  at::cuda::stream_synchronize(stream);
   // void *logit_ptr;
   // aoti_torch_get_data_ptr(logits.get(), &logit_ptr);
 
