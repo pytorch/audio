@@ -127,10 +127,10 @@ class IntWorkspace {
       //     GetPointerToAlphaCounters(),
       //     0,
       //     ComputeSizeForAlphaCounters(options_) * sizeof(int));
-      cudaMemset(
-          GetPointerToBetaCounters(),
-          0,
-          ComputeSizeForBetaCounters(options_) * sizeof(int));
+      // cudaMemset(
+      //     GetPointerToBetaCounters(),
+      //     0,
+      //     ComputeSizeForBetaCounters(options_) * sizeof(int));
     }
 #endif // USE_CUDA
   }

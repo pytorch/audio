@@ -125,6 +125,7 @@ std::tuple<Tensor, Tensor> compute(
   AtenTensorHandle costs;
   aoti_torch_empty_strided(1, cost_sizes, stride1, logits_dtype, logits_device, logits_device_index, &costs);
   aoti_torch_zero_(costs);
+  c10::cuda::device_synchronize();
 
   AtenTensorHandle gradients;
   aoti_torch_clone(logits.get(), &gradients);
@@ -148,6 +149,7 @@ std::tuple<Tensor, Tensor> compute(
   int64_t int_numel;
   aoti_torch_get_numel(int_workspace, &int_numel);
 
+  c10::cuda::device_synchronize();
   Workspace<float> workspace(
       /*options=*/options,
       /*dtype_data=*/(float*)float_workspace_ptr,
@@ -155,23 +157,23 @@ std::tuple<Tensor, Tensor> compute(
       /*int_data=*/(int*)int_workspace_ptr,
       /*int_size=*/int_numel);
 
-  void *logit_ptr;
-  aoti_torch_get_data_ptr(logits.get(), &logit_ptr);
+  // void *logit_ptr;
+  // aoti_torch_get_data_ptr(logits.get(), &logit_ptr);
 
-  void *target_ptr;
-  aoti_torch_get_data_ptr(targets.get(), &target_ptr);
+  // void *target_ptr;
+  // aoti_torch_get_data_ptr(targets.get(), &target_ptr);
 
-  void *logit_len_ptr;
-  aoti_torch_get_data_ptr(logit_lengths.get(), &logit_len_ptr);
+  // void *logit_len_ptr;
+  // aoti_torch_get_data_ptr(logit_lengths.get(), &logit_len_ptr);
 
-  void *target_len_ptr;
-  aoti_torch_get_data_ptr(target_lengths.get(), &target_len_ptr);
+  // void *target_len_ptr;
+  // aoti_torch_get_data_ptr(target_lengths.get(), &target_len_ptr);
 
-  void *costs_ptr;
-  aoti_torch_get_data_ptr(costs, &costs_ptr);
+  // void *costs_ptr;
+  // aoti_torch_get_data_ptr(costs, &costs_ptr);
 
-  void *grads_ptr;
-  aoti_torch_get_data_ptr(gradients, &grads_ptr);
+  // void *grads_ptr;
+  // aoti_torch_get_data_ptr(gradients, &grads_ptr);
 
   // if (logits_dtype == aoti_torch_dtype_float32()) {
   //     Compute</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
