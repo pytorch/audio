@@ -30,5 +30,5 @@ fi
 
 (
     cd test
-    pytest torchaudio_unittest -k "not backend and not (sox and not compatibility) and not /io/ and not prototype and not ffmpeg and not fairseq and not hdemucs and not (torchscript and rnnt) and not torchscript_consistency"
+    pytest torchaudio_unittest -k "not backend and not /io/ and not prototype and not ffmpeg and not fairseq and not hdemucs and not (torchscript and rnnt) and not torchscript_consistency"
 )
