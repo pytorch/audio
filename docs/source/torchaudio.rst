@@ -78,14 +78,6 @@ The following table summarizes the backends.
        to retrieve the supported codecs.
 
        This backend Supports various protocols, such as HTTPS and MP4, and file-like objects.
-   * - 2
-     - SoX
-     - Linux, macOS
-     - Use :py:func:`~torchaudio.utils.sox_utils.list_read_formats` and
-       :py:func:`~torchaudio.utils.sox_utils.list_write_formats`
-       to retrieve the supported codecs.
-
-       This backend does *not* support file-like objects.
    * - 3
      - SoundFile
      - Linux, macOS, Windows

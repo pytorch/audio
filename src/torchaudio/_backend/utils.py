@@ -5,7 +5,6 @@ import warnings
 
 import torch
 
-from torchaudio._extension import lazy_import_sox_ext
 from torchaudio.io import CodecConfig
 from torio._extension import lazy_import_ffmpeg_ext
 
@@ -15,7 +14,6 @@ from .backend import Backend
 from .common import AudioMetaData
 from .ffmpeg import FFmpegBackend
 from .soundfile import SoundfileBackend
-from .sox import SoXBackend
 
 
 @lru_cache(None)
@@ -23,8 +21,6 @@ def get_available_backends() -> Dict[str, Type[Backend]]:
     backend_specs: Dict[str, Type[Backend]] = {}
     if lazy_import_ffmpeg_ext().is_available():
         backend_specs["ffmpeg"] = FFmpegBackend
-    if lazy_import_sox_ext().is_available():
-        backend_specs["sox"] = SoXBackend
     if soundfile_backend._IS_SOUNDFILE_AVAILABLE:
         backend_specs["soundfile"] = SoundfileBackend
     return backend_specs
@@ -86,7 +82,7 @@ def get_info_func():
             backend (str or None, optional):
                 I/O backend to use.
                 If ``None``, function selects backend given input and available backends.
-                Otherwise, must be one of [``"ffmpeg"``, ``"sox"``, ``"soundfile"``],
+                Otherwise, must be one of [``"ffmpeg"``, ``"soundfile"``],
                 with the corresponding backend available.
                 (Default: ``None``)
 

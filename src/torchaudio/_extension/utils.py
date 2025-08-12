@@ -60,52 +60,6 @@ def _load_lib(lib: str) -> bool:
     torch.ops.load_library(path)
     return True
 
-
-def _import_sox_ext():
-    if os.name == "nt":
-        raise RuntimeError("sox extension is not supported on Windows")
-    if not eval_env("TORCHAUDIO_USE_SOX", True):
-        raise RuntimeError("sox extension is disabled. (TORCHAUDIO_USE_SOX=0)")
-
-    ext = "torchaudio.lib._torchaudio_sox"
-
-    if not importlib.util.find_spec(ext):
-        raise RuntimeError(
-            # fmt: off
-            "TorchAudio is not built with sox extension. "
-            "Please build TorchAudio with libsox support. (BUILD_SOX=1)"
-            # fmt: on
-        )
-
-    _load_lib("libtorchaudio_sox")
-    return importlib.import_module(ext)
-
-
-def _init_sox():
-    ext = _import_sox_ext()
-    ext.set_verbosity(0)
-
-    import atexit
-
-    torch.ops.torchaudio_sox.initialize_sox_effects()
-    atexit.register(torch.ops.torchaudio_sox.shutdown_sox_effects)
-
-    # Bundle functions registered with TORCH_LIBRARY into extension
-    # so that they can also be accessed in the same (lazy) manner
-    # from the extension.
-    keys = [
-        "get_info",
-        "load_audio_file",
-        "save_audio_file",
-        "apply_effects_tensor",
-        "apply_effects_file",
-    ]
-    for key in keys:
-        setattr(ext, key, getattr(torch.ops.torchaudio_sox, key))
-
-    return ext
-
-
 class _LazyImporter(types.ModuleType):
     """Lazily import module/extension."""
 

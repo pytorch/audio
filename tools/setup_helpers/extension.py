@@ -51,13 +51,6 @@ def get_ext_modules():
         Extension(name="torchaudio.lib.libtorchaudio", sources=[]),
         Extension(name="torchaudio.lib._torchaudio", sources=[]),
     ]
-    if _BUILD_SOX:
-        modules.extend(
-            [
-                Extension(name="torchaudio.lib.libtorchaudio_sox", sources=[]),
-                Extension(name="torchaudio.lib._torchaudio_sox", sources=[]),
-            ]
-        )
     if _BUILD_CUDA_CTC_DECODER:
         modules.extend(
             [
