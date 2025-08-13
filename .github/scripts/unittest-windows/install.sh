@@ -64,9 +64,8 @@ case "$(python --version)" in
         NUMBA_DEV_CHANNEL="-c numba/label/dev"
         ;;
 esac
-# Note: installing librosa via pip fail because it will try to compile numba.
 (
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa==0.10.0' parameterized 'requests>=2.20'
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
     # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
     # shellcheck disable=SC2086
     pip install \
@@ -76,7 +75,6 @@ esac
         coverage \
         expecttest \
         inflect \
-        kaldi-io \
         pytest \
         pytest-cov \
         pytorch-lightning \

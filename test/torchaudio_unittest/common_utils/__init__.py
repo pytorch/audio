@@ -15,9 +15,6 @@ from .case_utils import (
     skipIfNoModule,
     skipIfNoQengine,
     skipIfNoRIR,
-    skipIfNoSox,
-    skipIfNoSoxDecoder,
-    skipIfNoSoxEncoder,
     skipIfPy310,
     skipIfRocm,
     TempDirMixin,
@@ -29,7 +26,7 @@ from .data_utils import get_asset_path, get_sinusoid, get_spectrogram, get_white
 from .func_utils import torch_script
 from .image_utils import get_image, rgb_to_gray, rgb_to_yuv_ccir, save_image
 from .parameterized_utils import load_params, nested_params
-from .wav_utils import get_wav_data, load_wav, normalize_wav, save_wav
+from torchaudio.utils.wav_utils import get_wav_data, load_wav, normalize_wav, save_wav
 import pytest
 
 class RequestMixin:
@@ -63,9 +60,6 @@ __all__ = [
     "skipIfNoMacOS",
     "skipIfNoModule",
     "skipIfNoRIR",
-    "skipIfNoSox",
-    "skipIfNoSoxDecoder",
-    "skipIfNoSoxEncoder",
     "skipIfRocm",
     "skipIfNoQengine",
     "skipIfNoFFmpeg",
