@@ -85,7 +85,8 @@ pip install . -v --no-build-isolation
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
-conda install -y "ffmpeg>4"
+# On this CI, for whatever reason, we're only able to install ffmpeg 4.
+conda install -y "ffmpeg<5"
 python -c "import torch; import torchaudio; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
 
 NUMBA_DEV_CHANNEL=""
