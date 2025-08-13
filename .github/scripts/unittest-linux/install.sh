@@ -75,7 +75,7 @@ case $GPU_ARCH_TYPE in
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
 pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
-pip install "numpy>=1.26"
+
 
 # 2. Install torchaudio
 conda install --quiet -y ninja cmake
@@ -102,7 +102,7 @@ fi
     pip install SoundFile coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
 
     # TODO: might be better to fix the single call to `pip install` above
-    pip install pillow scipy
+    pip install pillow scipy "numpy>=1.26"
 )
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
