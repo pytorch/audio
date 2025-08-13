@@ -48,10 +48,18 @@ if "pytest" in sys.modules:
     from torchaudio.utils import wav_utils
     def load(
         uri: str,
+        frame_offset: int = 0,
+        num_frames: int = -1,
         normalize: bool = True,
         channels_first: bool = True,
     ) -> Tuple[torch.Tensor, int]:
-        return wav_utils.load_wav(uri, normalize, channels_first)
+        data, sample_rate = wav_utils.load_wav(uri, normalize, channels_first=False)
+        if num_frames == -1:
+            num_frames = data.shape[0] - frame_offset
+        data = data[frame_offset:frame_offset+num_frames]
+        if channels_first:
+            data = data.transpose(0, 1)
+        return data, sample_rate
 
     def save(
         uri: str,
