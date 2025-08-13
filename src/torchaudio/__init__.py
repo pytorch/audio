@@ -2,7 +2,6 @@ from torchaudio._internal.module_utils import dropping_io_support, dropping_clas
 from typing import Union, BinaryIO, Optional, Tuple
 import os
 import torch
-from scipy.io import wavfile
 import sys
 
 # Initialize extension and backend first
@@ -46,6 +45,7 @@ except ImportError:
 # CI cannot currently build with ffmpeg>4, but torchcodec is buggy with ffmpeg4. This hack
 # allows CI to build with ffmpeg4 and works around load/test bugginess.
 if "pytest" in sys.modules:
+    from scipy.io import wavfile
     def load(
         uri: Union[BinaryIO, str, os.PathLike],
         frame_offset: int = 0,
