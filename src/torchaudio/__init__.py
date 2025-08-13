@@ -45,28 +45,16 @@ except ImportError:
 # CI cannot currently build with ffmpeg>4, but torchcodec is buggy with ffmpeg4. This hack
 # allows CI to build with ffmpeg4 and works around load/test bugginess.
 if "pytest" in sys.modules:
-    from scipy.io import wavfile
+    from torchaudio.utils import wav_utils
     def load(
-        uri: Union[BinaryIO, str, os.PathLike],
-        frame_offset: int = 0,
-        num_frames: int = -1,
+        uri: str,
+        normalize: bool = True,
         channels_first: bool = True,
-        format: Optional[str] = None,
-        buffer_size: int = 4096,
-        backend: Optional[str] = None,
     ) -> Tuple[torch.Tensor, int]:
-            rate, data = wavfile.read(uri)
-            if data.ndim == 1:
-                data = data[:,None]
-            if num_frames == -1:
-                num_frames = data.shape[0] - frame_offset
-            data = data[frame_offset:frame_offset + num_frames]
-            if channels_first:
-                data = data.T
-            return data, rate
+        return wav_utils.load_wav(uri, normalize, channels_first)
 
     def save(
-        uri: Union[str, os.PathLike],
+        uri: str,
         src: torch.Tensor,
         sample_rate: int,
         channels_first: bool = True,
@@ -77,7 +65,7 @@ if "pytest" in sys.modules:
         backend: Optional[str] = None,
         compression: Optional[Union[float, int]] = None,
     ):
-        wavfile.write(uri, sample_rate, src.numpy())
+        wav_utils.save_wav(uri, src, sample_rate, channels_first=channels_first)
 else:
     def load(
         uri: Union[BinaryIO, str, os.PathLike],
