@@ -74,23 +74,6 @@ case $GPU_ARCH_TYPE in
     ;;
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-
-
-NUMBA_DEV_CHANNEL=""
-if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
-    # Numba isn't available for Python 3.9 and 3.10 except on the numba dev channel and building from source fails
-    # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
-    NUMBA_DEV_CHANNEL="-c numba/label/dev"
-fi
-(
-    set -x
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} "ffmpeg>4" libvorbis parameterized 'requests>=2.20'
-    pip install SoundFile coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
-
-    # TODO: might be better to fix the single call to `pip install` above
-    pip install pillow scipy "numpy>=1.26"
-)
-
 pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
 
 # 2. Install torchaudio
@@ -102,8 +85,23 @@ pip install . -v --no-build-isolation
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
+conda install -y "ffmpeg>4"
 python -c "import torch; import torchaudio; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
 
+NUMBA_DEV_CHANNEL=""
+if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
+    # Numba isn't available for Python 3.9 and 3.10 except on the numba dev channel and building from source fails
+    # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
+    NUMBA_DEV_CHANNEL="-c numba/label/dev"
+fi
+(
+    set -x
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} libvorbis parameterized 'requests>=2.20'
+    pip install SoundFile coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
+
+    # TODO: might be better to fix the single call to `pip install` above
+    pip install pillow scipy "numpy>=1.26"
+)
 # Install fairseq
 git clone https://github.com/pytorch/fairseq
 cd fairseq
