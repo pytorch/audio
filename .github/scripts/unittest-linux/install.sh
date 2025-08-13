@@ -99,8 +99,5 @@ fi
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
-    pip install coverage pytest pytest-cov scipy expecttest Pillow
-
-    # TODO: might be better to fix the single call to `pip install` above
-    pip install pillow scipy "numpy>=1.26"
+    pip install coverage pytest pytest-cov scipy expecttest scipy "numpy>=1.26"
 )
