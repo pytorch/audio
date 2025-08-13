@@ -42,13 +42,7 @@ print(torch.__version__)
 print(torchaudio.__version__)
 
 torch.random.manual_seed(0)
-if torch.accelerator.is_available():
-    acc = torch.accelerator.current_accelerator()
-    device: torch.device = torch.device(acc)
-    backend = torch.distributed.get_default_backend_for_device(device)
-else:
-    device: torch.device = torch.device("cpu")
-    backend = "gloo"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 print(device)
 
