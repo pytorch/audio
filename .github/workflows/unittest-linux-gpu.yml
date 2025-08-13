@@ -40,6 +40,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_demucs=true
         # Avoid reproducibility errors with CUBLAS: https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility
         export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
