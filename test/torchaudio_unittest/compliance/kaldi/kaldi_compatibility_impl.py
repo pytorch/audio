@@ -5,7 +5,6 @@ from torchaudio_unittest.common_utils import (
     get_asset_path,
     load_params,
     load_wav,
-    skipIfNoExec,
     TempDirMixin,
     TestBaseMixin,
     RequestMixin
@@ -19,7 +18,6 @@ class Kaldi(TempDirMixin, TestBaseMixin, RequestMixin):
         self.assertEqual(output, expected, rtol=rtol, atol=atol)
 
     @parameterized.expand(load_params("kaldi_test_fbank_args.jsonl"))
-    @skipIfNoExec("compute-fbank-feats")
     def test_fbank(self, kwargs):
         """fbank should be numerically compatible with compute-fbank-feats"""
         wave_file = get_asset_path("kaldi_file.wav")
@@ -30,7 +28,6 @@ class Kaldi(TempDirMixin, TestBaseMixin, RequestMixin):
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-8)
 
     @parameterized.expand(load_params("kaldi_test_spectrogram_args.jsonl"))
-    @skipIfNoExec("compute-spectrogram-feats")
     def test_spectrogram(self, kwargs):
         """spectrogram should be numerically compatible with compute-spectrogram-feats"""
         wave_file = get_asset_path("kaldi_file.wav")
@@ -41,7 +38,6 @@ class Kaldi(TempDirMixin, TestBaseMixin, RequestMixin):
         self.assert_equal(result, expected=kaldi_result, rtol=1e-4, atol=1e-6)
 
     @parameterized.expand(load_params("kaldi_test_mfcc_args.jsonl"))
-    @skipIfNoExec("compute-mfcc-feats")
     def test_mfcc(self, kwargs):
         """mfcc should be numerically compatible with compute-mfcc-feats"""
         wave_file = get_asset_path("kaldi_file.wav")
