@@ -98,14 +98,6 @@ if [[ "$(python --version)" = *3.9* || "$(python --version)" = *3.10* ]]; then
 fi
 (
     set -x
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} libvorbis parameterized 'requests>=2.20'
-    pip install SoundFile coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag pyroomacoustics flashlight-text git+https://github.com/kpu/kenlm
-
-    # TODO: might be better to fix the single call to `pip install` above
-    pip install pillow scipy "numpy>=1.26"
+    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
+    pip install coverage pytest pytest-cov scipy expecttest scipy "numpy>=1.26"
 )
-# Install fairseq
-git clone https://github.com/pytorch/fairseq
-cd fairseq
-git checkout e47a4c8
-pip install .
