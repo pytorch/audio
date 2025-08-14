@@ -21,17 +21,17 @@ std::string get_audio_src_args(
     AVSampleFormat format,
     AVRational time_base,
     int sample_rate,
-    uint64_t channel_layout) {
+    int nb_channels) {
   char args[512];
   std::snprintf(
       args,
       sizeof(args),
-      "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=0x%" PRIx64,
+      "time_base=%d/%d:sample_rate=%d:sample_fmt=%s:channel_layout=%dc",
       time_base.num,
       time_base.den,
       sample_rate,
       av_get_sample_fmt_name(format),
-      channel_layout);
+      nb_channels);
   return std::string(args);
 }
 
@@ -65,10 +65,10 @@ void FilterGraph::add_audio_src(
     AVSampleFormat format,
     AVRational time_base,
     int sample_rate,
-    uint64_t channel_layout) {
+    int nb_channels) {
   add_src(
       avfilter_get_by_name("abuffer"),
-      get_audio_src_args(format, time_base, sample_rate, channel_layout));
+      get_audio_src_args(format, time_base, sample_rate, nb_channels));
 }
 
 void FilterGraph::add_video_src(
