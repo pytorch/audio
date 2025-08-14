@@ -6,9 +6,6 @@
 #include <libtorchaudio/rnnt/options.h>
 
 #include <c10/util/Logging.h>
-#ifdef USE_CUDA
-#include <cuda_runtime.h>
-#endif
 
 namespace torchaudio {
 namespace rnnt {
@@ -126,23 +123,14 @@ class IntWorkspace {
   inline void ResetAlphaBetaCounters() {
 #ifdef USE_CUDA
     if (data_ != nullptr && options_.device_ == GPU) {
-      printf("ALPHA COUNTER SIZE IS %ld", ComputeSizeForAlphaCounters(options_));
-
-      // Use cudaPointerGetAttributes here to check that the device is cudaMemoryTypeDevice
-      cudaPointerAttributes attributes;
-      cudaError_t error = cudaPointerGetAttributes(&attributes, data_);
-      TORCH_CHECK_EQ(error, cudaSuccess);
-      TORCH_CHECK_EQ(attributes.device, cudaMemoryTypeDevice);
-
-      fflush(stdout);
       cudaMemset(
           GetPointerToAlphaCounters(),
           0,
           ComputeSizeForAlphaCounters(options_) * sizeof(int32_t));
-      // cudaMemset(
-      //     GetPointerToBetaCounters(),
-      //     0,
-      //     ComputeSizeForBetaCounters(options_) * sizeof(int));
+      cudaMemset(
+          GetPointerToBetaCounters(),
+          0,
+          ComputeSizeForBetaCounters(options_) * sizeof(int));
     }
 #endif // USE_CUDA
   }

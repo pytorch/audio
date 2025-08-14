@@ -1,10 +1,8 @@
 #include <c10/cuda/CUDAStream.h>
 #include <libtorchaudio/rnnt/gpu/gpu_transducer.h>
 #include <torch/csrc/inductor/aoti_torch/c/shim.h>
-#include <torch/csrc/inductor/aoti_runtime/utils.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/types.h>
-#include <torch/csrc/inductor/aoti_torch/utils.h>
 
 namespace torchaudio {
 namespace rnnt {
@@ -115,7 +113,7 @@ std::tuple<Tensor, Tensor> compute(
     options.fusedLogSmax_ = fused_log_softmax;
 
   int32_t logits_device_index;
-  aoti_torch_get_device_index(logits.get(), &logits_device_index);
+  TORCH_ERROR_CODE_CHECK(aoti_torch_get_device_index(logits.get(), &logits_device_index));
 
   TORCH_CHECK_EQ(logits_device, aoti_torch_device_type_cuda());
 
@@ -144,12 +142,6 @@ std::tuple<Tensor, Tensor> compute(
   TORCH_ERROR_CODE_CHECK(
     aoti_torch_empty_strided(1, int_sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace));
 
-  // torch::Tensor int_workspace = torch::empty(
-  //   IntWorkspace::ComputeSizeFromOptions(options),
-  //   torch::TensorOptions()
-  //             .device(torch::aot_inductor::tensor_handle_to_tensor_pointer(logits.get())->device())
-  //             .dtype(torch::ScalarType::Int));
-
   AtenTensorHandle float_workspace;
   int64_t float_sizes[1] = {DtypeWorkspace<float>::ComputeSizeFromOptions(options)};
   TORCH_ERROR_CODE_CHECK(
@@ -157,9 +149,9 @@ std::tuple<Tensor, Tensor> compute(
 
   int64_t float_numel;
   aoti_torch_get_numel(float_workspace, &float_numel);
-  // void *int_workspace_ptr;
-  // TORCH_ERROR_CODE_CHECK(
-  //   aoti_torch_get_data_ptr(int_workspace, &int_workspace_ptr));
+  void *int_workspace_ptr;
+  TORCH_ERROR_CODE_CHECK(
+    aoti_torch_get_data_ptr(int_workspace, &int_workspace_ptr));
   void *float_workspace_ptr;
   TORCH_ERROR_CODE_CHECK(
     aoti_torch_get_data_ptr(float_workspace, &float_workspace_ptr));
@@ -176,43 +168,43 @@ std::tuple<Tensor, Tensor> compute(
       /*int_size=*/int_numel
   );
   at::cuda::stream_synchronize(options.stream_);
-  // void *logit_ptr;
-  // aoti_torch_get_data_ptr(logits.get(), &logit_ptr);
+  void *logit_ptr;
+  aoti_torch_get_data_ptr(logits.get(), &logit_ptr);
 
-  // void *target_ptr;
-  // aoti_torch_get_data_ptr(targets.get(), &target_ptr);
+  void *target_ptr;
+  aoti_torch_get_data_ptr(targets.get(), &target_ptr);
 
-  // void *logit_len_ptr;
-  // aoti_torch_get_data_ptr(logit_lengths.get(), &logit_len_ptr);
+  void *logit_len_ptr;
+  aoti_torch_get_data_ptr(logit_lengths.get(), &logit_len_ptr);
 
-  // void *target_len_ptr;
-  // aoti_torch_get_data_ptr(target_lengths.get(), &target_len_ptr);
+  void *target_len_ptr;
+  aoti_torch_get_data_ptr(target_lengths.get(), &target_len_ptr);
 
-  // void *costs_ptr;
-  // aoti_torch_get_data_ptr(costs, &costs_ptr);
+  void *costs_ptr;
+  aoti_torch_get_data_ptr(costs, &costs_ptr);
 
-  // void *grads_ptr;
-  // aoti_torch_get_data_ptr(gradients, &grads_ptr);
+  void *grads_ptr;
+  aoti_torch_get_data_ptr(gradients, &grads_ptr);
 
-  // if (logits_dtype == aoti_torch_dtype_float32()) {
-  //     Compute</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
-  //         /*workspace=*/workspace,
-  //         /*logits=*/(float*)logit_ptr,
-  //         /*targets=*/(int*)target_ptr,
-  //         /*logit_lengths=*/(int*)logit_len_ptr,
-  //         /*target_lengths=*/(int*)target_len_ptr,
-  //         /*costs=*/(float*)costs_ptr,
-  //         /*gradients=*/(float*)grads_ptr);
-  //   } else {
-  //     Compute</*DTYPE=*/c10::Half, /*CAST_DTYPE=*/float>(
-  //         /*workspace=*/workspace,
-  //         /*logits=*/(c10::Half*)logit_ptr,
-  //         /*targets=*/(int*)target_ptr,
-  //         /*logit_lengths=*/(int*)logit_len_ptr,
-  //         /*target_lengths=*/(int*)target_len_ptr,
-  //         /*costs=*/(c10::Half*)costs_ptr,
-  //         /*gradients=*/(c10::Half*)grads_ptr);
-  //   }
+  if (logits_dtype == aoti_torch_dtype_float32()) {
+      Compute</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
+          /*workspace=*/workspace,
+          /*logits=*/(float*)logit_ptr,
+          /*targets=*/(int*)target_ptr,
+          /*logit_lengths=*/(int*)logit_len_ptr,
+          /*target_lengths=*/(int*)target_len_ptr,
+          /*costs=*/(float*)costs_ptr,
+          /*gradients=*/(float*)grads_ptr);
+    } else {
+      Compute</*DTYPE=*/c10::Half, /*CAST_DTYPE=*/float>(
+          /*workspace=*/workspace,
+          /*logits=*/(c10::Half*)logit_ptr,
+          /*targets=*/(int*)target_ptr,
+          /*logit_lengths=*/(int*)logit_len_ptr,
+          /*target_lengths=*/(int*)target_len_ptr,
+          /*costs=*/(c10::Half*)costs_ptr,
+          /*gradients=*/(c10::Half*)grads_ptr);
+    }
 
   return std::make_tuple(Tensor(costs), Tensor(gradients));
 }
