@@ -121,7 +121,7 @@ std::tuple<Tensor, Tensor> compute(
 
   options.stream_ = at::cuda::getCurrentCUDAStream();
   // aoti_torch_get_current_cuda_stream(logits_device_index, (void**)&options.stream_);
-  cudaSetDevice(logits_device);
+  TORCH_CHECK_EQ(cudaSetDevice(logits_device_index), cudaSuccess);
   options.device_ = GPU;
 
   int64_t cost_sizes[1] = {options.batchSize_ * options.nHypos_};
@@ -132,25 +132,23 @@ std::tuple<Tensor, Tensor> compute(
   aoti_torch_zero_(costs);
 
 
-  auto stream = at::cuda::getCurrentCUDAStream();
-  at::cuda::stream_synchronize(stream);
+  at::cuda::stream_synchronize(options.stream_);
 
   AtenTensorHandle gradients;
   aoti_torch_clone(logits.get(), &gradients);
   aoti_torch_zero_(gradients);
 
-  // AtenTensorHandle int_workspace;
-  // int64_t int_sizes[1] = {IntWorkspace::ComputeSizeFromOptions(options)};
-  // printf("INT SIZE IS %ld\n", int_sizes[0]);
+  AtenTensorHandle int_workspace;
+  int64_t int_sizes[1] = {IntWorkspace::ComputeSizeFromOptions(options)};
   int64_t strides[1] = {1};
-  // TORCH_ERROR_CODE_CHECK(
-  //   aoti_torch_empty_strided(1, int_sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace));
+  TORCH_ERROR_CODE_CHECK(
+    aoti_torch_empty_strided(1, int_sizes, strides, aoti_torch_dtype_int32(), logits_device, logits_device_index, &int_workspace));
 
-  torch::Tensor int_workspace = torch::empty(
-    IntWorkspace::ComputeSizeFromOptions(options),
-    torch::TensorOptions()
-              .device(torch::aot_inductor::tensor_handle_to_tensor_pointer(logits.get())->device())
-              .dtype(torch::ScalarType::Int));
+  // torch::Tensor int_workspace = torch::empty(
+  //   IntWorkspace::ComputeSizeFromOptions(options),
+  //   torch::TensorOptions()
+  //             .device(torch::aot_inductor::tensor_handle_to_tensor_pointer(logits.get())->device())
+  //             .dtype(torch::ScalarType::Int));
 
   AtenTensorHandle float_workspace;
   int64_t float_sizes[1] = {DtypeWorkspace<float>::ComputeSizeFromOptions(options)};
@@ -165,19 +163,19 @@ std::tuple<Tensor, Tensor> compute(
   void *float_workspace_ptr;
   TORCH_ERROR_CODE_CHECK(
     aoti_torch_get_data_ptr(float_workspace, &float_workspace_ptr));
-  // int64_t int_numel;
-  // TORCH_ERROR_CODE_CHECK(
-  //   aoti_torch_get_numel(int_workspace, &int_numel));
+  int64_t int_numel;
+  TORCH_ERROR_CODE_CHECK(
+    aoti_torch_get_numel(int_workspace, &int_numel));
 
-  at::cuda::stream_synchronize(stream);
+  at::cuda::stream_synchronize(options.stream_);
   Workspace<float> workspace(
       /*options=*/options,
       /*dtype_data=*/(float*)float_workspace_ptr,
       /*dtype_size=*/float_numel,
-      /*int_data=*/int_workspace.data_ptr<int>(), // (int*)int_workspace_ptr,
-      /*int_size=*/int_workspace.numel() // int_numel);
+      /*int_data=*/(int*)int_workspace_ptr,
+      /*int_size=*/int_numel
   );
-  at::cuda::stream_synchronize(stream);
+  at::cuda::stream_synchronize(options.stream_);
   // void *logit_ptr;
   // aoti_torch_get_data_ptr(logits.get(), &logit_ptr);
 
