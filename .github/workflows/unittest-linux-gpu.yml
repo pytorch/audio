@@ -75,9 +75,7 @@ jobs:
         echo "::endgroup::"
         echo "::group::Install other Dependencies"
         
-        pip3 install parameterized requests
-        pip3 install coverage pytest pytest-cov scipy expecttest Pillow
-        pip3 install pillow scipy "numpy>=1.26"
+        pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest 
 
         echo "::endgroup::"
         echo "::group::Run tests"
