@@ -59,12 +59,6 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install PyTorch"
-        # conda install \
-        #   --yes \
-        #   --quiet \
-        #   -c "pytorch-${CHANNEL}" \
-        #   -c nvidia "pytorch-${CHANNEL}"::pytorch[build="*${CU_VERSION}*"] \
-        #   "${CUDATOOLKIT}"
 
         GPU_ARCH_ID=cu126  # This is hard-coded and must be consistent with gpu-arch-version.
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${CHANNEL}/${GPU_ARCH_ID}"
@@ -75,19 +69,15 @@ jobs:
         conda install --quiet --yes cmake>=3.18.0 ninja
         pip3 install --progress-bar off -v -e . --no-use-pep517
 
+        # TODO: Need to rely on torchcodec instead of building ffmpeg from source.
         echo "::endgroup::"
         echo "::group::Build FFmpeg"
         .github/scripts/ffmpeg/build_gpu.sh
 
         echo "::endgroup::"
         echo "::group::Install other dependencies"
-        conda install \
-          --quiet --yes \
-          -c conda-forge \
-          sox libvorbis pandoc doxygen pysoundfile
-        pip install --progress-bar off \
-            git+https://github.com/kpu/kenlm/ flashlight-text \
-            -r docs/requirements.txt -r docs/requirements-tutorials.txt
+
+        pip install --progress-bar off -r docs/requirements.txt -r docs/requirements-tutorials.txt
 
         echo "::endgroup::"
         echo "::group::Build documentation"

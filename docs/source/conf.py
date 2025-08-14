@@ -53,19 +53,8 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_gallery.gen_gallery",
     "nbsphinx",
-    "breathe",
 ]
 
-breathe_projects = {"libtorio": "cpp/xml"}
-
-breathe_default_project = "libtorio"
-
-breathe_projects_source = {
-    "libtorio": (
-        "../../src/libtorio/ffmpeg/",
-        ["stream_reader/stream_reader.h", "stream_writer/stream_writer.h"],
-    )
-}
 
 nbsphinx_requirejs_path = ""
 
