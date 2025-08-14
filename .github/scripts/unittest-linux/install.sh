@@ -75,7 +75,7 @@ case $GPU_ARCH_TYPE in
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
 pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
-
+pip install "numpy>=1.26"
 
 # 2. Install torchaudio
 conda install --quiet -y ninja cmake
@@ -99,5 +99,5 @@ fi
 (
     set -x
     conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
-    pip install coverage pytest pytest-cov scipy expecttest scipy "numpy>=1.26"
+    pip install coverage pytest pytest-cov scipy expecttest scipy
 )
