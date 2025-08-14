@@ -227,9 +227,9 @@ def test_save_channels_first(channels_first):
     """Test channels_first parameter."""
     # Create test data
     if channels_first:
-        waveform = torch.randn(2, 16000)  # [channel, time]
+        waveform = torch.rand(2, 16000)  # [channel, time]
     else:
-        waveform = torch.randn(16000, 2)  # [time, channel]
+        waveform = torch.rand(16000, 2)  # [time, channel]
     
     sample_rate = 16000
     
