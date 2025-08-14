@@ -86,10 +86,13 @@ std::tuple<Tensor, Tensor> compute(
   aoti_torch_get_size(targets.get(), 0, &targets_size);
   AOTI_TORCH_CHECK(targets_size == logits_size);
 
-  // TORCH_CHECK(
-  //     blank >= 0 && blank < logits.size(-1),
-  //     "blank must be within [0, logits.shape[-1])");
+  AOTI_TORCH_CHECK(
+      blank >= 0 && blank < logits.size(-1),
+      "blank must be within [0, logits.shape[-1])");
 
+  // "Max" is not ABI stable yet, but no tests check
+  // for this error behavior, so it's okay to merge in for now.
+  //
   // TORCH_CHECK(
   //     logits.size(1) == at::max(logit_lengths).item().toInt(),
   //     "input length mismatch");
