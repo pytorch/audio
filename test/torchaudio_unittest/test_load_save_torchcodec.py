@@ -14,7 +14,7 @@ from torchaudio_unittest.common_utils import get_asset_path
 
 # Now, load/save_torchcodec are the same as torchaudio.load/save, so
 # there is no need to test this.
-pytest.skip()
+pytest.skip(allow_module_level=True)
 
 def get_ffmpeg_version():
     """Get FFmpeg version to check for compatibility issues."""
