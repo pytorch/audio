@@ -54,6 +54,5 @@ pip install . -v --no-build-isolation
 printf "* Installing test tools\n"
 # On this CI, for whatever reason, we're only able to install ffmpeg 4.
 conda install -y "ffmpeg<5"
-python -c "import torch; import torchaudio; import torchcodec; print(torch.__version__, torchaudio.__version__, torchcodec.__version__)"
 
 pip3 install parameterized requests coverage pytest pytest-cov scipy expecttest
