@@ -111,7 +111,7 @@ def _get_pattern():
         }
 
     ret = {"filename_pattern": "tutorial.py"}
-    no_build = r"/examples/tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.py"
+    no_build = r".*ctc_decoder_tutorial.py"
     if os.getenv("GALLERY_PATTERN"):
         # See https://github.com/pytorch/tutorials/blob/cbf2238df0e78d84c15bd94288966d2f4b2e83ae/conf.py#L75-L83
         ret["ignore_pattern"] = r"(/(?!" + re.escape(os.getenv("GALLERY_PATTERN")) + r")[^/]+$)"
