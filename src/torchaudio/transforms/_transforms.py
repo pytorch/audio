@@ -1185,7 +1185,7 @@ class _AxisMasking(torch.nn.Module):
         self.iid_masks = iid_masks
         self.p = p
 
-    def forward(self, specgram: Tensor, mask_value: float = 0.0) -> Tensor:
+    def forward(self, specgram: Tensor, mask_value: Union[float, torch.Tensor] = 0.0) -> Tensor:
         r"""
         Args:
             specgram (Tensor): Tensor of dimension `(..., freq, time)`.
