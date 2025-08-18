@@ -40,6 +40,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_demucs=true
         # Avoid reproducibility errors with CUBLAS: https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility
         export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
@@ -73,34 +74,8 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install other Dependencies"
-        # conda install \
-        #   --quiet --yes \
-        #   -c conda-forge \
-        #   -c numba/label/dev \
-        #   libvorbis parameterized 'requests>=2.20'
-        # pip3 install --progress-bar off \
-        #   SoundFile \
-        #   coverage \
-        #   pytest \
-        #   pytest-cov \
-        #   scipy \
-        #   transformers \
-        #   expecttest \
-        #   unidecode \
-        #   inflect \
-        #   Pillow \
-        #   sentencepiece \
-        #   pytorch-lightning \
-        #   'protobuf<4.21.0' \
-        #   demucs \
-        #   tinytag \
-        #   flashlight-text \
-        #   git+https://github.com/kpu/kenlm/ \
-        #   git+https://github.com/pytorch/fairseq.git@e47a4c8
         
-        pip3 install parameterized requests
-        pip3 install SoundFile coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag 
-        pip3 install pillow scipy "numpy>=1.26"
+        pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest 
 
         echo "::endgroup::"
         echo "::group::Run tests"
