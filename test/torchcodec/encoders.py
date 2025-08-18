@@ -1,6 +1,9 @@
 import torchaudio_unittest.common_utils.wav_utils as wav_utils
 from types import SimpleNamespace
 
+# See corresponding [TorchCodec test dependency mocking hack] note in
+# conftest.py
+
 class AudioEncoder:
     def __init__(self, data, sample_rate):
         self.data = data
