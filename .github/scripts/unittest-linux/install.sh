@@ -40,7 +40,6 @@ case $GPU_ARCH_TYPE in
     ;;
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-pip install "numpy>=1.26"
 pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
 
 
@@ -56,4 +55,4 @@ printf "* Installing test tools\n"
 # On this CI, for whatever reason, we're only able to install ffmpeg 4.
 conda install -y "ffmpeg<5"
 
-pip3 install parameterized requests coverage pytest pytest-cov scipy expecttest
+pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest
