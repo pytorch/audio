@@ -2,7 +2,6 @@ from torchaudio._internal.module_utils import dropping_io_support, dropping_clas
 from typing import Union, BinaryIO, Optional, Tuple
 import os
 import torch
-import sys
 
 # Initialize extension and backend first
 from . import _extension  # noqa  # usort: skip
