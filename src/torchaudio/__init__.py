@@ -199,7 +199,6 @@ __all__ = [
     "load_with_torchcodec",
     "save_with_torchcodec",
     "save",
-    "io",
     "compliance",
     "datasets",
     "functional",
