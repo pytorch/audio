@@ -12,7 +12,6 @@ from . import (  # noqa: F401
     compliance,
     datasets,
     functional,
-    io,
     kaldi_io,
     models,
     pipelines,
