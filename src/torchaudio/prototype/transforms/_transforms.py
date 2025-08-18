@@ -56,7 +56,7 @@ class BarkScale(torch.nn.Module):
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
 
         fb = barkscale_fbanks(n_stft, self.f_min, self.f_max, self.n_barks, self.sample_rate, self.bark_scale)
-        self.register_buffer("fb", fb)
+        self.register_buffer("fb", fb, persistent=False)
 
     def forward(self, specgram: torch.Tensor) -> torch.Tensor:
         r"""
@@ -140,7 +140,7 @@ class InverseBarkScale(torch.nn.Module):
             raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
 
         fb = barkscale_fbanks(n_stft, self.f_min, self.f_max, self.n_barks, self.sample_rate, bark_scale)
-        self.register_buffer("fb", fb)
+        self.register_buffer("fb", fb, persistent=False)
 
     def forward(self, barkspec: torch.Tensor) -> torch.Tensor:
         r"""
@@ -347,7 +347,7 @@ class ChromaScale(torch.nn.Module):
         fb = chroma_filterbank(
             sample_rate, n_freqs, n_chroma, tuning=tuning, ctroct=ctroct, octwidth=octwidth, norm=norm, base_c=base_c
         )
-        self.register_buffer("fb", fb)
+        self.register_buffer("fb", fb, persistent=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         r"""
