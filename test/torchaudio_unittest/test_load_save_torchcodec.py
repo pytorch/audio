@@ -12,8 +12,13 @@ import torchaudio
 from torchaudio import load_with_torchcodec, save_with_torchcodec
 from torchaudio_unittest.common_utils import get_asset_path
 
-# Now, load/save_torchcodec are the same as torchaudio.load/save, so
-# there is no need to test this.
+# These tests were ran when `torchaudio.load()` and `torchaudio.save()` were
+# still relying on their previous backends (ffmpeg, sox, soundfile). We needed
+# to validate that the newly introduced `load_with_torchcodec()` and
+# save_with_torchcodec() were matching their results.
+# From 2.9, `load()` and `save()` now internally rely on `load_with_torchcodec()` and
+# `save_with_torchcodec()` directly, so these tests are now redundant and we
+# skip them unconditionally.
 pytest.skip(allow_module_level=True)
 
 def get_ffmpeg_version():
