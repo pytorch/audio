@@ -204,5 +204,5 @@ __all__ = [
     "pipelines",
     "kaldi_io",
     "utils",
-    "transforms"
+    "transforms",
 ]
