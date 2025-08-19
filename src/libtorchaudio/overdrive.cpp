@@ -50,25 +50,25 @@ void overdrive_core_loop_cpu(
     aoti_torch_get_dtype(waveform.get(), &dtype);
     if (dtype == aoti_torch_dtype_float64()) {
       overdrive_cpu_kernel<double>(
-        Accessor<2, double>(wave_acc),
-        Accessor<2, double>(temp_acc),
-        Accessor<1, double>(last_in_acc),
-        Accessor<1, double>(last_out_acc),
-        Accessor<2, double>(out_acc));
+        Accessor<2, double>(waveform),
+        Accessor<2, double>(temp),
+        Accessor<1, double, false>(last_in),
+        Accessor<1, double>(last_out),
+        Accessor<2, double, false>(output_waveform));
     } else if (dtype == aoti_torch_dtype_float32()) {
       overdrive_cpu_kernel<float>(
-        Accessor<2, float>(wave_acc),
-        Accessor<2, float>(temp_acc),
-        Accessor<1, float>(last_in_acc),
-        Accessor<1, float>(last_out_acc),
-        Accessor<2, float>(out_acc));
+        Accessor<2, float>(waveform),
+        Accessor<2, float>(temp),
+        Accessor<1, float, false>(last_in),
+        Accessor<1, float>(last_out),
+        Accessor<2, float, false>(output_waveform));
     } else if (dtype == aoti_torch_dtype_float16()) {
       overdrive_cpu_kernel<c10::Half>(
-        Accessor<2, c10::Half>(wave_acc),
-        Accessor<2, c10::Half>(temp_acc),
-        Accessor<1, c10::Half>(last_in_acc),
-        Accessor<1, c10::Half>(last_out_acc),
-        Accessor<2, c10::Half>(out_acc));
+        Accessor<2, c10::Half>(waveform),
+        Accessor<2, c10::Half>(temp),
+        Accessor<1, c10::Half, false>(last_in),
+        Accessor<1, c10::Half>(last_out),
+        Accessor<2, c10::Half, false>(output_waveform));
     }
 }
 
@@ -80,7 +80,7 @@ void boxed_overdrive_core_loop(StableIValue* stack, uint64_t num_args, uint64_t 
   Tensor t3(to<AtenTensorHandle>(stack[2]));
   Tensor t4(to<AtenTensorHandle>(stack[3]));
   Tensor t5(to<AtenTensorHandle>(stack[4]));
-  overdrive_core_loop(
+  overdrive_core_loop_cpu(
       std::move(t1), std::move(t2), std::move(t3), std::move(t4), std::move(t5));
 }
 
@@ -88,11 +88,11 @@ STABLE_TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
     "overdrive_core_loop(Tensor waveform,"
     "Tensor temp, Tensor last_in, Tensor last_out,"
-    "Tensor output_waveform)"
+    "Tensor output_waveform)");
 }
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("overdrive_core_loop", &overdrive_core_loop_cpu);
+  m.impl("overdrive_core_loop", &boxed_overdrive_core_loop);
 }
 
 } // namespace
