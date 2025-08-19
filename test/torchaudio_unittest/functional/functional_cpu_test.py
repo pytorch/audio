@@ -4,7 +4,7 @@ import torch
 import torchaudio.functional as F
 from parameterized import parameterized
 import unittest
-from torchaudio_unittest.common_utils import PytorchTestCase, skipIfNoSox, TorchaudioTestCase
+from torchaudio_unittest.common_utils import PytorchTestCase, TorchaudioTestCase
 
 from .functional_impl import Functional, FunctionalCPUOnly
 
@@ -24,7 +24,6 @@ class TestFunctionalFloat64(Functional, PytorchTestCase):
 
 
 @unittest.skip("deprecated")
-@skipIfNoSox
 class TestApplyCodec(TorchaudioTestCase):
     def _smoke_test(self, format, compression, check_num_frames):
         """

@@ -34,17 +34,13 @@ jobs:
         export PYTHON_VERSION="${{ matrix.python_version }}"
         export CU_VERSION="${{ matrix.cuda_arch_version }}"
         export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_MFCC_FEATS=true
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_SPECTROGRAM_FEATS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_demucs=true
         # Avoid reproducibility errors with CUBLAS: https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility
         export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
@@ -78,35 +74,8 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install other Dependencies"
-        # conda install \
-        #   --quiet --yes \
-        #   -c conda-forge \
-        #   -c numba/label/dev \
-        #   sox libvorbis 'librosa==0.10.0' parameterized 'requests>=2.20'
-        # pip3 install --progress-bar off \
-        #   kaldi-io \
-        #   SoundFile \
-        #   coverage \
-        #   pytest \
-        #   pytest-cov \
-        #   scipy \
-        #   transformers \
-        #   expecttest \
-        #   unidecode \
-        #   inflect \
-        #   Pillow \
-        #   sentencepiece \
-        #   pytorch-lightning \
-        #   'protobuf<4.21.0' \
-        #   demucs \
-        #   tinytag \
-        #   flashlight-text \
-        #   git+https://github.com/kpu/kenlm/ \
-        #   git+https://github.com/pytorch/fairseq.git@e47a4c8
         
-        pip3 install parameterized requests
-        pip3 install kaldi-io SoundFile librosa coverage pytest pytest-cov scipy expecttest unidecode inflect Pillow sentencepiece pytorch-lightning 'protobuf<4.21.0' demucs tinytag 
-        pip3 install "pillow<10.0" "scipy<1.10" "numpy<2.0"
+        pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest 
 
         echo "::endgroup::"
         echo "::group::Run tests"

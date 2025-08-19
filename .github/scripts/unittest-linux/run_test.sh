@@ -29,6 +29,10 @@ fi
 )
 
 (
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
     cd test
-    pytest torchaudio_unittest -k "not backend and not /io/ and not prototype and not sox and not ffmpeg and not fairseq and not hdemucs and not (torchscript and rnnt) and not torchscript_consistency"
+    pytest torchaudio_unittest -k "not backend and not /io/ and not prototype and not ffmpeg and not fairseq and not hdemucs and not (torchscript and rnnt) and not torchscript_consistency"
 )
