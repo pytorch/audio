@@ -73,9 +73,6 @@ The following table summarizes the backends.
    * - 1
      - FFmpeg
      - Linux, macOS, Windows
-     - Use :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_decoders` and
-       :py:func:`~torchaudio.utils.ffmpeg_utils.get_audio_encoders`
-       to retrieve the supported codecs.
 
        This backend Supports various protocols, such as HTTPS and MP4, and file-like objects.
    * - 2
