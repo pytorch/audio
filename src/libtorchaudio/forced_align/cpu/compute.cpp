@@ -150,13 +150,17 @@ std::tuple<Tensor, Tensor> compute(
   TORCH_CHECK(
       logProbs.get_device() == targets.get_device(),
       "log_probs and targets need to be on the same device");
+  int32_t logprobs_dtype;
+  aoti_torch_get_dtype(logProbs.get(), &logprobs_dtype);
   TORCH_CHECK(
-      logProbs.dtype() == aoti_torch_dtype_float64() ||
-          logProbs.dtype() == aoti_torch_dtype_float32() ||
-          logProbs.dtype() == aoti_torch_dtype_float16(),
+    logprobs_dtype == aoti_torch_dtype_float64() ||
+    logprobs_dtype == aoti_torch_dtype_float32() ||
+    logprobs_dtype == aoti_torch_dtype_float16(),
       "log_probs must be float64, float32 or float16 (half) type");
+  int32_t targets_dtype;
+  aoti_torch_get_dtype(targets.get(), &targets_dtype);
   TORCH_CHECK(
-      targets.dtype() == aoti_torch_dtype_int32() || targets.dtype() == aoti_torch_dtype_int64(),
+    targets_dtype == aoti_torch_dtype_int32() || targets_dtype == aoti_torch_dtype_int64(),
       "targets must be int32 or int64 type");
   TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
   TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
@@ -195,24 +199,24 @@ std::tuple<Tensor, Tensor> compute(
   AtenTensorHandle paths_h;
   int32_t targets_device;
   aoti_torch_get_device_type(targets.get(), &targets_device);
-  aoti_torch_empty_strided(2, paths_size, paths_stride, targets.dtype(), targets_device, targets.get_device(), &paths_h);
+  aoti_torch_empty_strided(2, paths_size, paths_stride, targets_dtype, targets_device, targets.get_device(), &paths_h);
   auto paths = Tensor(paths_h);
 
 
-  if (targets.dtype() == aoti_torch_dtype_int64()) {
-    if (logProbs.dtype() == aoti_torch_dtype_float64()) {
+  if (targets_dtype == aoti_torch_dtype_int64()) {
+    if (logprobs_dtype == aoti_torch_dtype_float64()) {
       forced_align_impl<double, int64_t>(logProbs, targets, blank, paths);
-    } else if (logProbs.dtype() == aoti_torch_dtype_float32()) {
+    } else if (logprobs_dtype == aoti_torch_dtype_float32()) {
       forced_align_impl<float, int64_t>(logProbs, targets, blank, paths);
-    } else if (logProbs.dtype() == aoti_torch_dtype_float16()) {
+    } else if (logprobs_dtype == aoti_torch_dtype_float16()) {
       forced_align_impl<c10::Half, int64_t>(logProbs, targets, blank, paths);
     }
-  } else if (targets.dtype() == aoti_torch_dtype_int32()) {
-    if (logProbs.dtype() == aoti_torch_dtype_float64()) {
+  } else if (targets_dtype == aoti_torch_dtype_int32()) {
+    if (logprobs_dtype == aoti_torch_dtype_float64()) {
       forced_align_impl<double, int32_t>(logProbs, targets, blank, paths);
-    } else if (logProbs.dtype() == aoti_torch_dtype_float32()) {
+    } else if (logprobs_dtype == aoti_torch_dtype_float32()) {
       forced_align_impl<float, int32_t>(logProbs, targets, blank, paths);
-    } else if (logProbs.dtype() == aoti_torch_dtype_float16()) {
+    } else if (logprobs_dtype == aoti_torch_dtype_float16()) {
       forced_align_impl<c10::Half, int32_t>(logProbs, targets, blank, paths);
     }
   }
