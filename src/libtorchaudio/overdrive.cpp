@@ -18,7 +18,7 @@ void overdrive_cpu_kernel(
     Accessor<2, scalar_t> waveform_accessor,
     Accessor<2, scalar_t> temp_accessor,
     Accessor<1, scalar_t, false> last_in_accessor,
-    Accessor<1, scalar_t> last_out_accessor,
+    Accessor<1, scalar_t, false> last_out_accessor,
     Accessor<2, scalar_t, false> output_waveform_accessor) {
   int64_t n_frames = waveform_accessor.size(1);
   int64_t n_channels = waveform_accessor.size(0);
@@ -44,7 +44,7 @@ void overdrive_core_loop_cpu(
   const Tensor waveform,
   const Tensor temp,
   Tensor last_in,
-  const Tensor last_out,
+  Tensor last_out,
   Tensor output_waveform) {
     int32_t dtype;
     aoti_torch_get_dtype(waveform.get(), &dtype);
@@ -53,21 +53,21 @@ void overdrive_core_loop_cpu(
         Accessor<2, double>(waveform),
         Accessor<2, double>(temp),
         Accessor<1, double, false>(last_in),
-        Accessor<1, double>(last_out),
+        Accessor<1, double, false>(last_out),
         Accessor<2, double, false>(output_waveform));
     } else if (dtype == aoti_torch_dtype_float32()) {
       overdrive_cpu_kernel<float>(
         Accessor<2, float>(waveform),
         Accessor<2, float>(temp),
         Accessor<1, float, false>(last_in),
-        Accessor<1, float>(last_out),
+        Accessor<1, float, false>(last_out),
         Accessor<2, float, false>(output_waveform));
     } else if (dtype == aoti_torch_dtype_float16()) {
       overdrive_cpu_kernel<c10::Half>(
         Accessor<2, c10::Half>(waveform),
         Accessor<2, c10::Half>(temp),
         Accessor<1, c10::Half, false>(last_in),
-        Accessor<1, c10::Half>(last_out),
+        Accessor<1, c10::Half, false>(last_out),
         Accessor<2, c10::Half, false>(output_waveform));
     }
 }
