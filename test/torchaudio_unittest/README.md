@@ -8,12 +8,6 @@ https://docs.pytest.org/ for the detail of how to use `pytest` command.
 For testing, please refer to [contributing guide](../../CONTRIBUTING.md) for
 the installation of the required and optional packages.
 
-For running `kaldi`-related tests:
-
-```bash
-export PATH="${PATH}:<path_to_kaldi>/src/featbin/"
-```
-
 Some useful pytest commands:
 
 ```bash
