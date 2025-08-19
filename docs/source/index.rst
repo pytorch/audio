@@ -102,7 +102,6 @@ model implementations and application components.
    models
    models.decoder
    pipelines
-   sox_effects
    compliance.kaldi
    kaldi_io
    utils
