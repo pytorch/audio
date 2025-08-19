@@ -15,7 +15,6 @@ from . import (  # noqa: F401
     kaldi_io,
     models,
     pipelines,
-    sox_effects,
     transforms,
     utils,
 )
@@ -205,6 +204,5 @@ __all__ = [
     "pipelines",
     "kaldi_io",
     "utils",
-    "sox_effects",
     "transforms",
 ]

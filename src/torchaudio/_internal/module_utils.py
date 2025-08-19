@@ -97,10 +97,6 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
     {func.__doc__}
     """
 
-        # This is a temporary fix to avoid depending on sox during testing.
-        # It will be removed once the sox dependency is removed from the rest of the codebase.
-        if 'sox' not in func.__module__:
-            UNSUPPORTED.append(wrapped)
         return wrapped
 
     return decorator
