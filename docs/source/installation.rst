@@ -34,9 +34,6 @@ Optional Dependencies
 
 * `FFmpeg <https://ffmpeg.org>`__
 
-  Required to use :py:mod:`torchaudio.io` module. and ``backend="ffmpeg"`` in
-  `I/O functions <./torchaudio.html#i-o>`__.
-
   Starting version 2.1, TorchAudio official binary distributions are compatible with
   FFmpeg version 6, 5 and 4. (>=4.4, <7). At runtime, TorchAudio first looks for FFmpeg 6,
   if not found, then it continues to looks for 5 and move on to 4.
@@ -111,7 +108,7 @@ Optional Dependencies
 
   Required to use :py:mod:`torchaudio.kaldi_io` module.
 
-   
+
 Compatibility Matrix
 --------------------
 
