@@ -15,7 +15,8 @@ public:
   using tensor_type = typename std::conditional<IsConst, const Tensor&, Tensor&>::type;
 
   Accessor(tensor_type tensor) {
-    data = (T*)tensor.template data_ptr();
+    auto raw_ptr = tensor.data_ptr();
+    data = static_cast<T*>(raw_ptr);
     for (unsigned int i = 0; i < k; i++) {
       strides[i] = tensor.stride(i);
     }
