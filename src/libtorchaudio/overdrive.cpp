@@ -88,7 +88,7 @@ STABLE_TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
     "overdrive_core_loop(Tensor waveform,"
     "Tensor temp, Tensor last_in, Tensor last_out,"
-    "Tensor output_waveform)");
+    "Tensor output_waveform) -> ()");
 }
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
