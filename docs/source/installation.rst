@@ -70,27 +70,6 @@ Optional Dependencies
      files you installed follow this naming scheme, (and then make sure
      that they are in one of the directories listed in library search path.)
 
-* `SoX <https://sox.sourceforge.net/>`__
-
-  Required to use ``backend="sox"`` in `I/O functions <./torchaudio.html#i-o>`__.
-
-  Starting version 2.1, TorchAudio requires separately installed libsox.
-
-  If dynamic linking is causing an issue, you can set the environment variable
-  ``TORCHAUDIO_USE_SOX=0``, and TorchAudio won't use SoX.
-
-  .. note::
-
-     TorchAudio looks for a library file with unversioned name, that is ``libsox.so``
-     for Linux, and ``libsox.dylib`` for macOS. Some package managers install the library
-     file with different name. For example, aptitude on Ubuntu installs ``libsox.so.3``.
-     To have TorchAudio link against it, you can create a symbolic link to it with name
-     ``libsox.so`` (and put the symlink in a library search path).
-
-  .. note::
-     TorchAudio is tested on libsox 14.4.2. (And it is unlikely that other
-     versions would work.)
-
 * `SoundFile <https://pypi.org/project/PySoundFile/>`__
 
   Required to use ``backend="soundfile"`` in `I/O functions <./torchaudio.html#i-o>`__.
