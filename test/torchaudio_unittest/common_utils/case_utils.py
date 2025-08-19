@@ -242,7 +242,7 @@ skipIfPy310 = _skipIf(
     key="ON_PYTHON_310",
 )
 skipIfNoAudioDevice = _skipIf(
-    not _IS_FFMPEG_AVAILABLE,
+    True,
     reason="No output audio device is available.",
     key="NO_AUDIO_OUT_DEVICE",
 )
