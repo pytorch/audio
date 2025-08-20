@@ -67,7 +67,6 @@ model implementations and application components.
    models
    models.decoder
    pipelines
-   utils
 
 .. toctree::
    :maxdepth: 1

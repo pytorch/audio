@@ -2,10 +2,6 @@
 
 This example demonstarates how you can use torchaudio's I/O features and models to run speech recognition in C++ application.
 
-**NOTE**
-This example uses `"sox_io"` backend for loading audio, which does not work on Windows. To make it work on
-Windows, you need to replace the part of loading audio and converting it to Tensor object.
-
 ## 1. Create a transcription pipeline TorchScript file
 
 We will create a TorchScript that performs the following processes;
