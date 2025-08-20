@@ -12,7 +12,6 @@ from . import (  # noqa: F401
     compliance,
     datasets,
     functional,
-    kaldi_io,
     models,
     pipelines,
     transforms,
@@ -202,7 +201,6 @@ __all__ = [
     "functional",
     "models",
     "pipelines",
-    "kaldi_io",
     "utils",
     "transforms",
 ]
