@@ -933,7 +933,7 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
 
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _lfilter_core_loop = torch.ops.torchaudio._lfilter_core_loop
+    _lfilter_core_loop = torch.ops.torchaudio._lfilter_core_loop.default
 else:
     _lfilter_core_loop = _lfilter_core_generic_loop
 
