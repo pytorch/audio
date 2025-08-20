@@ -52,7 +52,6 @@ test:
     - torchaudio
     - torchaudio.io
     - torchaudio.datasets
-    - torchaudio.kaldi_io
     - torchaudio.sox_effects
     - torchaudio.transforms
 

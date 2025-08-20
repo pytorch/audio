@@ -83,9 +83,6 @@ Optional Dependencies
 
   Required for performing text-to-speech with :ref:`Tacotron2`.
 
-* `kaldi_io <https://pypi.org/project/kaldi-io/>`__
-
-  Required to use :py:mod:`torchaudio.kaldi_io` module.
 
 
 Compatibility Matrix

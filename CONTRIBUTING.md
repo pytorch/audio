@@ -61,7 +61,6 @@ Optional packages to install if you want to run related tests:
 - `librosa`
 - `requests`
 - `soundfile`
-- `kaldi_io`
 - `transformers`
 - `fairseq` (it has to be newer than `0.10.2`, so you will need to install from
   source. Commit `e6eddd80` is known to work.)
