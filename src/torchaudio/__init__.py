@@ -12,11 +12,9 @@ from . import (  # noqa: F401
     compliance,
     datasets,
     functional,
-    io,
     kaldi_io,
     models,
     pipelines,
-    sox_effects,
     transforms,
     utils,
 )
@@ -199,7 +197,6 @@ __all__ = [
     "load_with_torchcodec",
     "save_with_torchcodec",
     "save",
-    "io",
     "compliance",
     "datasets",
     "functional",
@@ -207,6 +204,5 @@ __all__ = [
     "pipelines",
     "kaldi_io",
     "utils",
-    "sox_effects",
     "transforms",
 ]

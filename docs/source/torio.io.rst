@@ -26,5 +26,3 @@ torio.io
 .. rubric:: Tutorials using ``torio.io``
 
 .. minigallery:: torio.io
-
-.. minigallery:: torchaudio.io

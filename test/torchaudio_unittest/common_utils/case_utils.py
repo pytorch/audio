@@ -109,7 +109,6 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
 
 
 _IS_FFMPEG_AVAILABLE = torio._extension.lazy_import_ffmpeg_ext().is_available()
-_IS_SOX_AVAILABLE = torchaudio._extension.lazy_import_sox_ext().is_available()
 _IS_CTC_DECODER_AVAILABLE = None
 _IS_CUDA_CTC_DECODER_AVAILABLE = None
 
