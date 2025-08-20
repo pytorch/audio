@@ -101,48 +101,6 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
 
     return decorator
 
-DEPRECATION_MSG = (
-    "This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. "
-    "Please see https://github.com/pytorch/audio/issues/3902 for more information."
-)
-
-IO_DEPRECATION_MSG = (
-    "This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. "
-    "The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. "
-    "Please see https://github.com/pytorch/audio/issues/3902 for more information."
-)
-
-dropping_support = deprecated(DEPRECATION_MSG, version="2.9", remove=True)
-
-def dropping_class_support(c, msg=DEPRECATION_MSG):
-    c.__init__ = wrap_deprecated(c.__init__, f"{c.__module__}.{c.__name__}", msg, version="2.9", remove=True)
-    c.__doc__ = f"""DEPRECATED
-
-.. warning::
-
-    This class is deprecated from version 2.8. It will be removed in the 2.9 release.
-    {msg}
-{c.__doc__}
-"""
-
-    UNSUPPORTED.append(c)
-    return c
-
-def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
-    c.__doc__ = f"""[DEPRECATED]
-
-.. warning::
-
-    This object is deprecated deprecated from version 2.8. It will be removed in the 2.9 release.
-    {msg}
-{c.__doc__}
-    """
-    return c
-
-dropping_class_io_support = partial(dropping_class_support, msg=IO_DEPRECATION_MSG)
-
-dropping_io_support = deprecated(IO_DEPRECATION_MSG, version="2.9", remove=True)
-
 def fail_with_message(message):
     """Generate decorator to give users message about missing TorchAudio extension."""
 
