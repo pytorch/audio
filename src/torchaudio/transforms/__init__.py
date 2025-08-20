@@ -1,4 +1,3 @@
-from torchaudio._internal.module_utils import dropping_class_support
 from ._multi_channel import MVDR, PSD, RTFMVDR, SoudenMVDR
 from ._transforms import (
     AddNoise,
@@ -22,7 +21,7 @@ from ._transforms import (
     PitchShift,
     Preemphasis,
     Resample,
-    RNNTLoss as _RNNTLoss,
+    RNNTLoss,
     SlidingWindowCmn,
     SpecAugment,
     SpectralCentroid,
@@ -34,8 +33,6 @@ from ._transforms import (
     Vad,
     Vol,
 )
-
-RNNTLoss = dropping_class_support(_RNNTLoss)
 
 __all__ = [
     "AddNoise",

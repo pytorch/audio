@@ -1,4 +1,3 @@
-from torchaudio._internal.module_utils import dropping_io_support, dropping_class_io_support
 from typing import Union, BinaryIO, Optional, Tuple
 import os
 import torch
@@ -12,7 +11,6 @@ from . import (  # noqa: F401
     compliance,
     datasets,
     functional,
-    kaldi_io,
     models,
     pipelines,
     transforms,
@@ -202,7 +200,6 @@ __all__ = [
     "functional",
     "models",
     "pipelines",
-    "kaldi_io",
     "utils",
     "transforms",
 ]

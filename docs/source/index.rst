@@ -103,7 +103,6 @@ model implementations and application components.
    models.decoder
    pipelines
    compliance.kaldi
-   kaldi_io
    utils
 
 .. toctree::
