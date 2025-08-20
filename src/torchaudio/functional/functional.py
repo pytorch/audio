@@ -9,7 +9,7 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal.module_utils import deprecated, dropping_support
+from torchaudio._internal.module_utils import deprecated
 
 
 from .filtering import highpass_biquad, treble_biquad
