@@ -1,7 +1,5 @@
 #include <libtorchaudio/accessor.h>
 #include <cstdint>
-#include <torch/torch.h>
-#include <torch/csrc/stable/tensor.h>
 #include <torch/csrc/stable/library.h>
 
 namespace torchaudio {
@@ -33,7 +31,7 @@ void boxed_test_accessor(StableIValue* stack, uint64_t num_args, uint64_t num_ou
   stack[0] = from(result);
 }
 
-TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
+STABLE_TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
       "_test_accessor(Tensor log_probs) -> bool");
 }
