@@ -804,7 +804,7 @@ class FunctionalFloat32Only(TestBaseMixin):
             logit_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
             target_lengths = torch.tensor([2], device=tensor.device, dtype=torch.int32)
             # This is hack for those functions which are deprecated with decorators
-            # like @deprecated or @dropping_support. Adding the decorators breaks
+            # like @deprecated. Adding the decorators breaks
             # TorchScript. So here we use the private function which make the tests
             # pass, but that's a lie: the public (deprecated) function doesn't
             # support torchscript anymore
