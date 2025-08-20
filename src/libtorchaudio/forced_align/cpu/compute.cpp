@@ -1,5 +1,3 @@
-#include <torch/script.h>
-#include <torch/torch.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/tensor.h>
 #include <torch/csrc/stable/ops.h>
