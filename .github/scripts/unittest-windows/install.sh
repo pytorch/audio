@@ -50,45 +50,4 @@ printf "* Installing torchaudio\n"
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
-NUMBA_DEV_CHANNEL=""
-SENTENCEPIECE_DEPENDENCY="sentencepiece"
-case "$(python --version)" in
-    *3.9*)
-        # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
-        # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
-        NUMBA_DEV_CHANNEL="-c numba/label/dev"
-        ;;
-    *3.10*)
-        # Don't install sentencepiece, no python 3.10 dependencies available for windows yet
-        SENTENCEPIECE_DEPENDENCY=""
-        NUMBA_DEV_CHANNEL="-c numba/label/dev"
-        ;;
-esac
-(
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
-    # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
-    # shellcheck disable=SC2086
-    pip install \
-        ${SENTENCEPIECE_DEPENDENCY} \
-        Pillow \
-        SoundFile \
-        coverage \
-        expecttest \
-        inflect \
-        pytest \
-        pytest-cov \
-        pytorch-lightning \
-        'scipy==1.7.3' \
-        unidecode \
-        'protobuf<4.21.0' \
-        demucs \
-        tinytag \
-        pyroomacoustics \
-        flashlight-text \
-        git+https://github.com/kpu/kenlm/
-)
-# Install fairseq
-git clone https://github.com/pytorch/fairseq
-cd fairseq
-git checkout e47a4c8
-pip install .
+pip install parameterized requests coverage pytest pytest-cov scipy numpy expecttest
