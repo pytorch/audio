@@ -131,10 +131,10 @@ void forced_align_impl(
 }
 
 std::tuple<Tensor, Tensor> compute(
-    const Tensor& logProbs,
-    const Tensor& targets,
-    const Tensor& inputLengths,
-    const Tensor& targetLengths,
+    const Tensor logProbs,
+    const Tensor targets,
+    Tensor inputLengths,
+    Tensor targetLengths,
     const int64_t blank) {
   AOTI_TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
   AOTI_TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
@@ -174,13 +174,40 @@ std::tuple<Tensor, Tensor> compute(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
 
-  // TODO: Requires port of `max` and `item` operators.
-  // TORCH_CHECK(
-  //     logProbs.size(1) == at::max(inputLengths).item().toInt(),
-  //     "input length mismatch");
-  // TORCH_CHECK(
-  //     targets.size(1) == at::max(targetLengths).item().toInt(),
-  //     "target length mismatch");
+  int32_t targetLengths_dtype;
+  TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(targetLengths.get(), &targetLengths_dtype));
+  AOTI_TORCH_CHECK(
+    targetLengths_dtype == aoti_torch_dtype_int32() || targetLengths_dtype == aoti_torch_dtype_int64(),
+      "target lengths must be int32 or int64 type");
+  auto target_length_max = amax(targetLengths, 0, false);
+  void *target_max_length_ptr = target_length_max.data_ptr();
+  int64_t target_max_length;
+  if (targetLengths_dtype == aoti_torch_dtype_int32()) {
+    printf("\n\n## INT32\n\n");
+    int32_t *ptr = (int32_t *)(target_max_length_ptr);
+    target_max_length = (int64_t)(*ptr);
+  } else if (targetLengths_dtype == aoti_torch_dtype_int64()) {
+    printf("\n\n## INT64\n\n");
+    target_max_length = *((int64_t *)(target_max_length_ptr));
+  }
+  printf("TARGET MAX LENGTH IS %ld\n", target_max_length);
+  TORCH_CHECK(targets.size(1) == target_max_length, "target length mismatch");
+
+  int32_t inputLengths_dtype;
+  TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(inputLengths.get(), &inputLengths_dtype));
+  AOTI_TORCH_CHECK(
+    inputLengths_dtype == aoti_torch_dtype_int32() || inputLengths_dtype == aoti_torch_dtype_int64(),
+      "input lengths must be int32 or int64 type");
+  auto input_length_max =  amax(inputLengths, 0, false);
+  void *input_max_length_ptr = input_length_max.data_ptr();
+  int64_t input_max_length;
+  if (inputLengths_dtype == aoti_torch_dtype_int32()) {
+    int32_t *ptr = (int32_t *)(input_max_length_ptr);
+    input_max_length = (int64_t)(*ptr);
+  } else if (inputLengths_dtype == aoti_torch_dtype_int64()) {
+    input_max_length = *((int64_t *)(input_max_length_ptr));
+  }
+  TORCH_CHECK(logProbs.size(1) == input_max_length, "input length mismatch");
 
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
