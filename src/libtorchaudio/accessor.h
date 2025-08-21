@@ -1,6 +1,6 @@
 #pragma once
 
-#include <torch/csrc/stable/tensor.h>
+#include <torch/csrc/stable/tensor_struct.h>
 #include <type_traits>
 #include <cstdarg>
 
