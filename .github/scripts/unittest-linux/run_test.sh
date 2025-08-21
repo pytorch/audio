@@ -33,6 +33,8 @@ fi
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_demucs=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_fairseq=true
     cd test
     pytest torchaudio_unittest
 )
