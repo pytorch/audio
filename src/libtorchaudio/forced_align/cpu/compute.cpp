@@ -1,3 +1,4 @@
+#include <c10/util/Exception.h>
 #include <libtorchaudio/accessor.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
@@ -46,14 +47,9 @@ void forced_align_impl(
       ++R;
     }
   }
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
       T >= L + R,
-      "targets length is too long for CTC. Found log_probs length: ",
-      T,
-      ", targets length: ",
-      L,
-      ", and number of repeats: ",
-      R);
+      "targets length is too long for CTC");
   auto start = T - (L + R) > 0 ? 0 : 1;
   auto end = (S == 1) ? 1 : 2;
   for (auto i = start; i < end; i++) {
@@ -140,41 +136,41 @@ std::tuple<Tensor, Tensor> compute(
     const Tensor& inputLengths,
     const Tensor& targetLengths,
     const int64_t blank) {
-  TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
-  TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
+  AOTI_TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
+  AOTI_TORCH_CHECK(
       logProbs.get_device() == targets.get_device(),
       "log_probs and targets need to be on the same device");
   int32_t logprobs_dtype;
   aoti_torch_get_dtype(logProbs.get(), &logprobs_dtype);
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
     logprobs_dtype == aoti_torch_dtype_float64() ||
     logprobs_dtype == aoti_torch_dtype_float32() ||
     logprobs_dtype == aoti_torch_dtype_float16(),
       "log_probs must be float64, float32 or float16 (half) type");
   int32_t targets_dtype;
   aoti_torch_get_dtype(targets.get(), &targets_dtype);
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
     targets_dtype == aoti_torch_dtype_int32() || targets_dtype == aoti_torch_dtype_int64(),
       "targets must be int32 or int64 type");
-  TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
-  TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
+  AOTI_TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
+  AOTI_TORCH_CHECK(
       logProbs.dim() == 3,
       "log_probs must be 3-D (batch_size, input length, num classes)");
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
       targets.dim() == 2, "targets must be 2-D (batch_size, target length,)");
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
       inputLengths.dim() == 1, "input_lengths must be 1-D (batch_size,)");
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
       targetLengths.dim() == 1, "target_lengths must be 1-D (batch_size,)");
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
       logProbs.size(0) == 1,
       "The batch dimension for log_probs must be 1 at the current version.")
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
       targets.size(0) == 1,
       "The batch dimension for targets must be 1 at the current version.")
-  TORCH_CHECK(
+  AOTI_TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
 
