@@ -43,7 +43,6 @@ model implementations and application components.
    build.linux
    build.windows
    build.jetson
-   build.ffmpeg
 
 .. toctree::
    :maxdepth: 1
