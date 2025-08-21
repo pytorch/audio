@@ -9,6 +9,7 @@ using torch::stable::Tensor;
 template<unsigned int k, typename T, bool IsConst = true>
 class Accessor {
   int64_t strides[k];
+  int64_t sizes[k];
   T *data;
 
 public:
@@ -19,6 +20,7 @@ public:
     data = static_cast<T*>(raw_ptr);
     for (unsigned int i = 0; i < k; i++) {
       strides[i] = tensor.stride(i);
+      sizes[i] = tensor.size(i);
     }
   }
 
@@ -31,6 +33,10 @@ public:
     }
     va_end(args);
     return data[ix];
+  }
+
+  int64_t size(int dim) {
+    return sizes[dim];
   }
 
   template<bool C = IsConst>
