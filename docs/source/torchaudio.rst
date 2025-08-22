@@ -33,7 +33,6 @@ it easy to handle audio data.
    load_with_torchcodec
    save
    save_with_torchcodec
-   list_audio_backends
 
 .. _backend:
 
