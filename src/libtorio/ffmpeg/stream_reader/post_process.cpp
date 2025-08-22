@@ -19,10 +19,15 @@ FilterGraphFactory get_audio_factory(
   return [fmt = codec_ctx->sample_fmt,
           time_base,
           rate = codec_ctx->sample_rate,
-          channel_layout = codec_ctx->channel_layout](
-             const std::string& filter_desc) -> FilterGraph {
+          nb_channels =
+#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(58, 2, 100)
+              codec_ctx->ch_layout.nb_channels
+#else
+              codec_ctx->channels
+#endif
+  ](const std::string& filter_desc) -> FilterGraph {
     FilterGraph f;
-    f.add_audio_src(fmt, time_base, rate, channel_layout);
+    f.add_audio_src(fmt, time_base, rate, nb_channels);
     f.add_audio_sink();
     f.add_process(filter_desc);
     f.create_filter();
