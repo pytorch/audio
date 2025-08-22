@@ -876,7 +876,7 @@ def mask_along_axis_iid(
     specgrams = specgrams.transpose(axis, -1)
     # this aims to avoid CPU-GPU sync from upstream
     specgrams = (
-        torch.where((mask >= mask_start) & (mask < mask_end), mask_value.repeat(*specgrams.shape), specgrams)
+        torch.where((mask >= mask_start) & (mask < mask_end), mask_value.repeat(specgrams.shape), specgrams)
         if isinstance(mask_value, Tensor)
         else specgrams.masked_fill((mask >= mask_start) & (mask < mask_end), mask_value)
     )
