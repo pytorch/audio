@@ -107,23 +107,6 @@ model implementations and application components.
 
 .. toctree::
    :maxdepth: 1
-   :hidden:
-
-   torio
-   torio.io
-   torio.utils
-
-.. toctree::
-   :maxdepth: 1
-   :caption: C++ Prototype API Reference
-   :hidden:
-
-   libtorio
-   libtorio.stream_reader
-   libtorio.stream_writer
-
-.. toctree::
-   :maxdepth: 1
    :caption: PyTorch Libraries
    :hidden:
 

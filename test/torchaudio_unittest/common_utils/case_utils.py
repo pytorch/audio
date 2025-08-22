@@ -10,7 +10,6 @@ from itertools import zip_longest
 
 import torch
 import torchaudio
-import torio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import eval_env, is_module_available
 
@@ -107,7 +106,6 @@ class TorchaudioTestCase(TestBaseMixin, PytorchTestCase):
     pass
 
 
-_IS_FFMPEG_AVAILABLE = torio._extension.lazy_import_ffmpeg_ext().is_available()
 _IS_CTC_DECODER_AVAILABLE = None
 _IS_CUDA_CTC_DECODER_AVAILABLE = None
 
@@ -231,7 +229,7 @@ skipIfNoQengine = _skipIf(
     key="NO_QUANTIZATION",
 )
 skipIfNoFFmpeg = _skipIf(
-    not _IS_FFMPEG_AVAILABLE,
+    True,
     reason="ffmpeg features are not available.",
     key="NO_FFMPEG",
 )
@@ -244,7 +242,7 @@ skipIfPy310 = _skipIf(
     key="ON_PYTHON_310",
 )
 skipIfNoAudioDevice = _skipIf(
-    not _IS_FFMPEG_AVAILABLE,
+    True,
     reason="No output audio device is available.",
     key="NO_AUDIO_OUT_DEVICE",
 )
