@@ -1114,7 +1114,7 @@ def _overdrive_core_loop_generic(
 
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _overdrive_core_loop_cpu = torch.ops.torchaudio._overdrive_core_loop
+    _overdrive_core_loop_cpu = torch.ops.torchaudio.overdrive_core_loop.default
 else:
     _overdrive_core_loop_cpu = _overdrive_core_loop_generic
 
