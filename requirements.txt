@@ -2,7 +2,6 @@
 torch
 
 # Optional runtime dependencies
-kaldi_io
 SoundFile
 
 # For build and test-time dependencies please refer to CONTRIBUTING.md

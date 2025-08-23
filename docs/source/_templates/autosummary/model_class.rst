@@ -147,25 +147,6 @@ Factory Functions
 
 {%- if prototype_factory[fullname] %}
 
-Prototype Factory Functions
-===========================
-
-.. currentmodule:: torchaudio.prototype.models
-
-.. autosummary::
-   :toctree: ../generated
-   :nosignatures:
-
-{% for item in prototype_factory[fullname] %}
-   {{["~torchaudio.prototype.models", item] | join('.')}}
-{%- endfor %}
-
-{%- endif %}
-
-.. UTILITY FUNCTIONS
-
-{%- if utils[fullname] %}
-
 Utility Functions
 =================
 
