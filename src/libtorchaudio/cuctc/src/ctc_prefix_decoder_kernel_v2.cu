@@ -23,6 +23,7 @@
 // OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <limits>
 #include <float.h>
 #include <algorithm>
 #include "../include/ctc_prefix_decoder_host.h"
@@ -440,7 +441,7 @@ __launch_bounds__(BLOCK_SIZE) void topk_reduce_and_copy_list_per_batch_kernel(
       topk_values,
       beam,
       items_per_batch,
-      cub::FpLimits<float>::Lowest(),
+      std::numeric_limits<float>::lowest(),
       block_topk_fun,
       set_key_value);
 
