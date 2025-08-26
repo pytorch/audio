@@ -1,4 +1,4 @@
-#include <thrust/functional.h>
+#include <cuda/std/functional>
 #include <ATen/core/TensorAccessor.h>
 #include <ATen/cuda/CUDAContext.h>
 #include <c10/cuda/CUDAException.h>
