@@ -441,7 +441,7 @@ __launch_bounds__(BLOCK_SIZE) void topk_reduce_and_copy_list_per_batch_kernel(
       topk_values,
       beam,
       items_per_batch,
-#if CUDA_VERSION >= 12090  // CUDA 12.9 and later
+#if CUDART_VERSION >= 12090  // CUDA 12.9 and later
       std::numeric_limits<float>::lowest(),
 #else
       cub::FpLimits<float>::Lowest(),
