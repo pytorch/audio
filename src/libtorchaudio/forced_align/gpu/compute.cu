@@ -94,7 +94,11 @@ __global__ void falign_cuda_step_kernel(
     alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
     threadMax = max(threadMax, alphas_a[curIdxOffset][i]);
   }
-  scalar_t maxResult = BlockReduce(tempStorage).Reduce(threadMax, cuda::maximum<scalar_t>{});
+#if CUDA_VERSION >= 12090  // CUDA 12.9 and later
+  scalar_t maxResult = BlockReduce(tempStorage).Reduce(threadMax, thrust::maximum<scalar_t>());
+#else
+  scalar_t maxResult = BlockReduce(tempStorage).Reduce(threadMax, cub::Max());
+#endif
   if (threadIdx.x == 0) {
     maxValue = maxResult;
   }
