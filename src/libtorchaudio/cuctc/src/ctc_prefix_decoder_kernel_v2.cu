@@ -25,6 +25,7 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <float.h>
 #include <algorithm>
+#include <limits>
 #include "../include/ctc_prefix_decoder_host.h"
 #include "ctc_fast_divmod.cuh"
 #include "cub/cub.cuh"
@@ -440,7 +441,7 @@ __launch_bounds__(BLOCK_SIZE) void topk_reduce_and_copy_list_per_batch_kernel(
       topk_values,
       beam,
       items_per_batch,
-      cub::FpLimits<float>::Lowest(),
+      std::numeric_limits<float>::lowest(),
       block_topk_fun,
       set_key_value);
 
