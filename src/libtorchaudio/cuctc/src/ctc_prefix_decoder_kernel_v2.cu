@@ -441,7 +441,7 @@ __launch_bounds__(BLOCK_SIZE) void topk_reduce_and_copy_list_per_batch_kernel(
       topk_values,
       beam,
       items_per_batch,
-      std::numeric_limits<float>::lowest(),
+      cuda::std::numeric_limits<float>::lowest(),
       block_topk_fun,
       set_key_value);
 
