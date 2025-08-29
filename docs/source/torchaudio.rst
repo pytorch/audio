@@ -72,6 +72,7 @@ The following table summarizes the backends.
    * - 1
      - FFmpeg
      - Linux, macOS, Windows
+     - Note
 
        This backend Supports various protocols, such as HTTPS and MP4, and file-like objects.
    * - 3
