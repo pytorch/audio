@@ -36,7 +36,10 @@ def __getattr__(name: str):
             ) from err
 
         orig_item = getattr(_cuda_ctc_decoder, name)
-        if inspect.isclass(orig_item):
+        if (
+                inspect.isclass(orig_item)
+                or (getattr(orig_item, "__sphinx_mock__", False) and inspect.isclass(orig_item.__class__))
+        ):
             item = dropping_class_support(orig_item)
         else:
             item = dropping_support(orig_item)
