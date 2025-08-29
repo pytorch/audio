@@ -1202,7 +1202,8 @@ class _AxisMasking(torch.nn.Module):
                 specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p
             )
         else:
-            return F.mask_along_axis(specgram, self.mask_param, mask_value, self.axis + specgram.dim() - 3, p=self.p)
+            mask_value_ = float(mask_value) if isinstance(mask_value, Tensor) else mask_value
+            return F.mask_along_axis(specgram, self.mask_param, mask_value_, self.axis + specgram.dim() - 3, p=self.p)
 
 
 class FrequencyMasking(_AxisMasking):
