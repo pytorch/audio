@@ -1706,10 +1706,10 @@ def _stretch_waveform(
     Returns:
         Tensor: The preprocessed waveform stretched prior to resampling.
     """
-    if hop_length is None:
-        hop_length = n_fft // 4
     if win_length is None:
         win_length = n_fft
+    if hop_length is None:
+        hop_length = win_length // 4
     if window is None:
         window = torch.hann_window(window_length=win_length, device=waveform.device)
 
