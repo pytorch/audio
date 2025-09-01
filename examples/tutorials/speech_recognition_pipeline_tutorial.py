@@ -38,17 +38,6 @@ pre-trained models from wav2vec 2.0
 import torch
 import torchaudio
 
-print(torch.__version__)
-print(torchaudio.__version__)
-
-torch.random.manual_seed(0)
-if torch.accelerator.is_available():
-    acc = torch.accelerator.current_accelerator()
-    device = torch.device(acc)
-    backend = torch.distributed.get_default_backend_for_device(device)
-else:
-    device = torch.device("cpu")
-    backend = "gloo"
 
 print(device)
 
