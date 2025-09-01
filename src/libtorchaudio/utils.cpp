@@ -1,6 +1,8 @@
 #include <ATen/DynamicLibrary.h>
 #include <libtorchaudio/utils.h>
 
+#include <torch/csrc/stable/tensor.h>
+
 #ifdef USE_CUDA
 #include <cuda.h>
 #endif
