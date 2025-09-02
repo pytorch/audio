@@ -69,11 +69,8 @@ jobs:
         pip3 install --progress-bar off -v -e . --no-use-pep517
 
         echo "::endgroup::"
-        echo "::group::Build FFmpeg"
-        .github/scripts/ffmpeg/build_gpu.sh
 
-        echo "::endgroup::"
-        echo "::group::Install other Dependencies"
+        echo "::group::Install Dependencies"
         
         pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest 
 
