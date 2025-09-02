@@ -22,7 +22,7 @@ TorchAudio integrates PyTorch for numerical computation. It requires the followi
 Customizing the build
 ---------------------
 
-TorchAudio functionality can be enabled/disabled via
+Optional features of torchaudio can be enabled/disabled via
 environment variables.
 
 They can be enabled by passing ``1`` and disabled by ``0``.
