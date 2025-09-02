@@ -69,12 +69,8 @@ jobs:
         conda install --quiet --yes cmake>=3.18.0 ninja
         pip3 install --progress-bar off -v -e . --no-use-pep517
 
-        # TODO: Need to rely on torchcodec instead of building ffmpeg from source.
         echo "::endgroup::"
-        echo "::group::Build FFmpeg"
-        .github/scripts/ffmpeg/build_gpu.sh
 
-        echo "::endgroup::"
         echo "::group::Install other dependencies"
 
         pip install --progress-bar off -r docs/requirements.txt -r docs/requirements-tutorials.txt
