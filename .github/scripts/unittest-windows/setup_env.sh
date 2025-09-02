@@ -31,6 +31,7 @@ if [ ! -d "${env_dir}" ]; then
     printf "* Creating a test environment with PYTHON_VERSION=%s\n" "${PYTHON_VERSION}"
     conda create --prefix "${env_dir}" -y python="${PYTHON_VERSION}"
 fi
+conda init bash
 conda activate "${env_dir}"
 
 # 3. Install minimal build tools
