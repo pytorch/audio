@@ -66,6 +66,7 @@ model implementations and application components.
    datasets
    models
    models.decoder
+   compliance.kaldi
    pipelines
 
 .. toctree::
