@@ -8,8 +8,7 @@ It provides signal and data processing functions, datasets,
 model implementations and application components.
 
 .. note::
-    Starting with version 2.8, we are refactoring TorchAudio to transition it
-    into a maintenance phase. As a result:
+    Starting with version 2.8, we have transitioned into a maintenance phase. As a result:
 
     - Some APIs were deprecated in 2.8 and removed as of 2.9.
     - The decoding and encoding capabilities of PyTorch for both audio and video
