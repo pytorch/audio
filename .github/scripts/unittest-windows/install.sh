@@ -37,7 +37,7 @@ case $GPU_ARCH_TYPE in
     ;;
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+conda run -p "${env_dir}" pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
 
 torch_cuda=$(conda run -p "${env_dir}" python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
