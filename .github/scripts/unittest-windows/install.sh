@@ -21,15 +21,23 @@ cd "${root_dir}"
 source "$this_dir/set_cuda_envs.sh"
 
 # 1. Install PyTorch
-if [ -z "${CUDA_VERSION:-}" ] ; then
-    cudatoolkit="cpuonly"
-    version="cpu"
-else
-    version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cudatoolkit="pytorch-cuda=${version}"
-fi
-printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -p "${env_dir}" -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia pytorch "${cudatoolkit}"  pytest pybind11
+export GPU_ARCH_TYPE="cpu"
+
+case $GPU_ARCH_TYPE in
+  cpu)
+    GPU_ARCH_ID="cpu"
+    ;;
+  cuda)
+    VERSION_WITHOUT_DOT=$(echo "${GPU_ARCH_VERSION}" | sed 's/\.//')
+    GPU_ARCH_ID="cu${VERSION_WITHOUT_DOT}"
+    ;;
+  *)
+    echo "Unknown GPU_ARCH_TYPE=${GPU_ARCH_TYPE}"
+    exit 1
+    ;;
+esac
+PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
+pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
 
 torch_cuda=$(conda run -p "${env_dir}" python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
