@@ -1,6 +1,5 @@
 # Libtorchaudio Examples
 
-* [Augmentation](./augmentation)
 * [Speech Recognition with wav2vec2.0](./speech_recognition)
 
 ## Build
