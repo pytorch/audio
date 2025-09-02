@@ -32,8 +32,7 @@ if [ ! -d "${env_dir}" ]; then
     conda create --prefix "${env_dir}" -y python="${PYTHON_VERSION}"
 fi
 conda init bash
-conda activate "${env_dir}"
 
 # 3. Install minimal build tools
-pip --quiet install cmake ninja
-conda install --quiet -y 'ffmpeg>=4.1'
+conda run -p "${env_dir}" pip --quiet install cmake ninja
+conda install -p "${env_dir}" -y 'ffmpeg>=4.1'
