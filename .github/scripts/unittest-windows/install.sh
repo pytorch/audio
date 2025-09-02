@@ -14,9 +14,9 @@ this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 cd "${root_dir}"
 
-# 0. Activate conda env
-eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
-conda activate "${env_dir}"
+# # 0. Activate conda env
+# eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
+# conda activate "${env_dir}"
 
 source "$this_dir/set_cuda_envs.sh"
 
@@ -29,9 +29,9 @@ else
     cudatoolkit="pytorch-cuda=${version}"
 fi
 printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia pytorch "${cudatoolkit}"  pytest pybind11
+conda install -p "${env_dir}" -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia pytorch "${cudatoolkit}"  pytest pybind11
 
-torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
+torch_cuda=$(conda run -p "${env_dir}" python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
 
 if [ ! -z "${CUDA_VERSION:-}" ] ; then
@@ -43,10 +43,10 @@ fi
 
 # 2. Install torchaudio
 printf "* Installing fsspec\n"
-pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
+conda run -p "${env_dir}" pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
 
 printf "* Installing torchaudio\n"
-"$root_dir/packaging/vc_env_helper.bat" pip install . -v --no-build-isolation
+conda run -p "${env_dir}" "$root_dir/packaging/vc_env_helper.bat" pip install . -v --no-build-isolation
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
@@ -65,30 +65,15 @@ case "$(python --version)" in
         ;;
 esac
 (
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
+    conda install -p "${env_dir}" -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
     # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
     # shellcheck disable=SC2086
-    pip install \
+    conda run -p "${env_dir}" pip install \
         ${SENTENCEPIECE_DEPENDENCY} \
-        Pillow \
-        SoundFile \
         coverage \
         expecttest \
         inflect \
         pytest \
         pytest-cov \
-        pytorch-lightning \
         'scipy==1.7.3' \
-        unidecode \
-        'protobuf<4.21.0' \
-        demucs \
-        tinytag \
-        pyroomacoustics \
-        flashlight-text \
-        git+https://github.com/kpu/kenlm/
 )
-# Install fairseq
-git clone https://github.com/pytorch/fairseq
-cd fairseq
-git checkout e47a4c8
-pip install .
