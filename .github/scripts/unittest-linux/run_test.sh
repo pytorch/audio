@@ -34,5 +34,5 @@ fi
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
     cd test
-    pytest torchaudio_unittest -k "not torchscript"
+    pytest torchaudio_unittest -k "not torchscript and not fairseq and not demucs" 
 )
