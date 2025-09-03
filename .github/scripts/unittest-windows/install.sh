@@ -21,21 +21,12 @@ cd "${root_dir}"
 source "$this_dir/set_cuda_envs.sh"
 
 # 1. Install PyTorch
-export GPU_ARCH_TYPE="cpu"
-
-case $GPU_ARCH_TYPE in
-  cpu)
+if [ -z "${CUDA_VERSION:-}" ] ; then
     GPU_ARCH_ID="cpu"
-    ;;
-  cuda)
-    VERSION_WITHOUT_DOT=$(echo "${GPU_ARCH_VERSION}" | sed 's/\.//')
-    GPU_ARCH_ID="cu${VERSION_WITHOUT_DOT}"
-    ;;
-  *)
-    echo "Unknown GPU_ARCH_TYPE=${GPU_ARCH_TYPE}"
-    exit 1
-    ;;
-esac
+else
+    GPU_ARCH_ID="cu126"
+fi
+
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
 conda run -p "${env_dir}" pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
 
