@@ -1,1 +1,1 @@
-Start-Process -FilePath %miniconda_exe% -ArgumentList "/S /InstallationType=AllUsers /AddToPath=0 /D=%tmp_conda%" -NoNewWindow -Wait
+start /wait "" "%miniconda_exe%" /S /InstallationType=JustMe /RegisterPython=0 /AddToPath=1 /D=conda
