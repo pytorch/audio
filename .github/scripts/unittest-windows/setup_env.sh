@@ -14,6 +14,7 @@ env_dir="${root_dir}/env"
 
 cd "${root_dir}"
 
+echo "1: Content of root_dir: $(ls ${root_dir})"
 echo "1: Content of conda_dir: $(ls ${conda_dir})"
 
 # 1. Install conda at ./conda
@@ -21,9 +22,9 @@ if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
     export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
-    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py313_25.5.1-1-Windows-x86_64.exe -O
-    echo "1: Content of root_dir: $(ls ${root_dir})"
+    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py39_25.7.0-2-Windows-x86_64.exe -O
     "$this_dir/install_conda.bat"
+    echo "2: Content of root_dir: $(ls ${root_dir})"
     unset tmp_conda
     unset miniconda_exe
 fi
