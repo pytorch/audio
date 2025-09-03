@@ -8,10 +8,10 @@ torchaudio: an audio library for PyTorch
 ![TorchAudio Logo](docs/source/_static/img/logo.png)
 
 > [!NOTE]
-> **We are in the process of refactoring TorchAudio and transitioning it into a
->  maintenance phase. This process will include removing some user-facing
->  features: those features are deprecated from TorchAudio 2.8 and will be removed in 2.9.
->  Our main goals are to reduce redundancies with the rest of the
+> **We have transitioned TorchAudio into a
+>  maintenance phase. This process removed some user-facing
+>  features. These features were deprecated from TorchAudio 2.8 and removed in 2.9.
+>  Our main goals were to reduce redundancies with the rest of the
 >  PyTorch ecosystem, make it easier to maintain, and create a version of
 >  TorchAudio that is more tightly scoped to its strengths: processing audio
 >  data for ML. Please see
