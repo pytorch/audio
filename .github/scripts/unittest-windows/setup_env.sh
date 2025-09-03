@@ -11,6 +11,7 @@ this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
+
 cd "${root_dir}"
 
 # 1. Install conda at ./conda
@@ -25,7 +26,6 @@ if [ ! -d "${conda_dir}" ]; then
     unset tmp_conda
     unset miniconda_exe
 fi
-
 eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
 
 # 2. Create test environment at ./env
@@ -37,4 +37,4 @@ conda activate "${env_dir}"
 
 # 3. Install minimal build tools
 pip --quiet install cmake ninja
-# conda install --quiet -y 'ffmpeg>=4.1'
+conda install --quiet -y 'ffmpeg>=4.1'
