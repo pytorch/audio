@@ -9,7 +9,7 @@ set -euxo pipefail
 
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 root_dir="$(git rev-parse --show-toplevel)"
-conda_dir=$(realpath "${root_dir}/../../../myconda")
+conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
 echo "conda_dir=$conda_dir"
 cd "${root_dir}"
@@ -20,7 +20,7 @@ if [ ! -d "${conda_dir}" ]; then
     export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
     echo "tmp_conda=$tmp_conda"
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
-    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py39_25.7.0-2-Windows-x86_64.exe -O
+    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py39_24.11.1-0-Windows-x86_64.exe -O
     "$this_dir/install_conda.bat"
     echo "2: Content of tmp_conda: $(ls ${tmp_conda})"
     unset tmp_conda
