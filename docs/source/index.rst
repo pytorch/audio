@@ -4,16 +4,15 @@ Torchaudio Documentation
 .. image:: _static/img/logo.png
 
 Torchaudio is a library for audio and signal processing with PyTorch.
-It provides I/O, signal and data processing functions, datasets,
+It provides signal and data processing functions, datasets,
 model implementations and application components.
 
 .. note::
-    Starting with version 2.8, we are refactoring TorchAudio to transition it
-    into a maintenance phase. As a result:
+    Starting with version 2.8, we have transitioned into a maintenance phase. As a result:
 
-    - Some APIs are deprecated in 2.8 and will be removed in 2.9.
+    - Some APIs were deprecated in 2.8 and removed as of 2.9.
     - The decoding and encoding capabilities of PyTorch for both audio and video
-      are being consolidated into TorchCodec.
+      have been consolidated into TorchCodec.
 
     Please see https://github.com/pytorch/audio/issues/3902 for more information.
 
@@ -43,40 +42,6 @@ model implementations and application components.
    build.linux
    build.windows
    build.jetson
-   build.ffmpeg
-
-.. toctree::
-   :maxdepth: 1
-   :caption: API Tutorials
-   :hidden:
-
-   tutorials/audio_resampling_tutorial
-   tutorials/audio_data_augmentation_tutorial
-   tutorials/audio_feature_extractions_tutorial
-   tutorials/audio_feature_augmentation_tutorial
-   tutorials/ctc_forced_alignment_api_tutorial
-
-   tutorials/oscillator_tutorial
-   tutorials/additive_synthesis_tutorial
-   tutorials/filter_design_tutorial
-   tutorials/subtractive_synthesis_tutorial
-
-   tutorials/audio_datasets_tutorial
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Pipeline Tutorials
-   :hidden:
-
-   tutorials/speech_recognition_pipeline_tutorial
-   tutorials/asr_inference_with_ctc_decoder_tutorial
-   tutorials/asr_inference_with_cuda_ctc_decoder_tutorial
-   tutorials/forced_alignment_tutorial
-   tutorials/forced_alignment_for_multilingual_data_tutorial
-   tutorials/tacotron2_pipeline_tutorial
-   tutorials/mvdr_tutorial
-   tutorials/hybrid_demucs_tutorial
-   tutorials/squim_tutorial
 
 .. toctree::
    :maxdepth: 1
@@ -95,45 +60,13 @@ model implementations and application components.
    :hidden:
 
    torchaudio
-   io
    functional
    transforms
    datasets
    models
    models.decoder
-   pipelines
    compliance.kaldi
-   kaldi_io
-   utils
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-
-   torio
-   torio.io
-   torio.utils
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Python Prototype API Reference
-   :hidden:
-
-   prototype
-   prototype.datasets
-   prototype.functional
-   prototype.models
-   prototype.pipelines
-   prototype.transforms
-
-.. toctree::
-   :maxdepth: 1
-   :caption: C++ Prototype API Reference
-   :hidden:
-
-   libtorio
-   libtorio.stream_reader
-   libtorio.stream_writer
+   pipelines
 
 .. toctree::
    :maxdepth: 1
