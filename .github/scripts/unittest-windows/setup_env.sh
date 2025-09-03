@@ -20,7 +20,8 @@ if [ ! -d "${conda_dir}" ]; then
     export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
     echo "tmp_conda=$tmp_conda"
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
-    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py39_24.11.1-0-Windows-x86_64.exe -O
+    curl --silent --output miniconda.exe https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe -O
+    # curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py39_24.11.1-0-Windows-x86_64.exe -O
     "$this_dir/install_conda.bat"
     echo "2: Content of tmp_conda: $(ls ${tmp_conda})"
     unset tmp_conda
