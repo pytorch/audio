@@ -57,7 +57,7 @@ conda run -p "${env_dir}" "$root_dir/packaging/vc_env_helper.bat" pip install . 
 printf "* Installing test tools\n"
 NUMBA_DEV_CHANNEL=""
 SENTENCEPIECE_DEPENDENCY="sentencepiece"
-case "$(python --version)" in
+case "$(conda run -p "${env_dir}" python --version)" in
     *3.9*)
         # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
         # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
