@@ -19,8 +19,6 @@ mkdir build
 cd build
 cmake -GNinja \
       -DCMAKE_PREFIX_PATH="$(python -c 'import torch;print(torch.utils.cmake_prefix_path)')" \
-      -DBUILD_SOX=ON \
-      -DBUILD_KALDI=OFF \
       -DBUILD_RNNT=ON \
       ..
 cmake --build .

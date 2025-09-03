@@ -1,6 +1,6 @@
 # Speech Recognition with wav2vec2.0
 
-This example demonstarates how you can use torchaudio's models to run speech recognition in a C++ application.
+This example demonstrates how you can use torchaudio's models to run speech recognition in a C++ application.
 
 ## 1. Create a transcription pipeline TorchScript file
 
