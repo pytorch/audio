@@ -19,7 +19,9 @@ if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
     export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
-    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -O
+    # not using miniconda because its installation will be incomplete
+    # despite using `start /wait` in the install batch file
+    curl -L --silent --output miniconda.exe https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe -O
     "$this_dir/install_conda.bat"
     unset tmp_conda
     unset miniconda_exe
@@ -34,5 +36,5 @@ fi
 conda init bash
 
 # 3. Install minimal build tools
-conda run -p "${env_dir}" pip --quiet install cmake ninja
-conda install -p "${env_dir}" -y 'ffmpeg>=4.1'
+pip --quiet install cmake ninja
+conda install -y 'ffmpeg>=4.1'
