@@ -15,10 +15,8 @@ Some useful pytest commands:
 pytest test --collect-only
 # Run all the test suites
 pytest test
-# Run tests on sox_effects module
-pytest test/torchaudio_unittest/sox_effect
 # use -k to apply filter
-pytest test/torchaudio_unittest/sox_io_backend -k load  # only runs tests where their names contain load
+pytest test/torchaudio_unittest/test_load_save_torchcodec.py -k load  # only runs tests where their names contain load
 # Some other useful options;
 # Stop on the first failure -x
 # Run failure fast --ff
@@ -61,8 +59,6 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [`torchaudio.functional`](./functional)
 - [`torchaudio.transforms`](./transforms/transforms_test.py)
 - [`torchaudio.compliance.kaldi`](./compliance_kaldi_test.py)
-- [`torchaudio.kaldi_io`](./kaldi_io_test.py)
-- [`torchaudio.sox_effects`](./sox_effect)
 - [`torchaudio.backend`](./backend)
 
 ### Test modules that do not fall into the above categories
@@ -73,6 +69,9 @@ The following test modules are defined for corresponding `torchaudio` module/fun
 - [assets](./assets): Contain sample audio files.
 - [assets/kaldi](./assets/kaldi): Contains Kaldi format matrix files used in [./test_compliance_kaldi.py](./test_compliance_kaldi.py).
 - [compliance](./compliance): Scripts used to generate above Kaldi matrix files.
+- [assets/kaldi_expected_results](./assets/kaldi_expected_results): Contains outputs from Kaldi to compare against torchaudio functionality in [./compliance/kaldi](./compliance/kaldi).
+- [assets/librosa_expected_results](./assets/librosa_expected_results): Contains outputs from Librosa to compare against torchaudio functionality.
+- [assets/sox_expected_results](./assets/sox_expected_results): Contains outputs from Sox to compare against torchaudio functionality.
 
 ### Waveforms for Testing Purposes
 

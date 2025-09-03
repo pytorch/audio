@@ -4,16 +4,15 @@ Torchaudio Documentation
 .. image:: _static/img/logo.png
 
 Torchaudio is a library for audio and signal processing with PyTorch.
-It provides I/O, signal and data processing functions, datasets,
+It provides signal and data processing functions, datasets,
 model implementations and application components.
 
 .. note::
-    Starting with version 2.8, we are refactoring TorchAudio to transition it
-    into a maintenance phase. As a result:
+    Starting with version 2.8, we have transitioned into a maintenance phase. As a result:
 
-    - Some APIs are deprecated in 2.8 and will be removed in 2.9.
+    - Some APIs were deprecated in 2.8 and removed as of 2.9.
     - The decoding and encoding capabilities of PyTorch for both audio and video
-      are being consolidated into TorchCodec.
+      have been consolidated into TorchCodec.
 
     Please see https://github.com/pytorch/audio/issues/3902 for more information.
 
@@ -66,8 +65,8 @@ model implementations and application components.
    datasets
    models
    models.decoder
+   compliance.kaldi
    pipelines
-   utils
 
 .. toctree::
    :maxdepth: 1
