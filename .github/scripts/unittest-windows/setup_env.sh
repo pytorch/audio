@@ -13,9 +13,6 @@ conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
 
 cd "${root_dir}"
-echo "1: Content of root_dir: $(ls ${root_dir})"
-echo "1: Content of env_dir: $(ls ${env_dir})"
-echo "1: Content of conda_dir: $(ls ${conda_dir})"
 # 1. Install conda at ./conda
 if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
@@ -23,15 +20,13 @@ if [ ! -d "${conda_dir}" ]; then
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
     curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -O
     "$this_dir/install_conda.bat"
-    echo "2: Content of conda_dir: $(ls ${conda_dir})"
     unset tmp_conda
     unset miniconda_exe
 fi
 
 echo "2: Content of conda_dir: $(ls ${conda_dir})"
-echo "2: Content of conda_dir/Scripts: $(ls ${conda_dir}/Scripts)"
 
-eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
+eval "$("${conda_dir}/_conda.exe" 'shell.bash' 'hook')"
 
 # 2. Create test environment at ./env
 if [ ! -d "${env_dir}" ]; then
