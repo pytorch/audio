@@ -47,6 +47,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MACOS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
 
         .github/scripts/unittest-windows/setup_env.sh
         .github/scripts/unittest-windows/install.sh
