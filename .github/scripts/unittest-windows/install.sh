@@ -76,9 +76,10 @@ esac
     conda run -p "${env_dir}" pip install \
         ${SENTENCEPIECE_DEPENDENCY} \
         coverage \
+        'numpy >=1.26' \
         expecttest \
         inflect \
         pytest \
         pytest-cov \
-        'scipy==1.7.3' \
+        scipy \
 )
