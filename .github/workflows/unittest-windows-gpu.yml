@@ -50,6 +50,6 @@ jobs:
         export BUILD_CUDA_CTC_DECODER=1
 
 
-        .github/scripts/unittest-windows/setup_env.sh
+        source .github/scripts/unittest-windows/setup_env.sh
         .github/scripts/unittest-windows/install.sh
         .github/scripts/unittest-windows/run_test.sh
