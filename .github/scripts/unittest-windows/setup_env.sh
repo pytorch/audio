@@ -11,7 +11,6 @@ this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 root_dir="$(git rev-parse --show-toplevel)"
 conda_dir="${root_dir}/conda"
 env_dir="${root_dir}/env"
-echo "conda_dir=$conda_dir"
 cd "${root_dir}"
 
 # 1. Install conda at ./conda
@@ -19,17 +18,15 @@ if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
     export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
-    curl -L --silent --output miniconda.exe https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe -O
+    curl --silent --output miniconda.exe https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Windows-x86_64.exe -O
     ls -la "${miniconda_exe}"
     # curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py39_24.11.1-0-Windows-x86_64.exe -O
     "$this_dir/install_conda.bat"
-    echo "2: Content of tmp_conda: $(ls ${tmp_conda})"
     unset tmp_conda
     unset miniconda_exe
 fi
 
 echo "2: Content of conda_dir: $(ls ${conda_dir})"
-echo "2: Content of conda_dir/Lib: $(ls ${conda_dir}/Lib)"
 
 eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
 
