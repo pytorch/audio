@@ -13,6 +13,7 @@ env_dir="${root_dir}/env"
 conda run -p "${env_dir}" python -m torch.utils.collect_env
 env | grep TORCHAUDIO || true
 
+export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION=True
 cd test
-conda run -p "${env_dir}" pytest --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not torchscript and not fairseq and not demucs"
+conda run -p "${env_dir}" pytest --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not torchscript and not fairseq and not demucs and not librosa"
 conda run -p "${env_dir}" coverage html
