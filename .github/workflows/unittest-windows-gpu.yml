@@ -47,6 +47,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_QUANTIZATION=true
         export USE_CUDA=1
         export BUILD_CUDA_CTC_DECODER=1
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
