@@ -29,6 +29,7 @@ if [ ! -d "${conda_dir}" ]; then
 fi
 
 echo "2: Content of conda_dir: $(ls ${conda_dir})"
+echo "2: Content of conda_dir/bin: $(ls ${conda_dir}/bin)"
 
 eval "$("${conda_dir}/_conda.exe" 'shell.bash' 'hook')"
 
