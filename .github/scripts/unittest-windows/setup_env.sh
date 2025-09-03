@@ -9,9 +9,9 @@ set -euxo pipefail
 
 this_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 root_dir="$(git rev-parse --show-toplevel)"
-conda_dir="${root_dir}/conda_"
+conda_dir=$(realpath "${root_dir}/../../../myconda")
 env_dir="${root_dir}/env"
-
+echo "conda_dir=$conda_dir"
 cd "${root_dir}"
 
 # 1. Install conda at ./conda
@@ -30,7 +30,7 @@ fi
 echo "2: Content of conda_dir: $(ls ${conda_dir})"
 echo "2: Content of conda_dir/Lib: $(ls ${conda_dir}/Lib)"
 
-eval "$("${conda_dir}/_conda.exe" 'shell.bash' 'hook')"
+eval "$("${conda_dir}/Scripts/conda.exe" 'shell.bash' 'hook')"
 
 # 2. Create test environment at ./env
 if [ ! -d "${env_dir}" ]; then
