@@ -21,7 +21,7 @@ if [ ! -d "${conda_dir}" ]; then
     printf "* Installing conda\n"
     export tmp_conda="$(echo $conda_dir | tr '/' '\\')"
     export miniconda_exe="$(echo $root_dir | tr '/' '\\')\\miniconda.exe"
-    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -O
+    curl --silent --output miniconda.exe https://repo.anaconda.com/miniconda/Miniconda3-py313_25.5.1-1-Windows-x86_64.exe -O
     echo "1: Content of root_dir: $(ls ${root_dir})"
     "$this_dir/install_conda.bat"
     unset tmp_conda
