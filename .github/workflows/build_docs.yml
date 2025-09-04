@@ -62,6 +62,7 @@ jobs:
         git config --global --add safe.directory /__w/audio/audio
         conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
         conda activate ./ci_env
+        conda install -q -y pip
 
         echo "::endgroup::"
         echo "::group::Install PyTorch"
