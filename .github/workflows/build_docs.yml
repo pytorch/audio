@@ -51,12 +51,11 @@ jobs:
           export BUILD_VERSION="$( cut -f 1 -d a version.txt )".dev"$(date "+%Y%m%d")"
         fi
         
-        # Install minoconda
+        # Install miniforge
         mkdir -p ~/miniconda3
-        wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-        bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-        rm ~/miniconda3/miniconda.sh
-        source ~/miniconda3/bin/activate
+        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+        bash Miniforge3.sh -b -p "${HOME}/conda"
+        source "${HOME}/conda/etc/profile.d/conda.sh"
 
         echo "::group::Create conda env"
         # Mark Build Directory Safe
