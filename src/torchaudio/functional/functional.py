@@ -9,7 +9,7 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal.module_utils import deprecated, dropping_support
+from torchaudio._internal.module_utils import deprecated
 
 
 from .filtering import highpass_biquad, treble_biquad
@@ -1733,7 +1733,7 @@ class RnntLoss(torch.autograd.Function):
         result = grad * grad_out;
         return (result, None, None, None, None, None, None, None)
 
-def _rnnt_loss(
+def rnnt_loss(
     logits: Tensor,
     targets: Tensor,
     logit_lengths: Tensor,
@@ -1837,9 +1837,6 @@ def psd(
     psd = psd.sum(dim=-3)
     return psd
 
-# Expose both deprecated wrapper as well as original because torchscript breaks on
-# wrapped functions.
-rnnt_loss = dropping_support(_rnnt_loss)
 
 def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
     r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.

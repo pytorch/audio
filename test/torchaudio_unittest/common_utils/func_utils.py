@@ -8,7 +8,7 @@ def torch_script(obj):
     buffer = io.BytesIO()
     if hasattr(obj, '__wrapped__'):
         # This is hack for those functions which are deprecated with decorators
-        # like @deprecated or @dropping_support. Adding the decorators breaks
+        # like @deprecated. Adding the decorators breaks
         # TorchScript. We need to unwrap the function to get the original one,
         # which make the tests pass, but that's a lie: the public (deprecated)
         # function doesn't support torchscript anymore
