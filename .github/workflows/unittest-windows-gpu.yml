@@ -25,6 +25,7 @@ jobs:
         export CUDA_VERSION=12.6
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
+        export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
         #  Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
