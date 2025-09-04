@@ -75,7 +75,7 @@ jobs:
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
         conda install --quiet --yes cmake>=3.18.0 ninja
-        pip install --progress-bar off -v -e . --no-use-pep517
+        pip install --progress-bar off -v . --no-build-isolation
 
         # TODO: Need to rely on torchcodec instead of building ffmpeg from source.
         echo "::endgroup::"
