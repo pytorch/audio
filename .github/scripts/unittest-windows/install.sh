@@ -21,7 +21,7 @@ conda activate "${env_dir}"
 source "$this_dir/set_cuda_envs.sh"
 
 printf "* Installing torchaudio/torch dependencies\n"
-conda install -q -y -c conda-forge numpy scipy
+conda install -y -c conda-forge numpy scipy
 
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
@@ -53,7 +53,7 @@ printf "* Installing torchaudio\n"
 printf "* Installing test tools\n"
 SENTENCEPIECE_DEPENDENCY="sentencepiece"
 (
-    conda install -q -y -c conda-forge parameterized 'requests>=2.20'
+    conda install -y -c conda-forge parameterized 'requests>=2.20'
     # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
     # shellcheck disable=SC2086
     pip install \

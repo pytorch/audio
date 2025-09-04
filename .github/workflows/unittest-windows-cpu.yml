@@ -23,6 +23,7 @@ jobs:
         # Set up Environment Variables
         export PYTHON_VERSION="3.9"
         export PIP_PROGRESS_BAR=off
+        export CONDA_QUIET=1
         unset CUDA_VERSION
 
         # Set CHANNEL

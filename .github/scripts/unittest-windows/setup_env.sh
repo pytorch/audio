@@ -36,4 +36,4 @@ fi
 conda activate "${env_dir}"
 
 # 3. Install minimal build tools
-conda install -q -y -c conda-forge cmake ninja
+conda install -y -c conda-forge cmake ninja
