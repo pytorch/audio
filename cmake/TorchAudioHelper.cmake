@@ -41,17 +41,6 @@ function(torchaudio_library name source include_dirs link_libraries compile_defs
     )
 endfunction()
 
-function(torio_library name source include_dirs link_libraries compile_defs)
-  _library(
-    torio/lib
-    "${name}"
-    "${source}"
-    "${include_dirs}"
-    "${link_libraries}"
-    "${compile_defs}"
-    )
-endfunction()
-
 if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   # See https://github.com/pytorch/pytorch/issues/38122
   find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
@@ -96,16 +85,6 @@ if (BUILD_TORCHAUDIO_PYTHON_EXTENSION)
   function(torchaudio_extension name sources include_dirs libraries definitions)
     _extension(
       torchaudio/lib
-      "${name}"
-      "${sources}"
-      "${include_dirs}"
-      "${libraries}"
-      "${definitions}"
-      )
-  endfunction()
-  function(torio_extension name sources include_dirs libraries definitions)
-    _extension(
-      torio/lib
       "${name}"
       "${sources}"
       "${include_dirs}"

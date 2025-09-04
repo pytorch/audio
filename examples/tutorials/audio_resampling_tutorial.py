@@ -26,15 +26,10 @@ print(torchaudio.__version__)
 import math
 import timeit
 
-import librosa
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
-import pandas as pd
-import resampy
 from IPython.display import Audio
-
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
+import numpy as np
 
 DEFAULT_OFFSET = 201
 
@@ -250,11 +245,11 @@ plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Default")
 
 
 ######################################################################
-# Comparison against librosa
+# Resampling support
 # --------------------------
 #
 # ``torchaudio``’s resample function can be used to produce results similar to
-# that of librosa (resampy)’s kaiser window resampling, with some noise
+# that of librosa's kaiser window resampling, with some noise
 #
 
 sample_rate = 48000
@@ -276,20 +271,6 @@ resampled_waveform = F.resample(
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Best (torchaudio)")
 
 ######################################################################
-#
-
-librosa_resampled_waveform = torch.from_numpy(
-    librosa.resample(waveform.squeeze().numpy(), orig_sr=sample_rate, target_sr=resample_rate, res_type="kaiser_best")
-).unsqueeze(0)
-plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Best (librosa)")
-
-######################################################################
-#
-
-mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
-print("torchaudio and librosa kaiser best MSE:", mse)
-
-######################################################################
 # kaiser_fast
 # ~~~~~~~~~~~
 #
@@ -305,34 +286,15 @@ resampled_waveform = F.resample(
 plot_sweep(resampled_waveform, resample_rate, title="Kaiser Window Fast (torchaudio)")
 
 ######################################################################
-#
-
-librosa_resampled_waveform = torch.from_numpy(
-    librosa.resample(waveform.squeeze().numpy(), orig_sr=sample_rate, target_sr=resample_rate, res_type="kaiser_fast")
-).unsqueeze(0)
-plot_sweep(librosa_resampled_waveform, resample_rate, title="Kaiser Window Fast (librosa)")
-
-######################################################################
-#
-
-mse = torch.square(resampled_waveform - librosa_resampled_waveform).mean().item()
-print("torchaudio and librosa kaiser fast MSE:", mse)
-
-######################################################################
 # Performance Benchmarking
 # ------------------------
 #
 # Below are benchmarks for downsampling and upsampling waveforms between
 # two pairs of sampling rates. We demonstrate the performance implications
 # that the ``lowpass_filter_width``, window type, and sample rates can
-# have. Additionally, we provide a comparison against ``librosa``\ ’s
-# ``kaiser_best`` and ``kaiser_fast`` using their corresponding parameters
-# in ``torchaudio``.
-#
+# have.
 
 print(f"torchaudio: {torchaudio.__version__}")
-print(f"librosa: {librosa.__version__}")
-print(f"resampy: {resampy.__version__}")
 
 ######################################################################
 #
@@ -413,37 +375,6 @@ resampler.to(waveform.device)
 #
 
 
-def benchmark_resample_librosa(
-    waveform,
-    sample_rate,
-    resample_rate,
-    res_type=None,
-    iters=5,
-):
-    waveform_np = waveform.squeeze().numpy()
-    return (
-        timeit.timeit(
-            stmt="""
-librosa.resample(
-    waveform_np,
-    orig_sr=sample_rate,
-    target_sr=resample_rate,
-    res_type=res_type,
-)
-        """,
-            setup="import librosa",
-            number=iters,
-            globals=locals(),
-        )
-        * 1000
-        / iters
-    )
-
-
-######################################################################
-#
-
-
 def benchmark(sample_rate, resample_rate):
     times, rows = [], []
     waveform = get_sine_sweep(sample_rate).to(torch.float32)
@@ -453,13 +384,13 @@ def benchmark(sample_rate, resample_rate):
     # sinc 64 zero-crossings
     f_time = benchmark_resample_functional(*args, lowpass_filter_width=64)
     t_time = benchmark_resample_transforms(*args, lowpass_filter_width=64)
-    times.append([None, f_time, t_time])
+    times.append([f_time, t_time])
     rows.append("sinc (width 64)")
 
     # sinc 6 zero-crossings
     f_time = benchmark_resample_functional(*args, lowpass_filter_width=16)
     t_time = benchmark_resample_transforms(*args, lowpass_filter_width=16)
-    times.append([None, f_time, t_time])
+    times.append([f_time, t_time])
     rows.append("sinc (width 16)")
 
     # kaiser best
@@ -469,10 +400,9 @@ def benchmark(sample_rate, resample_rate):
         "resampling_method": "sinc_interp_kaiser",
         "beta": 14.769656459379492,
     }
-    lib_time = benchmark_resample_librosa(*args, res_type="kaiser_best")
     f_time = benchmark_resample_functional(*args, **kwargs)
     t_time = benchmark_resample_transforms(*args, **kwargs)
-    times.append([lib_time, f_time, t_time])
+    times.append([f_time, t_time])
     rows.append("kaiser_best")
 
     # kaiser fast
@@ -482,26 +412,28 @@ def benchmark(sample_rate, resample_rate):
         "resampling_method": "sinc_interp_kaiser",
         "beta": 8.555504641634386,
     }
-    lib_time = benchmark_resample_librosa(*args, res_type="kaiser_fast")
     f_time = benchmark_resample_functional(*args, **kwargs)
     t_time = benchmark_resample_transforms(*args, **kwargs)
-    times.append([lib_time, f_time, t_time])
+    times.append([f_time, t_time])
     rows.append("kaiser_fast")
-
-    df = pd.DataFrame(times, columns=["librosa", "functional", "transforms"], index=rows)
-    return df
+    return (np.array(times), ["functional", "transforms"], rows)
 
 
 ######################################################################
 #
-def plot(df):
-    print(df.round(2))
-    ax = df.plot(kind="bar")
+
+def plot(data, cols, rows):
+    fig, ax = plt.subplots()
+    x_data = np.arange(len(rows))
+    bar_width = 0.8 / len(cols)
+    for (i, (c, d)) in enumerate(zip(cols, data.T)):
+        x_pos = x_data + (i - len(cols)/2 + 0.5) * bar_width
+        ax.bar(x_pos, d, bar_width, label=c)
+    ax.legend()
+    ax.set_xticks(x_data)
+    ax.set_xticklabels(rows)
     plt.ylabel("Time Elapsed [ms]")
-    plt.xticks(rotation=0, fontsize=10)
-    for cont, col, color in zip(ax.containers, df.columns, mcolors.TABLEAU_COLORS):
-        label = ["N/A" if v != v else str(v) for v in df[col].round(2)]
-        ax.bar_label(cont, labels=label, color=color, fontweight="bold", fontsize="x-small")
+    return ax
 
 
 ######################################################################
@@ -510,7 +442,7 @@ def plot(df):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(48_000, 44_100)
-plot(df)
+plot(*df)
 
 ######################################################################
 #
@@ -518,7 +450,7 @@ plot(df)
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(16_000, 8_000)
-plot(df)
+plot(*df)
 
 ######################################################################
 #
@@ -526,7 +458,7 @@ plot(df)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(44_100, 48_000)
-plot(df)
+plot(*df)
 
 ######################################################################
 #
@@ -534,7 +466,7 @@ plot(df)
 # ~~~~~~~~~~~~~~~~~~~~~~
 
 df = benchmark(8_000, 16_000)
-plot(df)
+plot(*df)
 
 ######################################################################
 #

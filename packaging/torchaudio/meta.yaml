@@ -50,10 +50,7 @@ build:
 test:
   imports:
     - torchaudio
-    - torchaudio.io
     - torchaudio.datasets
-    - torchaudio.kaldi_io
-    - torchaudio.sox_effects
     - torchaudio.transforms
 
   source_files:

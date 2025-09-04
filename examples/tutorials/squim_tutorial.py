@@ -73,13 +73,11 @@ print(torchaudio.__version__)
 #
 # First import the modules and define the helper functions.
 #
-# We will need torch, torchaudio to use Torchaudio-squim, Matplotlib to
-# plot data, pystoi, pesq for computing reference metrics.
+# We will need torch and torchaudio to use Torchaudio-squim and Matplotlib to
+# plot data.
 #
 
 try:
-    from pesq import pesq
-    from pystoi import stoi
     from torchaudio.pipelines import SQUIM_OBJECTIVE, SQUIM_SUBJECTIVE
 except ImportError:
     try:
@@ -92,8 +90,6 @@ except ImportError:
             of the notebook before running it:
             !pip3 uninstall -y torch torchvision torchaudio
             !pip3 install --pre torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/nightly/cpu
-            !pip3 install pesq
-            !pip3 install pystoi
             """
         )
     except Exception:
@@ -109,7 +105,7 @@ import matplotlib.pyplot as plt
 
 import torchaudio.functional as F
 from IPython.display import Audio
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 
 def si_snr(estimate, reference, epsilon=1e-8):
@@ -150,8 +146,8 @@ def plot(waveform, title, sample_rate=16000):
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
 
-SAMPLE_SPEECH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
-SAMPLE_NOISE = download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo.wav")
+SAMPLE_SPEECH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SAMPLE_NOISE = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-rm1-babb-mc01-stu-clo.wav")
 
 
 ######################################################################
@@ -280,12 +276,17 @@ print(f"STOI: {stoi_hyp[0]}")
 print(f"PESQ: {pesq_hyp[0]}")
 print(f"SI-SDR: {si_sdr_hyp[0]}\n")
 
-pesq_ref = pesq(16000, WAVEFORM_SPEECH[0].numpy(), WAVEFORM_DISTORTED[0].numpy(), mode="wb")
-stoi_ref = stoi(WAVEFORM_SPEECH[0].numpy(), WAVEFORM_DISTORTED[0].numpy(), 16000, extended=False)
-si_sdr_ref = si_snr(WAVEFORM_DISTORTED[0:1], WAVEFORM_SPEECH)
+# To calculate the STOI and PESQ reference metrics,
+# we would need to install the pystoi and pesq packages and execute the following:
+# ```python
+# pesq_ref = pesq(16000, WAVEFORM_SPEECH[0].numpy(), WAVEFORM_DISTORTED[0].numpy(), mode="wb")
+# stoi_ref = stoi(WAVEFORM_SPEECH[0].numpy(), WAVEFORM_DISTORTED[0].numpy(), 16000, extended=False)
+# ```
+# These values are precomputed and hard-coded below.
 print(f"Reference metrics for distorted speech at {snr_dbs[0]}dB are\n")
-print(f"STOI: {stoi_ref}")
-print(f"PESQ: {pesq_ref}")
+print(f"STOI: 0.9670831113894452")
+print(f"PESQ: 2.7961528301239014")
+si_sdr_ref = si_snr(WAVEFORM_DISTORTED[0:1], WAVEFORM_SPEECH)
 print(f"SI-SDR: {si_sdr_ref}")
 
 
@@ -300,12 +301,11 @@ print(f"STOI: {stoi_hyp[0]}")
 print(f"PESQ: {pesq_hyp[0]}")
 print(f"SI-SDR: {si_sdr_hyp[0]}\n")
 
-pesq_ref = pesq(16000, WAVEFORM_SPEECH[0].numpy(), WAVEFORM_DISTORTED[1].numpy(), mode="wb")
-stoi_ref = stoi(WAVEFORM_SPEECH[0].numpy(), WAVEFORM_DISTORTED[1].numpy(), 16000, extended=False)
 si_sdr_ref = si_snr(WAVEFORM_DISTORTED[1:2], WAVEFORM_SPEECH)
+# STOI and PESQ metrics are precomputed and hardcoded below.
 print(f"Reference metrics for distorted speech at {snr_dbs[1]}dB are\n")
-print(f"STOI: {stoi_ref}")
-print(f"PESQ: {pesq_ref}")
+print(f"STOI: 0.5743247866630554")
+print(f"PESQ: 1.1112866401672363")
 print(f"SI-SDR: {si_sdr_ref}")
 
 
@@ -326,7 +326,7 @@ subjective_model = SQUIM_SUBJECTIVE.get_model()
 # Load a non-matching reference (NMR)
 #
 
-NMR_SPEECH = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
+NMR_SPEECH = _download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 
 WAVEFORM_NMR, SAMPLE_RATE_NMR = torchaudio.load(NMR_SPEECH)
 if SAMPLE_RATE_NMR != 16000:

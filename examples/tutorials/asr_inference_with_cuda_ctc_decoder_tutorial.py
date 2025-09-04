@@ -5,12 +5,11 @@ ASR Inference with CUDA CTC Decoder
 **Author**: `Yuekai Zhang <yuekaiz@nvidia.com>`__
 
 .. warning::
-    Starting with version 2.8, we are refactoring TorchAudio to transition it
-    into a maintenance phase. As a result:
+    Starting with version 2.9, we have transitioned TorchAudio into a maintenance phase. As a result:
 
-    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The APIs described in this tutorial were deprecated in 2.8 and have been removed in 2.9.
     - The decoding and encoding capabilities of PyTorch for both audio and video
-      are being consolidated into TorchCodec.
+      have been consolidated into TorchCodec.
 
     Please see https://github.com/pytorch/audio/issues/3902 for more information.
 
@@ -67,7 +66,7 @@ from pathlib import Path
 import IPython
 import sentencepiece as spm
 from torchaudio.models.decoder import cuda_ctc_decoder
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 ######################################################################
 #
@@ -95,7 +94,7 @@ model_path = download_asset_external(model_link, "cuda_ctc_decoder/cpu_jit.pt")
 # We will load a sample from the LibriSpeech test-other dataset.
 #
 
-speech_file = download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
+speech_file = _download_asset("tutorial-assets/ctc-decoding/1688-142285-0007.wav")
 waveform, sample_rate = torchaudio.load(speech_file)
 assert sample_rate == 16000
 IPython.display.Audio(speech_file)

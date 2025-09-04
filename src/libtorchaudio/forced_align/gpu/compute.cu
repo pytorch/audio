@@ -94,7 +94,11 @@ __global__ void falign_cuda_step_kernel(
     alphas_a[curIdxOffset][i] = result + logProbs_a[batchIndex][t][labelIdx];
     threadMax = max(threadMax, alphas_a[curIdxOffset][i]);
   }
+#if CUDART_VERSION >= 12090  // CUDA 12.9 and later
+  scalar_t maxResult = BlockReduce(tempStorage).Reduce(threadMax, thrust::maximum<scalar_t>());
+#else
   scalar_t maxResult = BlockReduce(tempStorage).Reduce(threadMax, cub::Max());
+#endif
   if (threadIdx.x == 0) {
     maxValue = maxResult;
   }
@@ -306,11 +310,7 @@ std::tuple<torch::Tensor, torch::Tensor> compute(
       });
   return std::make_tuple(
       paths.to(logProbs.device()),
-      logProbs.index(
-          {torch::indexing::Slice(),
-           torch::linspace(
-               0, T - 1, T, torch::TensorOptions().dtype(paths.dtype())),
-           paths.index({0})}));
+      logProbs);
 }
 
 TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {

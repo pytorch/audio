@@ -32,8 +32,7 @@ def _get_hash(path, hash, chunk_size=1028):
 
 from torchaudio._internal.module_utils import dropping_support
 
-@dropping_support
-def download_asset(
+def _download_asset(
     key: str,
     hash: str = "",
     path: Union[str, PathLike] = "",

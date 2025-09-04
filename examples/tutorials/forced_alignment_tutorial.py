@@ -81,7 +81,7 @@ import matplotlib.pyplot as plt
 
 torch.random.manual_seed(0)
 
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SPEECH_FILE = torchaudio.utils._download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 ######################################################################
