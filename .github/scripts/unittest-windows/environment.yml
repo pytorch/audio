@@ -8,7 +8,6 @@ dependencies:
   - scipy >= 1.4.1
   - pip
   - pip:
-    - PySoundFile
     - future
     - parameterized
     - dataclasses
