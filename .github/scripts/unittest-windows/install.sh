@@ -20,8 +20,8 @@ conda activate "${env_dir}"
 
 source "$this_dir/set_cuda_envs.sh"
 
-printf "* Installing torchaudio/torch dependencies\n"
-conda install -y -c conda-forge numpy scipy
+printf "* Installing torch import-time dependencies\n"
+pip install numpy
 
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
@@ -64,5 +64,6 @@ SENTENCEPIECE_DEPENDENCY="sentencepiece"
         expecttest \
         inflect \
         pytest \
-        pytest-cov
+        pytest-cov \
+        scipy
 )
