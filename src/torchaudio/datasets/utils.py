@@ -2,7 +2,7 @@ import logging
 import os
 import tarfile
 import zipfile
-from typing import Any, List, Optional
+from typing import List, Optional
 
 import torchaudio
 
