@@ -31,6 +31,7 @@ jobs:
 
         # Set up Environment Variables
         export PYTHON_VERSION="${{ matrix.python_version }}"
+        export PIP_PROGRESS_BAR=off
         export CUDA_TESTS_ONLY="0"
         unset CUDA_VERSION
 
