@@ -28,7 +28,7 @@ jobs:
       contents: read
     with:
       job-name: Build doc
-      runner: linux.g5.4xlarge.nvidia.gpu
+      runner: amz2023.linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
       gpu-arch-version: "12.6"  # See GPU_ARCH_ID below
