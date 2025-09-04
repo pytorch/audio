@@ -20,6 +20,9 @@ conda activate "${env_dir}"
 
 source "$this_dir/set_cuda_envs.sh"
 
+printf "* Installing torchaudio/torch dependencies\n"
+conda install -q -y -c conda-forge numpy scipy
+
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
     wheel="cpu"
@@ -40,11 +43,8 @@ if [ ! -z "${CUDA_VERSION:-}" ] ; then
 fi
 
 # 2. Install torchaudio
-printf "* Installing fsspec\n"
+printf "* Installing fsspec\n"   # TODO: is this required for torchaudio??
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
-
-printf "* Installing torchaudio build dependencies\n"
-conda install -y -c conda-forge cmake
 
 printf "* Installing torchaudio\n"
 "$root_dir/packaging/vc_env_helper.bat" pip install . -v --no-build-isolation
@@ -53,7 +53,7 @@ printf "* Installing torchaudio\n"
 printf "* Installing test tools\n"
 SENTENCEPIECE_DEPENDENCY="sentencepiece"
 (
-    conda install -y -c conda-forge parameterized 'requests>=2.20'
+    conda install -q -y -c conda-forge parameterized 'requests>=2.20'
     # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
     # shellcheck disable=SC2086
     pip install \
@@ -64,8 +64,5 @@ SENTENCEPIECE_DEPENDENCY="sentencepiece"
         expecttest \
         inflect \
         pytest \
-        pytest-cov \
-        numpy \
-        scipy
-
+        pytest-cov
 )
