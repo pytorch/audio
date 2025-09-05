@@ -79,7 +79,7 @@ jobs:
         # TODO: Need to rely on torchcodec instead of building ffmpeg from source.
         echo "::endgroup::"
         echo "::group::Build FFmpeg"
-        conda install -q -y ffmpeg<=7
+        conda install -q -y "ffmpeg<=7"
 
         echo "::endgroup::"
         echo "::group::Install other dependencies"
