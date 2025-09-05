@@ -20,16 +20,17 @@ conda activate "${env_dir}"
 
 source "$this_dir/set_cuda_envs.sh"
 
+printf "* Installing torch import-time dependencies\n"
+pip install numpy
+
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
-    cudatoolkit="cpuonly"
-    version="cpu"
+    wheel="cpu"
 else
-    version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cudatoolkit="pytorch-cuda=${version}"
+    wheel="cu$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 fi
-printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia pytorch "${cudatoolkit}"  pytest pybind11
+printf "Installing PyTorch\n"
+pip install --pre torch --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
@@ -42,7 +43,7 @@ if [ ! -z "${CUDA_VERSION:-}" ] ; then
 fi
 
 # 2. Install torchaudio
-printf "* Installing fsspec\n"
+printf "* Installing fsspec\n"   # TODO: is this required for torchaudio??
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
 
 printf "* Installing torchaudio\n"
@@ -50,22 +51,9 @@ printf "* Installing torchaudio\n"
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
-NUMBA_DEV_CHANNEL=""
 SENTENCEPIECE_DEPENDENCY="sentencepiece"
-case "$(python --version)" in
-    *3.9*)
-        # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
-        # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
-        NUMBA_DEV_CHANNEL="-c numba/label/dev"
-        ;;
-    *3.10*)
-        # Don't install sentencepiece, no python 3.10 dependencies available for windows yet
-        SENTENCEPIECE_DEPENDENCY=""
-        NUMBA_DEV_CHANNEL="-c numba/label/dev"
-        ;;
-esac
 (
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} parameterized 'requests>=2.20'
+    conda install -y -c conda-forge parameterized 'requests>=2.20'
     # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
     # shellcheck disable=SC2086
     pip install \
@@ -77,18 +65,5 @@ esac
         inflect \
         pytest \
         pytest-cov \
-        pytorch-lightning \
-        'scipy==1.7.3' \
-        unidecode \
-        'protobuf<4.21.0' \
-        demucs \
-        tinytag \
-        pyroomacoustics \
-        flashlight-text \
-        git+https://github.com/kpu/kenlm/
+        scipy
 )
-# Install fairseq
-git clone https://github.com/pytorch/fairseq
-cd fairseq
-git checkout e47a4c8
-pip install .
