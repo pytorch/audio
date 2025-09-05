@@ -24,6 +24,8 @@ esac
 conda create -n ci -y python="${PYTHON_VERSION}"
 conda activate ci
 
+conda install -y "ffmpeg<=7"
+
 export GPU_ARCH_TYPE="cpu"
 
 case $GPU_ARCH_TYPE in
@@ -40,7 +42,7 @@ case $GPU_ARCH_TYPE in
     ;;
 esac
 PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
 
 
 # 2. Install torchaudio
@@ -53,6 +55,6 @@ pip install . -v --no-build-isolation
 # 3. Install Test tools
 printf "* Installing test tools\n"
 # On this CI, for whatever reason, we're only able to install ffmpeg 4.
-conda install -y "ffmpeg<=7"
+
 
 pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest
