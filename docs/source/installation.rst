@@ -15,9 +15,6 @@ Please refer to https://pytorch.org/get-started/locally/ for the details.
    Starting ``0.10``, torchaudio has CPU-only and CUDA-enabled binary distributions,
    each of which requires a corresponding PyTorch distribution.
 
-.. note::
-   This software was compiled against an unmodified copies of FFmpeg, with the specific rpath removed so as to enable the use of system libraries. The LGPL source can be downloaded from the following locations: `n4.1.8 <https://github.com/FFmpeg/FFmpeg/releases/tag/n4.4.4>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n4.4.4/COPYING.LGPLv2.1>`__), `n5.0.3 <https://github.com/FFmpeg/FFmpeg/releases/tag/n5.0.3>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n5.0.3/COPYING.LGPLv2.1>`__) and `n6.0 <https://github.com/FFmpeg/FFmpeg/releases/tag/n6.0>`__ (`license <https://github.com/FFmpeg/FFmpeg/blob/n6.0/COPYING.LGPLv2.1>`__).
-
 Dependencies
 ------------
 
@@ -30,49 +27,6 @@ Dependencies
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-.. _ffmpeg_dependency:
-
-* `FFmpeg <https://ffmpeg.org>`__
-
-  Starting version 2.1, TorchAudio official binary distributions are compatible with
-  FFmpeg version 6, 5 and 4. (>=4.4, <7). At runtime, TorchAudio first looks for FFmpeg 6,
-  if not found, then it continues to looks for 5 and move on to 4.
-
-  There are multiple ways to install FFmpeg libraries.
-  Please refer to the official documentation for how to install FFmpeg.
-  If you are using Anaconda Python distribution,
-  ``conda install -c conda-forge 'ffmpeg<7'`` will install
-  compatible FFmpeg libraries.
-
-  If you need to specify the version of FFmpeg TorchAudio searches and links, you can
-  specify it via the environment variable ``TORIO_USE_FFMPEG_VERSION``. For example,
-  by setting ``TORIO_USE_FFMPEG_VERSION=5``, TorchAudio will only look for FFmpeg
-  5.
-
-  If for some reason, this search mechanism is causing an issue, you can disable
-  the FFmpeg integration entirely by setting the environment variable
-  ``TORIO_USE_FFMPEG=0``.
-
-  There are multiple ways to install FFmpeg libraries.
-  If you are using Anaconda Python distribution,
-  ``conda install -c conda-forge 'ffmpeg<7'`` will install
-  compatible FFmpeg libraries.
-
-  .. note::
-
-     When searching for FFmpeg installation, TorchAudio looks for library files
-     which have names with version numbers.
-     That is, ``libavutil.so.<VERSION>`` for Linux, ``libavutil.<VERSION>.dylib``
-     for macOS, and ``avutil-<VERSION>.dll`` for Windows.
-     Many public pre-built binaries follow this naming scheme, but some distributions
-     have un-versioned file names.
-     If you are having difficulties detecting FFmpeg, double check that the library
-     files you installed follow this naming scheme, (and then make sure
-     that they are in one of the directories listed in library search path.)
-
-* `SoundFile <https://pypi.org/project/PySoundFile/>`__
-
-  Required to use ``backend="soundfile"`` in `I/O functions <./torchaudio.html#i-o>`__.
 
 * `sentencepiece <https://pypi.org/project/sentencepiece/>`__
 

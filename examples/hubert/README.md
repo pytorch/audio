@@ -2,6 +2,10 @@
 
 This directory contains sample implementations of pre-training pipeline for [HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units](https://arxiv.org/abs/2106.07447).
 
+> [!NOTE]
+> The code uses the `torchaudio.info` function which was removed from the library in version 2.9. As such, this code will
+> not run as written without modification. It is preserved for reference purposes only.
+
 ## Pre-training Usage
 
 The Base architecture of HuBERT model requires two iterations of pre-training.
