@@ -53,7 +53,6 @@ jobs:
         fi
         
         # Install miniforge
-        mkdir -p ~/miniconda3
         wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
         bash Miniforge3.sh -b -p "${HOME}/conda"
         source "${HOME}/conda/etc/profile.d/conda.sh"
@@ -80,7 +79,7 @@ jobs:
         # TODO: Need to rely on torchcodec instead of building ffmpeg from source.
         echo "::endgroup::"
         echo "::group::Build FFmpeg"
-        conda install -q -y ffmpeg
+        conda install -q -y ffmpeg<=7
 
         echo "::endgroup::"
         echo "::group::Install other dependencies"
