@@ -931,9 +931,14 @@ def _lfilter_core_generic_loop(input_signal_windows: Tensor, a_coeffs_flipped: T
         o0 -= (windowed_output_signal.transpose(0, 1) @ a_coeffs_flipped)[..., 0].t()
         padded_output_waveform[:, :, i_sample + n_order - 1] = o0
 
+def _lfilter_core_loop_dispatcher(input_signal_windows: Tensor, a_coeffs_flipped: Tensor, padded_output_waveform: Tensor):
+    if input_signal_windows.is_cuda or input_signal_windows.is_cpu:
+        return torch.ops.torchaudio._lfilter_core_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
+    else:
+        return _lfilter_core_generic_loop(input_signal_windows, a_coeffs_flipped, padded_output_waveform)
 
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _lfilter_core_loop = torch.ops.torchaudio._lfilter_core_loop
+    _lfilter_core_loop = _lfilter_core_loop_dispatcher
 else:
     _lfilter_core_loop = _lfilter_core_generic_loop
 
