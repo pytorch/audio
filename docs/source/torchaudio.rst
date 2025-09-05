@@ -8,11 +8,11 @@ torchaudio
 
     - APIs deprecated in version 2.8 have been removed in 2.9.
     - The decoding and encoding capabilities of PyTorch for both audio and video
-      have been consolidated into TorchCodec. For convenience, we provide
-      :func:`~torchaudio.load_with_torchcodec` as a replacement for
-      :func:`~torchaudio.load` and :func:`~torchaudio.save_with_torchcodec` as a
-      replacement for :func:`~torchaudio.save`, but we recommend that you port
-      your code to native torchcodec APIs.
+      have been consolidated into TorchCodec. For convenience,
+      :func:`~torchaudio.load` and :func:`~torchaudio.save` are now aliases to
+      :func:`~torchaudio.load_with_torchcodec` and :func:`~torchaudio.save_with_torchcodec`
+      respectively, which call the appropriate functions from TorchCodec.
+      That said, we recommend that you port your code to native torchcodec APIs.
 
     Please see https://github.com/pytorch/audio/issues/3902 for more information.
 
