@@ -52,7 +52,6 @@ pip install . -v --no-build-isolation
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
-# On this CI, for whatever reason, we're only able to install ffmpeg 4.
-conda install -y "ffmpeg<5"
+
 
 pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest
