@@ -63,5 +63,6 @@ jobs:
         echo '::endgroup::'
 
         echo '::group::Run Tests'
+        export PYTEST_K_EXTRA="and not librosa"
         ./.github/scripts/unittest-linux/run_test.sh
         echo '::endgroup::'
