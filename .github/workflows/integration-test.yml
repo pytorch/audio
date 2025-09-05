@@ -57,4 +57,5 @@ jobs:
         echo "::endgroup::"
         
         echo "::group::Run Integration Tests"
+        pip install pytest expecttest parameterized
         cd test && pytest integration_tests -v --use-tmp-hub-dir
