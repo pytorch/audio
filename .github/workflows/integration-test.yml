@@ -1,35 +1,61 @@
-# name: Integration Test
+name: Integration Test
 
-# on:
-#   pull_request:
-#     branches: [ main ]
+on:
+  pull_request:
+    branches: [ main ]
 
-#   workflow_dispatch:
+  workflow_dispatch:
 
-# jobs:
-#   build:
+jobs:
+  build:
 
-#     runs-on: ubuntu-22.04
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         python-version: [ 3.9 ]
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      job-name: Integration Tests
+      runner: linux.g5.4xlarge.nvidia.gpu
+      repository: pytorch/audio
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.6"  # See GPU_ARCH_ID below
+      timeout: 120
+      script: |
+        set -ex
+        
+        # Set up Environment Variables
+        export PYTHON_VERSION="3.10"
+        export CU_VERSION="11.8"
+        export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
+        
+        # Install miniforge
+        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+        bash Miniforge3.sh -b -p "${HOME}/conda"
+        source "${HOME}/conda/etc/profile.d/conda.sh"
 
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Set up Python ${{ matrix.python-version }}
-#       uses: actions/setup-python@v2
-#       with:
-#         python-version: ${{ matrix.python-version }}
-#     - name: Install dependencies
-#       run: |
-#         sudo apt install -y -qq libavfilter-dev libavdevice-dev
-#     - name: Install packages
-#       run: |
-#         python -m pip install --quiet --upgrade pip
-#         python -m pip install --quiet --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-#         python -m pip install --quiet pytest requests cmake ninja deep-phonemizer sentencepiece flashlight-text git+https://github.com/kpu/kenlm
-#         python -m pip install . -v --no-build-isolation
-#     - name: Run integration test
-#       run: |
-#         cd test && pytest integration_tests -v --use-tmp-hub-dir
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
+        conda activate ./ci_env
+        conda install -q -y pip numpy
+
+        echo "::endgroup::"
+        echo "::group::Install PyTorch"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/nightly/cpu"
+        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+
+        echo "::endgroup::"
+        echo "::group::Install TorchAudio"
+        conda install --quiet --yes cmake>=3.18.0 ninja
+        pip install --progress-bar off -v . --no-build-isolation
+
+        echo "::endgroup::"
+        echo "::group::Build FFmpeg"
+        conda install -q -y "ffmpeg<=7"
+
+        echo "::endgroup::"
+        
+        echo "::group::Run Integration Tests"
+        pip install pytest expecttest parameterized
+        cd test && pytest integration_tests -v --use-tmp-hub-dir
