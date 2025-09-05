@@ -14,7 +14,7 @@ jobs:
       id-token: write
       contents: read
     with:
-      job-name: Build doc
+      job-name: Integration Tests
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
