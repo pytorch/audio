@@ -37,6 +37,7 @@ jobs:
 
       script: |
         set -ex
+        
         # Set up Environment Variables
         export PYTHON_VERSION="3.10"
         export CU_VERSION="11.8"
@@ -50,12 +51,18 @@ jobs:
           export CHANNEL=nightly
           export BUILD_VERSION="$( cut -f 1 -d a version.txt )".dev"$(date "+%Y%m%d")"
         fi
+        
+        # Install miniforge
+        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+        bash Miniforge3.sh -b -p "${HOME}/conda"
+        source "${HOME}/conda/etc/profile.d/conda.sh"
 
         echo "::group::Create conda env"
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
         conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
         conda activate ./ci_env
+        conda install -q -y pip numpy
 
         echo "::endgroup::"
         echo "::group::Install PyTorch"
@@ -67,12 +74,12 @@ jobs:
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
         conda install --quiet --yes cmake>=3.18.0 ninja
-        pip3 install --progress-bar off -v -e . --no-use-pep517
+        pip install --progress-bar off -v . --no-build-isolation
 
         # TODO: Need to rely on torchcodec instead of building ffmpeg from source.
         echo "::endgroup::"
         echo "::group::Build FFmpeg"
-        .github/scripts/ffmpeg/build_gpu.sh
+        conda install -q -y "ffmpeg<=7"
 
         echo "::endgroup::"
         echo "::group::Install other dependencies"
