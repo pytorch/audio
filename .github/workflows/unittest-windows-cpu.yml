@@ -1,4 +1,4 @@
-# name: Unittests on Windows CPU
+name: Unittests on Windows CPU
 
 on:
   pull_request:
