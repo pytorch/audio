@@ -26,13 +26,39 @@ jobs:
         sudo apt install -y -qq libavfilter-dev libavdevice-dev cmake ffmpeg
     - name: Install packages
       run: |
-        python -m pip install --quiet --upgrade pip setuptools wheel
-        python -m pip install --quiet numpy
-        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CUDA=true
-        unset CUDA_VERSION
+        set -ex
+        
+        # Set up Environment Variables
+        export PYTHON_VERSION="3.10"
+        
+        # Install miniforge
+        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+        bash Miniforge3.sh -b -p "${HOME}/conda"
+        source "${HOME}/conda/etc/profile.d/conda.sh"
+
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
+        conda activate ./ci_env
+        conda install -q -y pip numpy
+
+        echo "::endgroup::"
+        echo "::group::Install PyTorch"
+
         python -m pip install --quiet --pre torch torchcodec -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-        python -m pip install --quiet pytest requests
-        USE_CUDA=0 python -m pip install . -v --no-build-isolation
+
+        echo "::endgroup::"
+        echo "::group::Install TorchAudio"
+        conda install --quiet --yes cmake>=3.18.0 ninja
+        pip install --progress-bar off -v . --no-build-isolation
+
+        echo "::endgroup::"
+        echo "::group::Build FFmpeg"
+        conda install -q -y "ffmpeg<=7"
+
+        echo "::endgroup::"
     - name: Run integration test
       run: |
+        source "${HOME}/conda/etc/profile.d/conda.sh"
         cd test && pytest integration_tests -v --use-tmp-hub-dir
