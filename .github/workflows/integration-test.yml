@@ -42,8 +42,8 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Install PyTorch"
-
-        python -m pip install --quiet --pre torch torchcodec -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/nightly/cpu"
+        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
 
         echo "::endgroup::"
         echo "::group::Install TorchAudio"
