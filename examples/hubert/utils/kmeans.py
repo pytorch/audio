@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Tuple
 
 import torch
-from sklearn.cluster import MiniBatchKMeans
 from torch import Tensor
 
 from .common_utils import _get_feat_lens_paths, _get_model_path
@@ -102,6 +101,7 @@ def learn_kmeans(
     """
     if not km_dir.exists():
         km_dir.mkdir()
+    from sklearn.cluster import MiniBatchKMeans
 
     km_model = MiniBatchKMeans(
         n_clusters=n_clusters,

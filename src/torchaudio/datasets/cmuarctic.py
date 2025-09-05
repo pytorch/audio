@@ -129,7 +129,7 @@ class CMUARCTIC(Dataset):
         self._text = os.path.join(self._path, self._folder_text, self._file_text)
 
         with open(self._text, "r") as text:
-            walker = csv.reader(text, delimiter="\n")
+            walker = csv.reader(text)
             self._walker = list(walker)
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:

@@ -11,7 +11,5 @@ cd "${build_dir}"
 git submodule update
 cmake -GNinja \
       -DCMAKE_PREFIX_PATH="$(python -c 'import torch;print(torch.utils.cmake_prefix_path)')" \
-      -DBUILD_SOX=ON \
-      -DBUILD_KALDI=OFF \
       ..
 cmake --build .

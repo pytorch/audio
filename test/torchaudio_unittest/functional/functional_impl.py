@@ -456,6 +456,20 @@ class Functional(TestBaseMixin):
         assert mask_specgrams.size() == specgrams.size()
         assert (num_masked_columns < mask_param).sum() == num_masked_columns.numel()
 
+    @parameterized.expand(list(itertools.product([100], [0.0, 30.0], [2, 3], [0.2, 1.0])))
+    def test_mask_along_axis_iid_mask_value(self, mask_param, mask_value, axis, p):
+        specgrams = torch.randn(4, 2, 1025, 400, dtype=self.dtype, device=self.device)
+        mask_value_tensor = torch.tensor(mask_value, dtype=self.dtype, device=self.device)
+        torch.manual_seed(0)
+        # as this operation is random we need to fix the seed for results to match
+        mask_specgrams = F.mask_along_axis_iid(specgrams, mask_param, mask_value_tensor, axis, p=p)
+        torch.manual_seed(0)
+        mask_specgrams_float = F.mask_along_axis_iid(specgrams, mask_param, mask_value, axis, p=p)
+        assert torch.allclose(
+            mask_specgrams, mask_specgrams_float
+        ), f"""Masking with float and tensor should be the same diff = {
+            torch.abs(mask_specgrams - mask_specgrams_float).max()}"""
+
     @parameterized.expand(list(itertools.product([(2, 1025, 400), (1, 201, 100)], [100], [0.0, 30.0], [1, 2])))
     def test_mask_along_axis_preserve(self, shape, mask_param, mask_value, axis):
         """mask_along_axis should not alter original input Tensor
