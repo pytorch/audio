@@ -14,7 +14,7 @@ env:
 
 jobs:
   tests:
-    uses: pytorch/test-infra/.github/workflows/test_macos_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
     with:
       runner: macos-m1-stable
       repository: pytorch/audio
