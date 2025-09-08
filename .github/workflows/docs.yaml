@@ -105,7 +105,7 @@ jobs:
       - name: Install doc dependencies
         run: |
           cd docs
-          ${CONDA_RUN} python -m pip install -r docs/requirements.txt -r docs/requirements-tutorials.txt
+          ${CONDA_RUN} python -m pip install -r requirements.txt -r requirements-tutorials.txt
       - name: Build docs
         run: |
           cd docs
