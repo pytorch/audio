@@ -1,0 +1,116 @@
+name: Docs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions:
+  id-token: write
+  contents: write
+
+defaults:
+  run:
+    shell: bash -l -eo pipefail {0}
+
+jobs:
+  generate-matrix:
+    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@main
+    with:
+      package-type: wheel
+      os: linux
+      test-infra-repository: pytorch/test-infra
+      test-infra-ref: main
+      with-cpu: disable
+      with-xpu: disable
+      with-rocm: disable
+      with-cuda: enable
+      build-python-only: "disable"
+  build:
+    needs: generate-matrix
+    strategy:
+      fail-fast: false
+    name: Build and Upload wheel
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
+    with:
+      repository: pytorch/torchcodec
+      ref: ""
+      test-infra-repository: pytorch/test-infra
+      test-infra-ref: main
+      build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
+      pre-script: packaging/pre_build_script.sh
+      post-script: packaging/post_build_script.sh
+      smoke-test-script: packaging/fake_smoke_test.py
+      package-name: torchcodec
+      trigger-event: ${{ github.event_name }}
+      build-platform: "python-build-package"
+      build-command: "BUILD_AGAINST_ALL_FFMPEG_FROM_S3=1 ENABLE_CUDA=1 python -m build --wheel -vvv --no-isolation"
+
+  build-docs:
+    runs-on: linux.4xlarge.nvidia.gpu
+    strategy:
+      fail-fast: false
+      matrix:
+          # 3.10 corresponds to the minimum python version for which we build
+          # the wheel unless the label cliflow/binaries/all is present in the
+          # PR.
+        python-version: ['3.10']
+        cuda-version: ['12.6']
+        ffmpeg-version-for-tests: ['7']
+    container:
+      image: "pytorch/manylinux2_28-builder:cuda${{ matrix.cuda-version }}"
+      options: "--gpus all -e NVIDIA_DRIVER_CAPABILITIES=video,compute,utility"
+    needs: build
+    steps:
+      - name: Setup env vars
+        run: |
+          cuda_version_without_periods=$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')
+          echo cuda_version_without_periods=${cuda_version_without_periods} >> $GITHUB_ENV
+          python_version_without_periods=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
+          echo python_version_without_periods=${python_version_without_periods} >> $GITHUB_ENV
+      - uses: actions/download-artifact@v4
+        with:
+          name: pytorch_torchcodec__${{ matrix.python-version }}_cu${{ env.cuda_version_without_periods }}_x86_64
+          path: pytorch/torchcodec/dist/
+      - name: Setup miniconda using test-infra
+        uses: pytorch/test-infra/.github/actions/setup-miniconda@main
+        with:
+          python-version: ${{ matrix.python-version }}
+          # We install conda packages at the start because otherwise conda may have conflicts with dependencies.
+          default-packages: "nvidia/label/cuda-${{ matrix.cuda-version }}.0::libnpp nvidia::cuda-nvrtc=${{ matrix.cuda-version }} nvidia::cuda-toolkit=${{ matrix.cuda-version }} nvidia::cuda-cudart=${{ matrix.cuda-version }} nvidia::cuda-driver-dev=${{ matrix.cuda-version }} conda-forge::ffmpeg=${{ matrix.ffmpeg-version-for-tests }}"
+      - name: Check env
+        run: |
+          ${CONDA_RUN} env
+          ${CONDA_RUN} conda info
+          ${CONDA_RUN} nvidia-smi
+          ${CONDA_RUN} conda list
+      - name: Assert ffmpeg exists
+        run: |
+          ${CONDA_RUN} ffmpeg -buildconf
+      - name: Update pip
+        run: ${CONDA_RUN} python -m pip install --upgrade pip
+      - name: Install PyTorch
+        run: |
+          ${CONDA_RUN} python -m pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu${{ env.cuda_version_without_periods }}
+          ${CONDA_RUN} python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
+      - name: Install torchcodec from the wheel
+        run: |
+          wheel_path=`find pytorch/torchcodec/dist -type f -name "*cu${{ env.cuda_version_without_periods }}-cp${{ env.python_version_without_periods }}*.whl"`
+          echo Installing $wheel_path
+          ${CONDA_RUN} python -m pip install $wheel_path -vvv
+
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Install doc dependencies
+        run: |
+          cd docs
+          ${CONDA_RUN} python -m pip install -r requirements.txt
+      - name: Build docs
+        run: |
+          cd docs
+          ${CONDA_RUN} make html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Built-Docs
+          path: docs/build/html/
