@@ -70,8 +70,8 @@ jobs:
           echo python_version_without_periods=${python_version_without_periods} >> $GITHUB_ENV
       - uses: actions/download-artifact@v4
         with:
-          name: pytorch_torchaudio__${{ matrix.python-version }}_cu${{ env.cuda_version_without_periods }}_x86_64
-          path: pytorch/torchaudio/dist/
+          name: pytorch_audio__${{ matrix.python-version }}_cu${{ env.cuda_version_without_periods }}_x86_64
+          path: pytorch/audio/dist/
       - name: Setup miniconda using test-infra
         uses: pytorch/test-infra/.github/actions/setup-miniconda@main
         with:
@@ -95,7 +95,7 @@ jobs:
           ${CONDA_RUN} python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
       - name: Install torchaudio from the wheel
         run: |
-          wheel_path=`find pytorch/torchaudio/dist -type f -name "*cu${{ env.cuda_version_without_periods }}-cp${{ env.python_version_without_periods }}*.whl"`
+          wheel_path=`find pytorch/audio/dist -type f -name "*cu${{ env.cuda_version_without_periods }}-cp${{ env.python_version_without_periods }}*.whl"`
           echo Installing $wheel_path
           ${CONDA_RUN} python -m pip install $wheel_path -vvv
 
