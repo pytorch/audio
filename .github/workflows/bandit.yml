@@ -1,5 +1,4 @@
-GitHub Actions Bandit Workflow
-
+# GitHub Actions Bandit Workflow
 name: Bandit
 
 on:
