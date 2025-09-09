@@ -24,6 +24,7 @@ jobs:
     runs-on: linux.g5.4xlarge.nvidia.gpu
     env:
       REPOSITORY: pytorch/audio
+      REF: ""
     steps:
       - name: Setup env vars
         run: |
