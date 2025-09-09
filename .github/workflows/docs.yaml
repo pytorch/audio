@@ -16,14 +16,15 @@ defaults:
 jobs:
   build-docs:
     runs-on: linux.g5.4xlarge.nvidia.gpu
-    gpu-arch-type: cuda
-    gpu-arch-version: "12.6"
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.10']
         cuda-version: ['12.6']
         ffmpeg-version: ['7']
+    with:
+      gpu-arch-type: cuda
+      gpu-arch-version: "12.6"
     steps:
       - name: Setup env vars
         run: |
