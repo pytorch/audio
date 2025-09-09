@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.11']
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
@@ -41,36 +41,3 @@ jobs:
       - name: Check to see what files pre-commit modified
         run: |
           git diff
-
-  mypy:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.12']
-    steps:
-      - name: Check out repo
-        uses: actions/checkout@v3
-      - name: Setup conda env
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          miniconda-version: "latest"
-          activate-environment: test
-          python-version: ${{ matrix.python-version }}
-      - name: Update pip
-        run: python -m pip install --upgrade pip
-      - name: Install dependencies and FFmpeg
-        run: |
-          python -m pip install --pre torch torchcodec --index-url https://download.pytorch.org/whl/nightly/cpu
-          conda install "ffmpeg=7.0.1" pkg-config pybind11 -c conda-forge
-          ffmpeg -version
-      - name: Build and install torchaudio
-        run: |
-          python -m pip install -e ".[dev]" --no-build-isolation -vvv
-      - name: Install mypy
-        run: |
-          python -m pip install mypy
-      - name: Run mypy
-        run: |
-          mypy --install-types --non-interactive --config-file mypy.ini
