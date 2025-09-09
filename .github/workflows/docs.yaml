@@ -1,79 +1,71 @@
 name: Docs
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
-
-permissions:
-  id-token: write
-  contents: write
-
-defaults:
-  run:
-    shell: bash -l -eo pipefail {0}
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
 
 jobs:
-  build-docs:
+  build:
     strategy:
-      fail-fast: false
       matrix:
-        python-version: ['3.10']
-        cuda-version: ['12.6']
-        ffmpeg-version: ['7']
-    runs-on: linux.g5.4xlarge.nvidia.gpu
-    env:
-      REPOSITORY: pytorch/audio
-      REF: ""
-    steps:
-      - name: Setup env vars
-        run: |
-          cuda_version_without_periods=$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')
-          echo cuda_version_without_periods=${cuda_version_without_periods} >> $GITHUB_ENV
-          python_version_without_periods=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
-          echo python_version_without_periods=${python_version_without_periods} >> $GITHUB_ENV
-      - name: Setup miniconda using test-infra
-        uses: pytorch/test-infra/.github/actions/setup-miniconda@main
-        with:
-          python-version: ${{ matrix.python-version }}
-          # We install conda packages at the start because otherwise conda may have conflicts with dependencies.
-          default-packages: "nvidia/label/cuda-${{ matrix.cuda-version }}.0::libnpp nvidia::cuda-nvrtc=${{ matrix.cuda-version }} nvidia::cuda-toolkit=${{ matrix.cuda-version }} nvidia::cuda-cudart=${{ matrix.cuda-version }} nvidia::cuda-driver-dev=${{ matrix.cuda-version }} conda-forge::ffmpeg=${{ matrix.ffmpeg-version }} cmake ninja"
-      - uses: pytorch/test-infra/.github/actions/setup-binary-builds@main
-        with:
-          setup-miniconda: false
-          python-version: ${{ matrix.python-version }}
-          cuda-version: ${{ matrix.cuda-version }}
-          repository: ""
-      - name: Check env
-        run: |
-          ${CONDA_RUN} env
-          ${CONDA_RUN} conda info
-          ${CONDA_RUN} nvidia-smi
-          ${CONDA_RUN} conda list
-      - name: Assert ffmpeg exists
-        run: |
-          ${CONDA_RUN} ffmpeg -buildconf
-      - name: Update pip
-        run: ${CONDA_RUN} python -m pip install --upgrade pip
-      - name: Install PyTorch
-        run: |
-          ${CONDA_RUN} python -m pip install --pre torch torchcodec --index-url https://download.pytorch.org/whl/nightly/cu${{ env.cuda_version_without_periods }}
-          ${CONDA_RUN} python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
-      - name: Check out repo
-        uses: actions/checkout@v3
-      - name: Install torchaudio
-        run: |
-          export USE_CUDA=1
-          ${CONDA_RUN} python -m pip install . -v --no-build-isolation
-      - name: Install doc dependencies
-        run: |
-          cd docs
-          ${CONDA_RUN} python -m pip install -r requirements.txt -r requirements-tutorials.txt
-      - name: Build docs
-        run: |
-          cd docs
-          ${CONDA_RUN} make html
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Built-Docs
-          path: docs/build/html/
+        # TODO add up to 3.13
+        python_version: ["3.10"]
+        cuda-version: ["12.6"]
+      fail-fast: false
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      runner: linux.g5.4xlarge.nvidia.gpu
+      repository: pytorch/audio
+      gpu-arch-type: cuda
+      gpu-arch-version: ${{ matrix.cuda-version }}
+      timeout: 120
+      job-name: docs
+      # run-with-docker: false
+
+      script: |
+        set -ex
+        # Set up Environment Variables
+        export PYTHON_VERSION="${{ matrix.python_version }}"
+        export PIP_PROGRESS_BAR=off
+        export CONDA_QUIET=1
+        export CU_VERSION="${{ matrix.cuda-version }}"
+        export CU_VERSION_WITHOUT_PERIODS="$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')"
+        # Set UPLOAD_CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export UPLOAD_CHANNEL=test
+        else
+          export UPLOAD_CHANNEL=nightly
+        fi
+
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create -c conda-forge --strict-channel-priority -y --prefix ci_env python="${PYTHON_VERSION}" ffmpeg=7 cmake ninja
+        conda activate ./ci_env
+        conda info
+
+        python -m pip install --upgrade pip
+
+        echo "::endgroup::"
+        echo "::group::Install PyTorch and TorchCodec"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cu${CU_VERSION_WITHOUT_PERIODS}"
+        python -m pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
+        echo "::endgroup::"
+        echo "::group::Build and install TorchAudio"
+        python -m pip install . -v --no-build-isolation
+        echo "::endgroup::"
+        echo "::group::Build TorchAudio documentation"
+        cd docs
+        python -m pip install -r requirements.txt -r requirements-tutorials.txt
+        make html
+        echo "::endgroup::"
+        # TODO: upload
