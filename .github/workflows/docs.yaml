@@ -15,30 +15,26 @@ defaults:
 
 jobs:
   build-docs:
-    with:
-      os: linux
-      python-version: "3.10"
-      cuda-version: "12.6"
-      ffmpeg-version: "7"
     runs-on: linux.4xlarge.nvidia.gpu
     strategy:
       fail-fast: false
-    container:
-      image: "pytorch/manylinux2_28-builder:cuda${{ cuda-version }}"
-      options: "--gpus all -e NVIDIA_DRIVER_CAPABILITIES=video,compute,utility"
+      matrix:
+        python-version: ['3.10']
+        cuda-version: ['12.6']
+        ffmpeg-version: ['7']
     steps:
       - name: Setup env vars
         run: |
-          cuda_version_without_periods=$(echo "${{ cuda-version }}" | sed 's/\.//g')
+          cuda_version_without_periods=$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')
           echo cuda_version_without_periods=${cuda_version_without_periods} >> $GITHUB_ENV
-          python_version_without_periods=$(echo "${{ python-version }}" | sed 's/\.//g')
+          python_version_without_periods=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
           echo python_version_without_periods=${python_version_without_periods} >> $GITHUB_ENV
       - name: Setup miniconda using test-infra
         uses: pytorch/test-infra/.github/actions/setup-miniconda@main
         with:
-          python-version: ${{ python-version }}
+          python-version: ${{ matrix.python-version }}
           # We install conda packages at the start because otherwise conda may have conflicts with dependencies.
-          default-packages: "conda-forge::ffmpeg=${{ ffmpeg-version }}"
+          default-packages: "conda-forge::ffmpeg=${{ matrix.ffmpeg-version }}"
       - name: Check env
         run: |
           ${CONDA_RUN} env
