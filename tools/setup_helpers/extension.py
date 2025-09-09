@@ -34,10 +34,8 @@ def _get_build(var, default=False):
 
 
 _BUILD_CPP_TEST = _get_build("BUILD_CPP_TEST", False)
-_BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
-_USE_FFMPEG = _get_build("USE_FFMPEG", True)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
 _BUILD_ALIGN = _get_build("BUILD_ALIGN", True)
@@ -102,7 +100,6 @@ class CMakeBuild(build_ext):
             "-DCMAKE_VERBOSE_MAKEFILE=ON",
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_CPP_TEST={'ON' if _BUILD_CPP_TEST else 'OFF'}",
-            f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
             f"-DBUILD_RIR:BOOL={'ON' if _BUILD_RIR else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             f"-DBUILD_ALIGN:BOOL={'ON' if _BUILD_ALIGN else 'OFF'}",
@@ -112,7 +109,6 @@ class CMakeBuild(build_ext):
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",
-            f"-DUSE_FFMPEG:BOOL={'ON' if _USE_FFMPEG else 'OFF'}",
         ]
         build_args = ["--target", "install"]
         # Pass CUDA architecture to cmake
