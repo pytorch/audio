@@ -40,6 +40,7 @@ jobs:
           setup-miniconda: false
           python-version: ${{ matrix.python-version }}
           cuda-version: ${{ matrix.cuda-version }}
+          repository: ""
       - name: Check env
         run: |
           ${CONDA_RUN} env
