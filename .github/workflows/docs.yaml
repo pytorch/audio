@@ -28,7 +28,7 @@ jobs:
       gpu-arch-version: ${{ matrix.cuda-version }}
       timeout: 120
       job-name: docs
-      run-with-docker: false
+      # run-with-docker: false
 
       script: |
         set -ex
