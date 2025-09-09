@@ -161,7 +161,7 @@ def _load_phonemizer(file, dl_kwargs):
         raise RuntimeError("DeepPhonemizer is not installed. Please install it.")
 
     from dp.phonemizer import Phonemizer
-    from dp.preprocessing.text import Preprocessor, LanguageTokenizer, SequenceTokenizer
+    from dp.preprocessing.text import LanguageTokenizer, Preprocessor, SequenceTokenizer
 
     # By default, dp issues DEBUG level log.
     logger = logging.getLogger("dp")

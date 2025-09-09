@@ -262,6 +262,7 @@ def skipIfNoHWAccel(name):
     key = "NO_HW_ACCEL"
     return _skipIf(True, reason="ffmpeg features are not available.", key=key)
 
+
 def zip_equal(*iterables):
     """With the regular Python `zip` function, if one iterable is longer than the other,
     the remainder portions are ignored.This is resolved in Python 3.10 where we can use

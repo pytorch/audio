@@ -1,10 +1,7 @@
 import unittest
 
 import torch
-import torchaudio.functional as F
-from parameterized import parameterized
-import unittest
-from torchaudio_unittest.common_utils import PytorchTestCase, TorchaudioTestCase
+from torchaudio_unittest.common_utils import PytorchTestCase
 
 from .functional_impl import Functional, FunctionalCPUOnly
 

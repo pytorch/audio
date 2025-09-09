@@ -128,6 +128,7 @@ def generate_mixture(waveform_clean, waveform_noise, target_snr):
     waveform_noise *= 10 ** (-(target_snr - current_snr) / 20)
     return waveform_clean + waveform_noise
 
+
 # If you have mir_eval installed, you can use it to evaluate the separation quality of the estimated sources.
 # You can also evaluate the intelligibility of the speech with the Short-Time Objective Intelligibility (STOI) metric
 # available in the `pystoi` package, or the Perceptual Evaluation of Speech Quality (PESQ) metric available in the `pesq` package.

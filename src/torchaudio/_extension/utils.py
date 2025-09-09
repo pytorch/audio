@@ -4,14 +4,12 @@ The implementations here should be stateless.
 They should not depend on external state.
 Anything that depends on external state should happen in __init__.py
 """
-import importlib
 import logging
 import os
 import types
 from pathlib import Path
 
 import torch
-from torchaudio._internal.module_utils import eval_env
 
 _LG = logging.getLogger(__name__)
 _LIB_DIR = Path(__file__).parent.parent / "lib"

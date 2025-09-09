@@ -3,8 +3,8 @@ import warnings
 from typing import Optional
 
 import torch
-from torch import Tensor
 import torch.nn.functional as F
+from torch import Tensor
 
 from torchaudio._extension import _IS_TORCHAUDIO_EXT_AVAILABLE
 
@@ -955,19 +955,21 @@ class DifferentiableFIR(torch.autograd.Function):
         n_batch = x.size(0)
         n_channel = x.size(1)
         n_order = b_coeffs.size(1)
-        db = F.conv1d(
+        db = (
+            F.conv1d(
                 F.pad(x, (n_order - 1, 0)).view(1, n_batch * n_channel, -1),
                 dy.view(n_batch * n_channel, 1, -1),
-                groups=n_batch * n_channel
-            ).view(
-                n_batch, n_channel, -1
-            ).sum(0).flip(1) if b_coeffs.requires_grad else None
-        dx = F.conv1d(
-                F.pad(dy, (0, n_order - 1)),
-                b_coeffs.unsqueeze(1),
-                groups=n_channel
-            ) if x.requires_grad else None
+                groups=n_batch * n_channel,
+            )
+            .view(n_batch, n_channel, -1)
+            .sum(0)
+            .flip(1)
+            if b_coeffs.requires_grad
+            else None
+        )
+        dx = F.conv1d(F.pad(dy, (0, n_order - 1)), b_coeffs.unsqueeze(1), groups=n_channel) if x.requires_grad else None
         return (dx, db)
+
 
 class DifferentiableIIR(torch.autograd.Function):
     @staticmethod
@@ -976,11 +978,12 @@ class DifferentiableIIR(torch.autograd.Function):
         n_order = a_coeffs_normalized.size(1)
         n_sample_padded = n_sample + n_order - 1
 
-        a_coeff_flipped = a_coeffs_normalized.flip(1).contiguous();
-        padded_output_waveform = torch.zeros(n_batch, n_channel, n_sample_padded,
-            device=waveform.device, dtype=waveform.dtype)
+        a_coeff_flipped = a_coeffs_normalized.flip(1).contiguous()
+        padded_output_waveform = torch.zeros(
+            n_batch, n_channel, n_sample_padded, device=waveform.device, dtype=waveform.dtype
+        )
         _lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform)
-        output = padded_output_waveform[:,:,n_order - 1:]
+        output = padded_output_waveform[:, :, n_order - 1 :]
         ctx.save_for_backward(waveform, a_coeffs_normalized, output)
         return output
 
@@ -991,16 +994,23 @@ class DifferentiableIIR(torch.autograd.Function):
         n_order = a_coeffs_normalized.size(1)
         tmp = DifferentiableIIR.apply(dy.flip(2).contiguous(), a_coeffs_normalized).flip(2)
         dx = tmp if x.requires_grad else None
-        da = -(tmp.transpose(0, 1).reshape(n_channel, 1, -1) @
-                F.pad(y, (n_order - 1, 0)).unfold(2, n_order, 1).transpose(0,1)
-                .reshape(n_channel, -1, n_order)
-            ).squeeze(1).flip(1) if a_coeffs_normalized.requires_grad else None
+        da = (
+            -(
+                tmp.transpose(0, 1).reshape(n_channel, 1, -1)
+                @ F.pad(y, (n_order - 1, 0)).unfold(2, n_order, 1).transpose(0, 1).reshape(n_channel, -1, n_order)
+            )
+            .squeeze(1)
+            .flip(1)
+            if a_coeffs_normalized.requires_grad
+            else None
+        )
         return (dx, da)
 
+
 def _lfilter(waveform, a_coeffs, b_coeffs):
-    n_order = b_coeffs.size(1)
     filtered_waveform = DifferentiableFIR.apply(waveform, b_coeffs / a_coeffs[:, 0:1])
     return DifferentiableIIR.apply(filtered_waveform, a_coeffs / a_coeffs[:, 0:1])
+
 
 def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = True, batching: bool = True) -> Tensor:
     r"""Perform an IIR filter by evaluating difference equation, using differentiable implementation
@@ -1070,6 +1080,7 @@ def lfilter(waveform: Tensor, a_coeffs: Tensor, b_coeffs: Tensor, clamp: bool = 
     output = output.reshape(shape[:-1] + output.shape[-1:])
 
     return output
+
 
 def lowpass_biquad(waveform: Tensor, sample_rate: int, cutoff_freq: float, Q: float = 0.707) -> Tensor:
     r"""Design biquad lowpass filter and perform filtering.  Similar to SoX implementation.

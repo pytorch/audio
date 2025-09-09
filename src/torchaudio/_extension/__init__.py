@@ -4,7 +4,7 @@ import sys
 
 from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
 
-from .utils import _check_cuda_version, _init_dll_path, _LazyImporter, _load_lib
+from .utils import _check_cuda_version, _init_dll_path, _load_lib
 
 _LG = logging.getLogger(__name__)
 
@@ -41,7 +41,6 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _check_cuda_version()
     _IS_RIR_AVAILABLE = torchaudio.lib._torchaudio.is_rir_available()
     _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
-
 
 
 fail_if_no_rir = (

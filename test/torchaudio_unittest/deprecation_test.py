@@ -1,7 +1,5 @@
 import pytest
 
-import torch
-
 from torchaudio._internal.module_utils import UNSUPPORTED
 
 
