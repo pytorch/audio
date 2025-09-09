@@ -21,53 +21,49 @@ jobs:
         python-version: ['3.10']
         cuda-version: ['12.6']
         ffmpeg-version: ['7']
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      runner: linux.g5.4xlarge.nvidia.gpu
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.6"
-      steps:
-        - name: Setup env vars
-          run: |
-            cuda_version_without_periods=$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')
-            echo cuda_version_without_periods=${cuda_version_without_periods} >> $GITHUB_ENV
-            python_version_without_periods=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
-            echo python_version_without_periods=${python_version_without_periods} >> $GITHUB_ENV
-        - name: Setup miniconda using test-infra
-          uses: pytorch/test-infra/.github/actions/setup-miniconda@main
-          with:
-            python-version: ${{ matrix.python-version }}
-            # We install conda packages at the start because otherwise conda may have conflicts with dependencies.
-            default-packages: "conda-forge::ffmpeg=${{ matrix.ffmpeg-version }} cmake ninja"
-        - name: Check env
-          run: |
-            ${CONDA_RUN} env
-            ${CONDA_RUN} conda info
-            ${CONDA_RUN} nvidia-smi
-            ${CONDA_RUN} conda list
-        - name: Assert ffmpeg exists
-          run: |
-            ${CONDA_RUN} ffmpeg -buildconf
-        - name: Update pip
-          run: ${CONDA_RUN} python -m pip install --upgrade pip
-        - name: Install PyTorch
-          run: |
-            ${CONDA_RUN} python -m pip install --pre torch torchcodec --index-url https://download.pytorch.org/whl/nightly/cu${{ env.cuda_version_without_periods }}
-            ${CONDA_RUN} python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
-        - name: Check out repo
-          uses: actions/checkout@v3
-        - name: Install torchaudio
-          run: |
-            ${CONDA_RUN} python -m pip install . -v --no-build-isolation
-        - name: Install doc dependencies
-          run: |
-            cd docs
-            ${CONDA_RUN} python -m pip install -r requirements.txt -r requirements-tutorials.txt
-        - name: Build docs
-          run: |
-            cd docs
-            ${CONDA_RUN} make html
-        - uses: actions/upload-artifact@v4
-          with:
-            name: Built-Docs
-            path: docs/build/html/
+    runs-on: linux.g5.4xlarge.nvidia.gpu
+    steps:
+      - name: Setup env vars
+        run: |
+          cuda_version_without_periods=$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')
+          echo cuda_version_without_periods=${cuda_version_without_periods} >> $GITHUB_ENV
+          python_version_without_periods=$(echo "${{ matrix.python-version }}" | sed 's/\.//g')
+          echo python_version_without_periods=${python_version_without_periods} >> $GITHUB_ENV
+      - name: Setup miniconda using test-infra
+        uses: pytorch/test-infra/.github/actions/setup-miniconda@main
+        with:
+          python-version: ${{ matrix.python-version }}
+          # We install conda packages at the start because otherwise conda may have conflicts with dependencies.
+          default-packages: "nvidia/label/cuda-${{ matrix.cuda-version }}.0::libnpp nvidia::cuda-nvrtc=${{ matrix.cuda-version }} nvidia::cuda-toolkit=${{ matrix.cuda-version }} nvidia::cuda-cudart=${{ matrix.cuda-version }} nvidia::cuda-driver-dev=${{ matrix.cuda-version }} conda-forge::ffmpeg=${{ matrix.ffmpeg-version }} cmake ninja"
+      - name: Check env
+        run: |
+          ${CONDA_RUN} env
+          ${CONDA_RUN} conda info
+          ${CONDA_RUN} nvidia-smi
+          ${CONDA_RUN} conda list
+      - name: Assert ffmpeg exists
+        run: |
+          ${CONDA_RUN} ffmpeg -buildconf
+      - name: Update pip
+        run: ${CONDA_RUN} python -m pip install --upgrade pip
+      - name: Install PyTorch
+        run: |
+          ${CONDA_RUN} python -m pip install --pre torch torchcodec --index-url https://download.pytorch.org/whl/nightly/cu${{ env.cuda_version_without_periods }}
+          ${CONDA_RUN} python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Install torchaudio
+        run: |
+          ${CONDA_RUN} python -m pip install . -v --no-build-isolation
+      - name: Install doc dependencies
+        run: |
+          cd docs
+          ${CONDA_RUN} python -m pip install -r requirements.txt -r requirements-tutorials.txt
+      - name: Build docs
+        run: |
+          cd docs
+          ${CONDA_RUN} make html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Built-Docs
+          path: docs/build/html/
