@@ -38,13 +38,10 @@ jobs:
       test-infra-repository: pytorch/test-infra
       test-infra-ref: main
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
-      pre-script: packaging/pre_build_script.sh
-      post-script: packaging/post_build_script.sh
-      smoke-test-script: packaging/fake_smoke_test.py
       package-name: torchaudio
       trigger-event: ${{ github.event_name }}
       build-platform: "python-build-package"
-      build-command: "BUILD_AGAINST_ALL_FFMPEG_FROM_S3=1 ENABLE_CUDA=1 python -m build --wheel -vvv --no-isolation"
+      build-command: "python -m build --wheel -vvv --no-isolation"
 
   build-docs:
     runs-on: linux.4xlarge.nvidia.gpu
