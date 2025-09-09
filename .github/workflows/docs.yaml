@@ -48,7 +48,7 @@ jobs:
         echo "::group::Create conda env"
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
-        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION} nvidia/label/cuda-${{ matrix.cuda-version }}.0::libnpp nvidia::cuda-nvrtc=${{ matrix.cuda-version }} nvidia::cuda-toolkit=${{ matrix.cuda-version }} nvidia::cuda-cudart=${{ matrix.cuda-version }} nvidia::cuda-driver-dev=${{ matrix.cuda-version }} conda-forge::ffmpeg=${{ matrix.ffmpeg-version }} cmake ninja"
+        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}" ffmpeg=7 cmake ninja
         conda activate ./ci_env
         conda info
 
