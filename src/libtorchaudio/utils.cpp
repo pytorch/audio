@@ -5,6 +5,11 @@
 #include <cuda.h>
 #endif
 
+// Include of tensor.h defines the implementation of
+// torch::stable::scalar_type function. No other source file should
+// include torch/csrc/stable/tensor.h!
+#include <torch/csrc/stable/tensor.h>
+
 namespace torchaudio {
 
 bool is_rir_available() {
