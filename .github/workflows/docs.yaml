@@ -10,12 +10,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  tests:
+  build:
     strategy:
       matrix:
         # TODO add up to 3.13
         python_version: ["3.10"]
-        cuda_arch_version: ["12.6"]
+        cuda-version: ["12.6"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:
@@ -25,8 +25,10 @@ jobs:
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
-      gpu-arch-version: ${{ matrix.cuda_arch_version }}
+      gpu-arch-version: ${{ matrix.cuda-version }}
       timeout: 120
+      job-name: docs
+      run-with-docker: false
 
       script: |
         set -ex
@@ -34,8 +36,8 @@ jobs:
         export PYTHON_VERSION="${{ matrix.python_version }}"
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
-        export CU_VERSION="${{ matrix.cuda_arch_version }}"
-        export CU_VERSION_WITHOUT_PERIODS="$(echo "${{ matrix.cuda_arch_version }}" | sed 's/\.//g')"
+        export CU_VERSION="${{ matrix.cuda-version }}"
+        export CU_VERSION_WITHOUT_PERIODS="$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')"
         # Set UPLOAD_CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
           export UPLOAD_CHANNEL=test
