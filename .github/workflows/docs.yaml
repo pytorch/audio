@@ -35,6 +35,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           # We install conda packages at the start because otherwise conda may have conflicts with dependencies.
           default-packages: "nvidia/label/cuda-${{ matrix.cuda-version }}.0::libnpp nvidia::cuda-nvrtc=${{ matrix.cuda-version }} nvidia::cuda-toolkit=${{ matrix.cuda-version }} nvidia::cuda-cudart=${{ matrix.cuda-version }} nvidia::cuda-driver-dev=${{ matrix.cuda-version }} conda-forge::ffmpeg=${{ matrix.ffmpeg-version }} cmake ninja"
+      - uses: pytorch/test-infra/.github/actions/setup-binary-builds@main
+        with:
+          setup-miniconda: false
+          python-version: ${{ matrix.python-version }}
+          cuda-version: ${{ matrix.cuda-version }}
       - name: Check env
         run: |
           ${CONDA_RUN} env
