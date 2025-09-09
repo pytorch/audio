@@ -7,11 +7,11 @@ from torchaudio_unittest.common_utils import (
     get_asset_path,
     get_whitenoise,
     load_wav,
+    RequestMixin,
     save_wav,
     sox_utils,
     TempDirMixin,
     TorchaudioTestCase,
-    RequestMixin
 )
 
 

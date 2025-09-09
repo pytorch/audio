@@ -26,7 +26,6 @@ print(torchaudio.__version__)
 import math
 import timeit
 
-import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from IPython.display import Audio
 import numpy as np
@@ -427,7 +426,7 @@ def plot(data, cols, rows):
     x_data = np.arange(len(rows))
     bar_width = 0.8 / len(cols)
     for (i, (c, d)) in enumerate(zip(cols, data.T)):
-        x_pos = x_data + (i - len(cols)/2 + 0.5) * bar_width
+        x_pos = x_data + (i - len(cols) / 2 + 0.5) * bar_width
         ax.bar(x_pos, d, bar_width, label=c)
     ax.legend()
     ax.set_xticks(x_data)

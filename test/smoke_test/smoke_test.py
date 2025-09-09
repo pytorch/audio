@@ -13,6 +13,7 @@ def base_smoke_test():
     import torchaudio.transforms  # noqa: F401
     import torchaudio.utils  # noqa: F401
 
+
 def _run_smoke_test():
     base_smoke_test()
     print("Smoke test passed.")

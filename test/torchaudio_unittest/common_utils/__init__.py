@@ -1,3 +1,5 @@
+import pytest
+
 from .autograd_utils import use_deterministic_algorithms
 from .case_utils import (
     disabledInCI,
@@ -26,7 +28,7 @@ from .data_utils import get_asset_path, get_sinusoid, get_spectrogram, get_white
 from .func_utils import torch_script
 from .parameterized_utils import load_params, nested_params
 from .wav_utils import get_wav_data, load_wav, normalize_wav, save_wav
-import pytest
+
 
 class RequestMixin:
     """
@@ -38,6 +40,7 @@ class RequestMixin:
     @pytest.fixture(autouse=True)
     def inject_request(self, request):
         self.request = request.node.nodeid.replace(":", "_").replace("_cpu_", "_").replace("_cuda_", "_")
+
 
 __all__ = [
     "get_asset_path",

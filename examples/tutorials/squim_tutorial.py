@@ -284,8 +284,8 @@ print(f"SI-SDR: {si_sdr_hyp[0]}\n")
 # ```
 # These values are precomputed and hard-coded below.
 print(f"Reference metrics for distorted speech at {snr_dbs[0]}dB are\n")
-print(f"STOI: 0.9670831113894452")
-print(f"PESQ: 2.7961528301239014")
+print("STOI: 0.9670831113894452")
+print("PESQ: 2.7961528301239014")
 si_sdr_ref = si_snr(WAVEFORM_DISTORTED[0:1], WAVEFORM_SPEECH)
 print(f"SI-SDR: {si_sdr_ref}")
 
@@ -304,8 +304,8 @@ print(f"SI-SDR: {si_sdr_hyp[0]}\n")
 si_sdr_ref = si_snr(WAVEFORM_DISTORTED[1:2], WAVEFORM_SPEECH)
 # STOI and PESQ metrics are precomputed and hardcoded below.
 print(f"Reference metrics for distorted speech at {snr_dbs[1]}dB are\n")
-print(f"STOI: 0.5743247866630554")
-print(f"PESQ: 1.1112866401672363")
+print("STOI: 0.5743247866630554")
+print("PESQ: 1.1112866401672363")
 print(f"SI-SDR: {si_sdr_ref}")
 
 

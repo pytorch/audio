@@ -135,8 +135,8 @@ class CMakeBuild(build_ext):
 
             python_version = sys.version_info
 
-            cxx_compiler = os.environ.get('CXX', 'cl')
-            c_compiler = os.environ.get('CC', 'cl')
+            cxx_compiler = os.environ.get("CXX", "cl")
+            c_compiler = os.environ.get("CC", "cl")
 
             cmake_args += [
                 f"-DCMAKE_C_COMPILER={c_compiler}",
