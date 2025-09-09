@@ -52,12 +52,9 @@ jobs:
           ${CONDA_RUN} python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
       - name: Check out repo
         uses: actions/checkout@v3
-      - name: Build and install torchaudio
+      - name: Install torchaudio
         run: |
-          python -m build --wheel -vvv --no-isolation
-          wheel_path=`find pytorch/audio/dist -type f -name "*cu${{ env.cuda_version_without_periods }}-cp${{ env.python_version_without_periods }}*.whl"`
-          echo Installing $wheel_path
-          ${CONDA_RUN} python -m pip install $wheel_path -vvv
+          ${CONDA_RUN} python -m pip install . -v --no-build-isolation
       - name: Install doc dependencies
         run: |
           cd docs
