@@ -36,6 +36,7 @@ SAMPLE_WAV_SPEECH_PATH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-s
 def _get_sample(path):
     return torchaudio.load(path)
 
+
 def get_speech_sample():
     return _get_sample(SAMPLE_WAV_SPEECH_PATH)
 

@@ -1,9 +1,9 @@
+import shutil
 import subprocess
 import sys
 import warnings
-import shutil
 from pathlib import Path
-import os
+
 
 def get_encoding(dtype):
     encodings = {

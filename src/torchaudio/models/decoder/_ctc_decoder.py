@@ -69,7 +69,7 @@ def _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word):
 
     if lexicon and word_dict is None:
         word_dict = _create_word_dict(lexicon)
-    elif not lexicon and word_dict is None and type(lm) == str:
+    elif not lexicon and word_dict is None and type(lm) is str:
         d = {tokens_dict.get_entry(i): [[tokens_dict.get_entry(i)]] for i in range(tokens_dict.index_size())}
         d[unk_word] = [[unk_word]]
         word_dict = _create_word_dict(d)
@@ -499,7 +499,7 @@ def ctc_decoder(
     # construct word dict and language model
     word_dict = _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word)
 
-    if type(lm) == str:
+    if type(lm) is str:
         if _KenLM is None:
             raise RuntimeError(
                 "flashlight-text is installed, but KenLM is not installed. "

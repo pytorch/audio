@@ -1,7 +1,7 @@
 import importlib.util
 import os
 import warnings
-from functools import wraps, partial
+from functools import partial, wraps
 from typing import Optional
 
 
@@ -59,7 +59,9 @@ def requires_module(*modules: str):
 
     return decorator
 
+
 UNSUPPORTED = []
+
 
 def wrap_deprecated(func, name, direction: str, version: Optional[str] = None, remove: bool = False):
     @wraps(func)
@@ -69,7 +71,9 @@ def wrap_deprecated(func, name, direction: str, version: Optional[str] = None, r
             message += f' It will be removed from {"a future" if version is None else "the " + str(version)} release. '
         warnings.warn(message, stacklevel=2)
         return func(*args, **kwargs)
+
     return wrapped
+
 
 def deprecated(direction: str, version: Optional[str] = None, remove: bool = False):
     """Decorator to add deprecation message
@@ -101,6 +105,7 @@ def deprecated(direction: str, version: Optional[str] = None, remove: bool = Fal
 
     return decorator
 
+
 DEPRECATION_MSG = (
     "This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. "
     "Please see https://github.com/pytorch/audio/issues/3902 for more information."
@@ -108,11 +113,13 @@ DEPRECATION_MSG = (
 
 IO_DEPRECATION_MSG = (
     "This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. "
-    "The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. "
+    "The decoding and encoding capabilities of PyTorch for both audio"
+    " and video are being consolidated into TorchCodec. "
     "Please see https://github.com/pytorch/audio/issues/3902 for more information."
 )
 
 dropping_support = deprecated(DEPRECATION_MSG, version="2.9", remove=True)
+
 
 def dropping_class_support(c, msg=DEPRECATION_MSG):
     c.__init__ = wrap_deprecated(c.__init__, f"{c.__module__}.{c.__name__}", msg, version="2.9", remove=True)
@@ -128,6 +135,7 @@ def dropping_class_support(c, msg=DEPRECATION_MSG):
     UNSUPPORTED.append(c)
     return c
 
+
 def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
     c.__doc__ = f"""[DEPRECATED]
 
@@ -139,9 +147,11 @@ def dropping_const_support(c, msg=DEPRECATION_MSG, name=None):
     """
     return c
 
+
 dropping_class_io_support = partial(dropping_class_support, msg=IO_DEPRECATION_MSG)
 
 dropping_io_support = deprecated(IO_DEPRECATION_MSG, version="2.9", remove=True)
+
 
 def fail_with_message(message):
     """Generate decorator to give users message about missing TorchAudio extension."""

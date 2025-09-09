@@ -181,7 +181,7 @@ def cuda_ctc_decoder(
         >>> )
         >>> results = decoder(log_probs, encoder_out_lens) # List of shape (B, nbest) of Hypotheses
     """
-    if type(tokens) == str:
+    if type(tokens) is str:
         tokens = _get_vocab_list(tokens)
 
     return CUCTCDecoder(vocab_list=tokens, beam_size=beam_size, nbest=nbest, blank_skip_threshold=blank_skip_threshold)

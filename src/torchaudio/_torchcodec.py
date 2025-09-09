@@ -81,43 +81,34 @@ def load_with_torchcodec(
         from torchcodec.decoders import AudioDecoder
     except ImportError as e:
         raise ImportError(
-            "TorchCodec is required for load_with_torchcodec. "
-            "Please install torchcodec to use this function."
+            "TorchCodec is required for load_with_torchcodec. " "Please install torchcodec to use this function."
         ) from e
 
     # Parameter validation and warnings
     if not normalize:
         import warnings
+
         warnings.warn(
             "TorchCodec AudioDecoder always returns normalized float32 samples. "
             "The 'normalize=False' parameter is ignored.",
             UserWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
     if buffer_size != 4096:
         import warnings
-        warnings.warn(
-            "The 'buffer_size' parameter is not used by TorchCodec AudioDecoder.",
-            UserWarning,
-            stacklevel=2
-        )
+
+        warnings.warn("The 'buffer_size' parameter is not used by TorchCodec AudioDecoder.", UserWarning, stacklevel=2)
 
     if backend is not None:
         import warnings
-        warnings.warn(
-            "The 'backend' parameter is not used by TorchCodec AudioDecoder.",
-            UserWarning,
-            stacklevel=2
-        )
+
+        warnings.warn("The 'backend' parameter is not used by TorchCodec AudioDecoder.", UserWarning, stacklevel=2)
 
     if format is not None:
         import warnings
-        warnings.warn(
-            "The 'format' parameter is not supported by TorchCodec AudioDecoder.",
-            UserWarning,
-            stacklevel=2
-        )
+
+        warnings.warn("The 'format' parameter is not supported by TorchCodec AudioDecoder.", UserWarning, stacklevel=2)
 
     # Create AudioDecoder
     try:
@@ -253,51 +244,45 @@ def save_with_torchcodec(
         from torchcodec.encoders import AudioEncoder
     except ImportError as e:
         raise ImportError(
-            "TorchCodec is required for save_with_torchcodec. "
-            "Please install torchcodec to use this function."
+            "TorchCodec is required for save_with_torchcodec. " "Please install torchcodec to use this function."
         ) from e
 
     # Parameter validation and warnings
     if format is not None:
         import warnings
+
         warnings.warn(
             "The 'format' parameter is not used by TorchCodec AudioEncoder. "
             "Format is determined by the file extension.",
             UserWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
     if encoding is not None:
         import warnings
+
         warnings.warn(
-            "The 'encoding' parameter is not fully supported by TorchCodec AudioEncoder.",
-            UserWarning,
-            stacklevel=2
+            "The 'encoding' parameter is not fully supported by TorchCodec AudioEncoder.", UserWarning, stacklevel=2
         )
 
     if bits_per_sample is not None:
         import warnings
+
         warnings.warn(
             "The 'bits_per_sample' parameter is not directly supported by TorchCodec AudioEncoder.",
             UserWarning,
-            stacklevel=2
+            stacklevel=2,
         )
 
     if buffer_size != 4096:
         import warnings
-        warnings.warn(
-            "The 'buffer_size' parameter is not used by TorchCodec AudioEncoder.",
-            UserWarning,
-            stacklevel=2
-        )
+
+        warnings.warn("The 'buffer_size' parameter is not used by TorchCodec AudioEncoder.", UserWarning, stacklevel=2)
 
     if backend is not None:
         import warnings
-        warnings.warn(
-            "The 'backend' parameter is not used by TorchCodec AudioEncoder.",
-            UserWarning,
-            stacklevel=2
-        )
+
+        warnings.warn("The 'backend' parameter is not used by TorchCodec AudioEncoder.", UserWarning, stacklevel=2)
 
     # Input validation
     if not isinstance(src, torch.Tensor):
@@ -338,11 +323,12 @@ def save_with_torchcodec(
             bit_rate = int(compression)
         else:
             import warnings
+
             warnings.warn(
                 f"Unsupported compression type {type(compression)}. "
                 "TorchCodec AudioEncoder expects int or float for bit_rate.",
                 UserWarning,
-                stacklevel=2
+                stacklevel=2,
             )
 
     # Save to file

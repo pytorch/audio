@@ -6,7 +6,7 @@ import torch
 def torch_script(obj):
     """TorchScript the given function or Module"""
     buffer = io.BytesIO()
-    if hasattr(obj, '__wrapped__'):
+    if hasattr(obj, "__wrapped__"):
         # This is hack for those functions which are deprecated with decorators
         # like @deprecated or @dropping_support. Adding the decorators breaks
         # TorchScript. We need to unwrap the function to get the original one,

@@ -1,17 +1,12 @@
-import unittest
-from distutils.version import StrictVersion
+import librosa_mock
+import numpy as np
 
 import torch
 import torchaudio.functional as F
 from parameterized import param
-from torchaudio._internal.module_utils import is_module_available
 
-import librosa_mock
-import numpy as np
-import pytest
+from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, RequestMixin, TestBaseMixin
 
-
-from torchaudio_unittest.common_utils import get_spectrogram, get_whitenoise, nested_params, TestBaseMixin, RequestMixin
 
 class Functional(TestBaseMixin, RequestMixin):
     """Test suite for functions in `functional` module."""
@@ -79,7 +74,13 @@ class Functional(TestBaseMixin, RequestMixin):
 
         expected = librosa_mock.mel(
             self.request,
-            sr=sample_rate, n_fft=n_fft, n_mels=n_mels, fmax=fmax, fmin=fmin, htk=mel_scale == "htk", norm=norm
+            sr=sample_rate,
+            n_fft=n_fft,
+            n_mels=n_mels,
+            fmax=fmax,
+            fmin=fmin,
+            htk=mel_scale == "htk",
+            norm=norm,
         ).T
         result = F.melscale_fbanks(
             sample_rate=sample_rate,
@@ -126,13 +127,17 @@ class FunctionalComplex(TestBaseMixin, RequestMixin):
         # Due to cummulative sum, numerical error in using torch.float32 will
         # result in bottom right values of the stretched sectrogram to not
         # match with librosa.
-        spec = torch.randn(num_freq, num_frames, dtype=torch.complex128).to(self.device,)
+        spec = torch.randn(num_freq, num_frames, dtype=torch.complex128).to(
+            self.device,
+        )
         phase_advance = torch.linspace(0, np.pi * hop_length, num_freq, device=self.device, dtype=torch.float64)[
             ..., None
         ]
 
         stretched = F.phase_vocoder(spec, rate=rate, phase_advance=phase_advance)
 
-        expected_stretched = librosa_mock.phase_vocoder(self.request, spec.cpu().numpy(), rate=rate, hop_length=hop_length)
+        expected_stretched = librosa_mock.phase_vocoder(
+            self.request, spec.cpu().numpy(), rate=rate, hop_length=hop_length
+        )
 
         self.assertEqual(stretched, torch.from_numpy(expected_stretched))

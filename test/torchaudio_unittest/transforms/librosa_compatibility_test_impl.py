@@ -1,12 +1,17 @@
-import unittest
+import librosa_mock
 
 import torch
 import torchaudio.transforms as T
 from parameterized import param, parameterized
-from torchaudio._internal.module_utils import is_module_available
-from torchaudio_unittest.common_utils import get_sinusoid, get_spectrogram, get_whitenoise, nested_params, TestBaseMixin, RequestMixin
-import librosa_mock
-import pytest
+from torchaudio_unittest.common_utils import (
+    get_sinusoid,
+    get_spectrogram,
+    get_whitenoise,
+    nested_params,
+    RequestMixin,
+    TestBaseMixin,
+)
+
 
 class TransformsTestBase(TestBaseMixin, RequestMixin):
     @parameterized.expand(
@@ -26,7 +31,11 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
 
         expected = librosa_mock.spectrogram(
             self.request,
-            y=waveform[0].cpu().numpy(), n_fft=n_fft, hop_length=hop_length, power=power, pad_mode="reflect"
+            y=waveform[0].cpu().numpy(),
+            n_fft=n_fft,
+            hop_length=hop_length,
+            power=power,
+            pad_mode="reflect",
         )[0]
 
         result = T.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=power,).to(self.device, self.dtype)(
@@ -44,8 +53,7 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
         ).to(self.device, self.dtype)
 
         expected = librosa_mock.spectrogram(
-            self.request,
-            y=waveform[0].cpu().numpy(), n_fft=n_fft, hop_length=hop_length, power=1, pad_mode="reflect"
+            self.request, y=waveform[0].cpu().numpy(), n_fft=n_fft, hop_length=hop_length, power=1, pad_mode="reflect"
         )[0]
 
         result = T.Spectrogram(n_fft=n_fft, hop_length=hop_length, power=None, return_complex=True,).to(
@@ -121,13 +129,7 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
         ).to(self.device, self.dtype)(waveform)[0]
 
         expected = librosa_mock.mfcc_from_waveform(
-            f"{self.request}",
-            waveform,
-            sample_rate,
-            n_fft,
-            hop_length,
-            n_mels,
-            n_mfcc
+            f"{self.request}", waveform, sample_rate, n_fft, hop_length, n_mels, n_mfcc
         )
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-4, rtol=1e-5)
 
@@ -147,6 +149,10 @@ class TransformsTestBase(TestBaseMixin, RequestMixin):
         )(waveform)
         expected = librosa_mock.spectral_centroid(
             self.request,
-            y=waveform[0].cpu().numpy(), sr=sample_rate, n_fft=n_fft, hop_length=hop_length, pad_mode="reflect"
+            y=waveform[0].cpu().numpy(),
+            sr=sample_rate,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            pad_mode="reflect",
         )
         self.assertEqual(result, torch.from_numpy(expected), atol=5e-4, rtol=1e-5)
