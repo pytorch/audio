@@ -22,6 +22,8 @@ jobs:
         cuda-version: ['12.6']
         ffmpeg-version: ['7']
     runs-on: linux.g5.4xlarge.nvidia.gpu
+    env:
+      REPOSITORY: pytorch/audio
     steps:
       - name: Setup env vars
         run: |
