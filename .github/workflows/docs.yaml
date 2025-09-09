@@ -34,7 +34,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           # We install conda packages at the start because otherwise conda may have conflicts with dependencies.
-          default-packages: "conda-forge::ffmpeg=${{ matrix.ffmpeg-version }}"
+          default-packages: "conda-forge::ffmpeg=${{ matrix.ffmpeg-version }} cmake ninja"
       - name: Check env
         run: |
           ${CONDA_RUN} env
