@@ -16,10 +16,8 @@ defaults:
 jobs:
   build-docs:
     runs-on: linux.g5.4xlarge.nvidia.gpu
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-    with:
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.6"
+    gpu-arch-type: cuda
+    gpu-arch-version: "12.6"
     strategy:
       fail-fast: false
       matrix:
