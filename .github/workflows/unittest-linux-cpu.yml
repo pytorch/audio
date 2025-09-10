@@ -46,9 +46,10 @@ jobs:
         echo "::group::Create conda env"
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
-        conda create -c conda-forge --strict-channel-priority -y --prefix ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja pybind11
-        conda activate ./ci_env
+        conda create -c conda-forge --strict-channel-priority -y -n ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
+        conda activate ci_env
         conda info
+        conda list
         python -m pip install --upgrade pip
         echo "::endgroup::"
 
