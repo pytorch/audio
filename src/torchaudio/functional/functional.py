@@ -1734,33 +1734,14 @@ class RnntLoss(torch.autograd.Function):
         return (result, None, None, None, None, None, None, None)
 
     @staticmethod
-    def ts_apply(
-            logits,
-            targets,
-            logit_lengths,
-            target_lengths,
-            blank: int,
-            clamp: float,
-            fused_log_softmax: bool):
+    def ts_apply(logits, targets, logit_lengths, target_lengths, blank: int, clamp: float, fused_log_softmax: bool):
         if torch.jit.is_scripting():
             output, saved = torch.ops.torchaudio.rnnt_loss_forward(
-                logits,
-                targets,
-                logit_lengths,
-                target_lengths,
-                blank,
-                clamp,
-                fused_log_softmax)
+                logits, targets, logit_lengths, target_lengths, blank, clamp, fused_log_softmax
+            )
             return output
         else:
-            return RnntLoss.apply(
-                logits,
-                targets,
-                logit_lengths,
-                target_lengths,
-                blank,
-                clamp,
-                fused_log_softmax)
+            return RnntLoss.apply(logits, targets, logit_lengths, target_lengths, blank, clamp, fused_log_softmax)
 
 
 def rnnt_loss(
