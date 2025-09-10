@@ -1,16 +1,16 @@
 name: Unit-tests on Linux CPU
 
 on:
-    pull_request:
-    push:
-        branches:
-            - nightly
-            - main
-            - release/*
-    workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
 
 jobs:
-  build:
+  tests:
     strategy:
       matrix:
         python-version: ["3.11"]
@@ -21,12 +21,12 @@ jobs:
       id-token: write
       contents: read
     with:
-      runner: linux.4xlarge.nvidia.gpu
+      runner: linux.12xlarge
       repository: pytorch/audio
       gpu-arch-type: cpu
       gpu-arch-version:
       timeout: 120
-      job-name: test
+      job-name: linux-cpu
 
       script: |
         set -ex
