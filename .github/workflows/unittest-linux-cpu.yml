@@ -62,6 +62,8 @@ jobs:
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
         python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
         python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
+        ls -la /opt/conda/envs/ci_env/lib/python3.11/site-packages/torchcodec/
+        ldd /opt/conda/envs/ci_env/lib/python3.11/site-packages/torchcodec/libtorchcodec_core7.so
         python -c 'import torchcodec; print(f"{torchcodec.__version__}"); print(f"{torchcodec.__file__}")'
         echo "::endgroup::"
 
