@@ -957,18 +957,19 @@ class DifferentiableFIR(torch.autograd.Function):
         n_channel = x.size(1)
         n_order = b_coeffs.size(1)
 
-        db = F.conv1d(
-            F.pad(x, (n_order - 1, 0)).view(1, n_batch * n_channel, -1),
-            dy.view(n_batch * n_channel, 1, -1),
-            groups=n_batch * n_channel
-        ).view(
-            n_batch, n_channel, -1
-        ).sum(0).flip(1) if b_coeffs.requires_grad else None
-        dx = F.conv1d(
-            F.pad(dy, (0, n_order - 1)),
-            b_coeffs.unsqueeze(1),
-            groups=n_channel
-        ) if x.requires_grad else None
+        db = (
+            F.conv1d(
+                F.pad(x, (n_order - 1, 0)).view(1, n_batch * n_channel, -1),
+                dy.view(n_batch * n_channel, 1, -1),
+                groups=n_batch * n_channel,
+            )
+            .view(n_batch, n_channel, -1)
+            .sum(0)
+            .flip(1)
+            if b_coeffs.requires_grad
+            else None
+        )
+        dx = F.conv1d(F.pad(dy, (0, n_order - 1)), b_coeffs.unsqueeze(1), groups=n_channel) if x.requires_grad else None
         return (dx, db)
 
     @staticmethod
