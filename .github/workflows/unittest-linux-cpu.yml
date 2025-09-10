@@ -21,7 +21,7 @@ jobs:
       id-token: write
       contents: read
     with:
-      runner: linux.g5.4xlarge.nvidia.gpu
+      runner: linux.12xlarge
       repository: pytorch/audio
       gpu-arch-type: cpu
       gpu-arch-version:
@@ -50,6 +50,7 @@ jobs:
         conda activate ci_env
         conda info
         conda list
+        ffmpeg -version
         python -m pip install --upgrade pip
         echo "::endgroup::"
 
