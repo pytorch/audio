@@ -58,7 +58,7 @@ jobs:
 
         echo "::group::Install PyTorch and TorchCodec"
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
-        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -m pip install --pre torch=2.9 torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
         python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
         echo "::endgroup::"
 
