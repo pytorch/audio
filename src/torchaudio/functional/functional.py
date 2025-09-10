@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import math
-import tempfile
 import warnings
 from collections.abc import Sequence
 from typing import List, Optional, Tuple, Union
@@ -9,8 +8,7 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torchaudio
 from torch import Tensor
-from torchaudio._internal.module_utils import deprecated, dropping_support
-
+from torchaudio._internal.module_utils import dropping_support
 
 from .filtering import highpass_biquad, treble_biquad
 
@@ -1719,6 +1717,7 @@ def _fix_waveform_shape(
     waveform_shift = waveform_shift.view(shape[:-1] + waveform_shift.shape[-1:])
     return waveform_shift
 
+
 class RnntLoss(torch.autograd.Function):
     @staticmethod
     def forward(ctx, *args):
@@ -1730,8 +1729,9 @@ class RnntLoss(torch.autograd.Function):
     def backward(ctx, dy):
         grad = ctx.saved_tensors[0]
         grad_out = dy.view((-1, 1, 1, 1))
-        result = grad * grad_out;
+        result = grad * grad_out
         return (result, None, None, None, None, None, None, None)
+
 
 def _rnnt_loss(
     logits: Tensor,
@@ -1775,15 +1775,7 @@ def _rnnt_loss(
     if blank < 0:  # reinterpret blank index if blank < 0.
         blank = logits.shape[-1] + blank
 
-    costs = RnntLoss.apply(
-        logits,
-        targets,
-        logit_lengths,
-        target_lengths,
-        blank,
-        clamp,
-        fused_log_softmax
-    )
+    costs = RnntLoss.apply(logits, targets, logit_lengths, target_lengths, blank, clamp, fused_log_softmax)
 
     if reduction == "mean":
         return costs.mean()
@@ -1837,9 +1829,11 @@ def psd(
     psd = psd.sum(dim=-3)
     return psd
 
+
 # Expose both deprecated wrapper as well as original because torchscript breaks on
 # wrapped functions.
 rnnt_loss = dropping_support(_rnnt_loss)
+
 
 def _compute_mat_trace(input: torch.Tensor, dim1: int = -1, dim2: int = -2) -> torch.Tensor:
     r"""Compute the trace of a Tensor along ``dim1`` and ``dim2`` dimensions.

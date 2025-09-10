@@ -1,7 +1,7 @@
-import re
-import os
 from pathlib import Path
+
 import torch
+
 
 def mock_function(f):
     """
@@ -12,6 +12,7 @@ def mock_function(f):
     """
     this_file = Path(__file__).parent.resolve()
     expected_results_folder = this_file / "torchaudio_unittest" / "assets" / "librosa_expected_results"
+
     def wrapper(request, *args, **kwargs):
         mocked_results = expected_results_folder / f"{request}.pt"
         return torch.load(mocked_results, weights_only=False)
@@ -25,7 +26,9 @@ def mock_function(f):
         #     mocked_results.parent.mkdir(parents=True, exist_ok=True)
         #     torch.save(result, mocked_results)
         # return result
+
     return wrapper
+
 
 griffinlim = mock_function("librosa.griffinlim")
 
@@ -41,8 +44,10 @@ spectrogram = mock_function("librosa.core.spectrum._spectrogram")
 
 mel_spectrogram = mock_function("librosa.feature.melspectrogram")
 
+
 def _mfcc_from_waveform(waveform, sample_rate, n_fft, hop_length, n_mels, n_mfcc):
     import librosa
+
     melspec = librosa.feature.melspectrogram(
         y=waveform[0].cpu().numpy(),
         sr=sample_rate,
@@ -55,6 +60,7 @@ def _mfcc_from_waveform(waveform, sample_rate, n_fft, hop_length, n_mels, n_mfcc
         pad_mode="reflect",
     )
     return librosa.feature.mfcc(S=librosa.core.power_to_db(melspec), n_mfcc=n_mfcc, dct_type=2, norm="ortho")
+
 
 mfcc_from_waveform = mock_function("_mfcc_from_waveform")
 

@@ -267,4 +267,3 @@ if(HIP_FOUND)
     set(roctracer_INCLUDE_DIRS ${ROCTRACER_PATH}/include)
   endif() 
 endif()
-

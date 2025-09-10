@@ -1,5 +1,7 @@
-from torchaudio._internal.module_utils import dropping_support, dropping_class_support
 import inspect
+
+from torchaudio._internal.module_utils import dropping_class_support, dropping_support
+
 _CTC_DECODERS = [
     "CTCHypothesis",
     "CTCDecoder",
@@ -39,14 +41,12 @@ def __getattr__(name: str):
         # following if-else block with
         #  item = getattr(_cuda_ctc_decoder, name)
         orig_item = getattr(_cuda_ctc_decoder, name)
-        if (
-                inspect.isclass(orig_item)
-                or (
-                    # workaround a failure to detect type instances
-                    # after sphinx autodoc mocking, required for
-                    # building docs
-                    getattr(orig_item, "__sphinx_mock__", False) and inspect.isclass(orig_item.__class__)
-                )
+        if inspect.isclass(orig_item) or (
+            # workaround a failure to detect type instances
+            # after sphinx autodoc mocking, required for
+            # building docs
+            getattr(orig_item, "__sphinx_mock__", False)
+            and inspect.isclass(orig_item.__class__)
         ):
             item = dropping_class_support(orig_item)
         else:

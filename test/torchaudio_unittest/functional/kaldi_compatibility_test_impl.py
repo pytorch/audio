@@ -1,6 +1,6 @@
 import torch
 import torchaudio.functional as F
-from torchaudio_unittest.common_utils import TempDirMixin, TestBaseMixin, RequestMixin
+from torchaudio_unittest.common_utils import RequestMixin, TempDirMixin, TestBaseMixin
 from torchaudio_unittest.common_utils.kaldi_utils import convert_args, run_kaldi
 
 

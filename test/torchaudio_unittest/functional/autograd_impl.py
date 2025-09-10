@@ -419,7 +419,7 @@ class AutogradFloat32(TestBaseMixin):
     def test_rnnt_loss(self, data_func):
         def get_data(data_func, device):
             data = data_func()
-            if type(data) == tuple:
+            if type(data) is tuple:
                 data = data[0]
             return data
 

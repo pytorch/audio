@@ -1,22 +1,12 @@
-from torchaudio._internal.module_utils import dropping_io_support, dropping_class_io_support
-from typing import Union, BinaryIO, Optional, Tuple
 import os
+from typing import BinaryIO, Optional, Tuple, Union
+
 import torch
-import sys
 
 # Initialize extension and backend first
 from . import _extension  # noqa  # usort: skip
+from . import compliance, datasets, functional, models, pipelines, transforms, utils  # noqa: F401
 from ._torchcodec import load_with_torchcodec, save_with_torchcodec
-
-from . import (  # noqa: F401
-    compliance,
-    datasets,
-    functional,
-    models,
-    pipelines,
-    transforms,
-    utils,
-)
 
 
 try:
@@ -100,8 +90,9 @@ def load(
         channels_first=channels_first,
         format=format,
         buffer_size=buffer_size,
-        backend=backend
+        backend=backend,
     )
+
 
 def save(
     uri: Union[str, os.PathLike],
@@ -182,14 +173,19 @@ def save(
         - The output format is determined by the file extension in the uri.
         - TorchCodec uses FFmpeg under the hood for encoding.
     """
-    return save_with_torchcodec(uri, src, sample_rate,
+    return save_with_torchcodec(
+        uri,
+        src,
+        sample_rate,
         channels_first=channels_first,
         format=format,
         encoding=encoding,
         bits_per_sample=bits_per_sample,
         buffer_size=buffer_size,
         backend=backend,
-        compression=compression)
+        compression=compression,
+    )
+
 
 __all__ = [
     "load",

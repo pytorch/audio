@@ -1,10 +1,8 @@
-from unittest.mock import patch
+import os
 import re
 import subprocess
-
-
-import os
 import tempfile
+
 import pytest
 import torch
 
@@ -21,13 +19,14 @@ from torchaudio_unittest.common_utils import get_asset_path
 # skip them unconditionally.
 pytest.skip(allow_module_level=True)
 
+
 def get_ffmpeg_version():
     """Get FFmpeg version to check for compatibility issues."""
     try:
-        result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, timeout=5)
+        result = subprocess.run(["ffmpeg", "-version"], capture_output=True, text=True, timeout=5)
         if result.returncode == 0:
             # Extract version number from output like "ffmpeg version 4.4.2-0ubuntu0.22.04.1"
-            match = re.search(r'ffmpeg version (\d+)\.', result.stdout)
+            match = re.search(r"ffmpeg version (\d+)\.", result.stdout)
             if match:
                 return int(match.group(1))
     except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError):
@@ -79,30 +78,31 @@ def test_basic_load(filename):
     # Check values are close (allowing for small differences in decoders)
     torch.testing.assert_close(waveform_ta, waveform_tc)
 
-@pytest.mark.parametrize("frame_offset,num_frames", [
-    (0, 1000),      # First 1000 samples
-    (1000, 2000),   # 2000 samples starting from 1000
-    (5000, -1),     # From 5000 to end
-    (0, -1),        # Full file
-])
+
+@pytest.mark.parametrize(
+    "frame_offset,num_frames",
+    [
+        (0, 1000),  # First 1000 samples
+        (1000, 2000),  # 2000 samples starting from 1000
+        (5000, -1),  # From 5000 to end
+        (0, -1),  # Full file
+    ],
+)
 def test_frame_offset_and_num_frames(frame_offset, num_frames):
     """Test frame_offset and num_frames parameters."""
     file_path = get_asset_path("sinewave.wav")
 
     # Load with torchaudio
-    waveform_ta, sample_rate_ta = torchaudio.load(
-        file_path, frame_offset=frame_offset, num_frames=num_frames
-    )
+    waveform_ta, sample_rate_ta = torchaudio.load(file_path, frame_offset=frame_offset, num_frames=num_frames)
 
     # Load with torchcodec
-    waveform_tc, sample_rate_tc = load_with_torchcodec(
-        file_path, frame_offset=frame_offset, num_frames=num_frames
-    )
+    waveform_tc, sample_rate_tc = load_with_torchcodec(file_path, frame_offset=frame_offset, num_frames=num_frames)
 
     # Check results match
     assert sample_rate_ta == sample_rate_tc
     assert waveform_ta.shape == waveform_tc.shape
     torch.testing.assert_close(waveform_ta, waveform_tc)
+
 
 def test_channels_first():
     """Test channels_first parameter."""
@@ -127,6 +127,7 @@ def test_channels_first():
     torch.testing.assert_close(waveform_cf_true, waveform_ta_true)
     torch.testing.assert_close(waveform_cf_false, waveform_ta_false)
 
+
 def test_normalize_parameter_warning():
     """Test that normalize=False produces a warning."""
     file_path = get_asset_path("sinewave.wav")
@@ -137,6 +138,7 @@ def test_normalize_parameter_warning():
 
         # Result should still be float32 (normalized)
         assert waveform.dtype == torch.float32
+
 
 def test_buffer_size_parameter_warning():
     """Test that non-default buffer_size produces a warning."""
@@ -180,13 +182,7 @@ def test_multiple_warnings():
 
     with pytest.warns() as warning_list:
         # This should produce multiple warnings
-        waveform, sample_rate = load_with_torchcodec(
-            file_path,
-            normalize=False,
-            buffer_size=8192,
-            backend="ffmpeg"
-        )
-
+        waveform, sample_rate = load_with_torchcodec(file_path, normalize=False, buffer_size=8192, backend="ffmpeg")
 
         # Check that expected warnings are present
         messages = [str(w.message) for w in warning_list]
@@ -196,6 +192,7 @@ def test_multiple_warnings():
 
 
 # ===== SAVE WITH TORCHCODEC TESTS =====
+
 
 @pytest.mark.parametrize("filename", TEST_FILES)
 def test_save_basic_save(filename):
@@ -416,7 +413,7 @@ def test_save_multiple_warnings():
                 encoding="PCM_16",
                 bits_per_sample=16,
                 buffer_size=8192,
-                backend="ffmpeg"
+                backend="ffmpeg",
             )
 
         # Check that expected warnings are present

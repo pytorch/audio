@@ -1,43 +1,43 @@
-# name: Lint
+name: Lint
 
-# on:
-#   pull_request:
-#   push:
-#     branches:
-#       - nightly
-#       - main
-#       - release/*
-#   workflow_dispatch:
+on:
+  push:
+    branches: [ main ]
+  pull_request:
 
-# jobs:
-#   python-source-and-configs:
-#     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
-#     permissions:
-#       id-token: write
-#       contents: read
-#     with:
-#       repository: pytorch/audio
-#       script: |
-#         set -euo pipefail
+concurrency:
+  group: unit-test${{ github.workflow }}-${{ github.ref == 'refs/heads/main' && github.run_number || github.ref }}
+  cancel-in-progress: true
 
-#         echo '::group::Setup environment'
-#         eval "$("$(which conda)" shell.bash hook)"
-#         # libcst does not have 3.11 pre-built binaries yet. Use python 3.10
-#         conda create -y --name env python=3.10
-#         conda activate env
-#         pip3 install --progress-bar=off pre-commit
-#         echo '::endgroup::'
+defaults:
+  run:
+    shell: bash -l -eo pipefail {0}
 
-#         set +e
-#         pre-commit run --all-files --show-diff-on-failure
-#         status=$?
-
-#         echo '::group::Add Summry'
-#         if [ $status -ne 0 ]; then
-#           echo '### Lint failure'  >> $GITHUB_STEP_SUMMARY
-#           echo '```diff'           >> $GITHUB_STEP_SUMMARY
-#           git --no-pager diff      >> $GITHUB_STEP_SUMMARY
-#           echo '```'               >> $GITHUB_STEP_SUMMARY
-#         fi
-#         echo '::endgroup::'
-#         exit $status
+jobs:
+  pre-commit-checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11']
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Setup conda env
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          miniconda-version: "latest"
+          activate-environment: test
+          python-version: ${{ matrix.python-version }}
+      - name: Update pip
+        run: python -m pip install --upgrade pip
+      - name: Install pre-commit
+        run: |
+          python -m pip install pre-commit
+      - name: Run pre-commit checks
+        run: |
+          pre-commit run --all-files
+      - name: Check to see what files pre-commit modified
+        run: |
+          git diff

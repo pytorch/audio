@@ -5,9 +5,9 @@ from torchaudio_unittest.common_utils import (
     get_asset_path,
     load_params,
     load_wav,
+    RequestMixin,
     TempDirMixin,
     TestBaseMixin,
-    RequestMixin
 )
 from torchaudio_unittest.common_utils.kaldi_utils import convert_args, run_kaldi
 

@@ -59,7 +59,7 @@ extensions = [
 nbsphinx_requirejs_path = ""
 
 autodoc_member_order = "bysource"
-autodoc_mock_imports = ['torchaudio.models.decoder']
+autodoc_mock_imports = ["torchaudio.models.decoder"]
 
 # katex options
 #

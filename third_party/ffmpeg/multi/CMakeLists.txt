@@ -87,16 +87,6 @@ elseif (UNIX)
       URL ${base_url}/2023-07-06/linux_x86_64/6.0.tar.gz
       URL_HASH SHA256=04d3916404bab5efadd29f68361b7d13ea71e6242c6473edcb747a41a9fb97a6
       )
-  else ()
-    # Possible case ppc64le (though it's not officially supported.)
-    message(
-      FATAL_ERROR
-      "${CMAKE_SYSTEM_PROCESSOR} is not supported for FFmpeg multi-version integration. "
-      "If you have FFmpeg libraries installed in the system,"
-      " setting FFMPEG_ROOT environment variable to the root directory of FFmpeg installation"
-      " (the directory where `include` and `lib` sub directories with corresponding headers"
-      " and library files are present) will invoke the FFmpeg single-version integration. "
-      "If you do not need the FFmpeg integration, setting USE_FFMPEG=0 will bypass the issue.")
   endif()
 elseif(MSVC)
   FetchContent_Declare(

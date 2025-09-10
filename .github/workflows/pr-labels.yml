@@ -1,4 +1,6 @@
-# name: pr-labels
+name: pr-labels
+
+# This workflow is disabled and kept only for reference.
 
 # on:
 #   push:
