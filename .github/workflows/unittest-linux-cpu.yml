@@ -52,9 +52,12 @@ jobs:
         python -m pip install --upgrade pip
         echo "::endgroup::"
 
+        echo "::group::Install TorchAudio test and PyTorch dependencies"
+        python -m pip install parameterized requests coverage pytest pytest-cov scipy numpy expecttest
+        echo "::endgroup::"
+
         echo "::group::Install PyTorch and TorchCodec"
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
-        python -m pip install numpy
         python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
         python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
         echo "::endgroup::"
@@ -65,7 +68,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run TorchAudio C tests"
-        (cd build/temp*/test/cpp && ls)
+        (cd build/temp*/test/cpp && ./wall_collision)
         echo "::endgroup::"
 
         echo "::group::Run TorchAudio tests"
