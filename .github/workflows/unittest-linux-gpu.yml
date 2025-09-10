@@ -10,7 +10,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    tests:
+    build:
         # Do not use matrix here to parameterize Python/CUDA versions.
         # This job is required to pass for each PR.
         # The name of the required job is sensitive to matrix parameter.
