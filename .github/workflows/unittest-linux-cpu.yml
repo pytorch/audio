@@ -56,15 +56,22 @@ jobs:
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
         python -m pip install numpy
         python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
-        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")")'
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
         echo "::endgroup::"
 
         echo "::group::Build and install TorchAudio"
         python -m pip install . -v --no-build-isolation
         echo "::endgroup::"
 
+        echo "::group::Run TorchAudio C tests"
+        (cd build/temp*/test/cpp && ctest)
+        echo "::endgroup::"
+
         echo "::group::Run TorchAudio tests"
-        cd test
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
@@ -80,5 +87,5 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
-        pytest torchaudio_unittest -k "not torchscript and not fairseq and not demucs"
+        (cd test && pytest torchaudio_unittest -k "not torchscript and not fairseq and not demucs")
         echo "::endgroup::"
