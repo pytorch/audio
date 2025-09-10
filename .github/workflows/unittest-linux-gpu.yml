@@ -10,7 +10,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    build:
+    tests:
         # Do not use matrix here to parameterize Python/CUDA versions.
         # This job is required to pass for each PR.
         # The name of the required job is sensitive to matrix parameter.
@@ -19,7 +19,7 @@ jobs:
             id-token: write
             contents: read
         with:
-            job-name: Build doc
+            job-name: Run tests
             runner: linux.g5.4xlarge.nvidia.gpu
             repository: pytorch/audio
             gpu-arch-type: cuda
