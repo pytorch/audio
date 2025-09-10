@@ -44,13 +44,7 @@ Please refer to https://pytorch.org/audio/main/build.html
 
 ## Running Test
 
-If you built sox, set the `PATH` variable so that the tests properly use the newly built `sox` binary:
-
-```bash
-export PATH="<path_to_torchaudio>/third_party/install/bin:${PATH}"
-```
-
-The following dependencies are also needed for testing:
+The following dependencies are needed for testing:
 
 ```bash
 pip install typing pytest scipy numpy parameterized
