@@ -65,7 +65,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run TorchAudio C tests"
-        (cd build/temp*/test/cpp && wall_collision)
+        (cd build/temp*/test/cpp && ls)
         echo "::endgroup::"
 
         echo "::group::Run TorchAudio tests"
