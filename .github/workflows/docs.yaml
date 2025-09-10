@@ -32,7 +32,7 @@ jobs:
       script: |
         set -ex
         # Set up Environment Variables
-        export PYTHON-VERSION="${{ matrix.python-version }}"
+        export PYTHON_VERSION="${{ matrix.python-version }}"
         export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
         export CU_VERSION_WITHOUT_PERIODS="$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')"
         export PIP_PROGRESS_BAR=off
