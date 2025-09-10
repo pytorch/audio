@@ -13,7 +13,6 @@ jobs:
   build:
     strategy:
       matrix:
-        # TODO add up to 3.13
         python-version: ["3.11"]
         cuda-version: ["12.6"]
         ffmpeg-version: ["7"]
@@ -23,13 +22,12 @@ jobs:
       id-token: write
       contents: read
     with:
-      runner: linux.g5.4xlarge.nvidia.gpu
+      runner: linux.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
       gpu-arch-version: ${{ matrix.cuda-version }}
       timeout: 120
       job-name: docs
-      # run-with-docker: false
 
       script: |
         set -ex
