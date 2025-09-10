@@ -52,6 +52,8 @@ jobs:
         conda list
         ffmpeg -version
         python -m pip install --upgrade pip
+        export LD_LIBRARY_PATH=$CONDA_LIBRARY_PATH:$LD_LIBRARY_PATH
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
         echo "::endgroup::"
 
         echo "::group::Install TorchAudio test and PyTorch dependencies"
