@@ -63,7 +63,8 @@ jobs:
         echo "::group::Install PyTorch"
         export GPU_ARCH_ID="cu126"  # TODO this is currently hardcoded, should depend on matrix's value.
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+        pip install --progress-bar=off --pre torchcodec --index-url="https://download.pytorch.org/whl/nightly/${GPU_ARCH_ID}"
         echo "::endgroup::"
 
         echo "::group::Install TorchAudio"
