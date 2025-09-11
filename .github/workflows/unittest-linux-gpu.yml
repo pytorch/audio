@@ -66,7 +66,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install Python Dependencies"
-        pip install --progress-bar off parameterized requests coverage pytest pytest-cov scipy numpy expecttest
+        pip install parameterized requests coverage pytest pytest-cov scipy expecttest
         echo "::endgroup::"
 
         echo "::group::Run tests"
