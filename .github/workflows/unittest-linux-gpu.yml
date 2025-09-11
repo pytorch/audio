@@ -65,7 +65,12 @@ jobs:
         python -m pip install . -v --no-build-isolation
         echo "::endgroup::"
 
+        echo "::group::Install Python Dependencies"
         pip install --progress-bar off parameterized requests coverage pytest pytest-cov scipy numpy expecttest
+        echo "::endgroup::"
+
+        echo "::group::Run tests"
+
         declare -a args=(
             '-v'
             '--cov=torchaudio'

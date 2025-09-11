@@ -30,6 +30,7 @@ def load_with_torchcodec(
         :func:`~torchaudio.load_with_torchcodec`. Note that some parameters of
         :func:`~torchaudio.load`, like ``normalize``, ``buffer_size``, and
         ``backend``, are ignored by :func:`~torchaudio.load_with_torchcodec`.
+        To install torchcodec, follow the instructions at https://github.com/pytorch/torchcodec#installing-torchcodec.
 
 
     Args:
@@ -180,6 +181,7 @@ def save_with_torchcodec(
         :func:`~torchaudio.save`, like ``format``, ``encoding``,
         ``bits_per_sample``, ``buffer_size``, and ``backend``, are ignored by
         are ignored by :func:`~torchaudio.save_with_torchcodec`.
+        To install torchcodec, follow the instructions at https://github.com/pytorch/torchcodec#installing-torchcodec.
 
     This function provides a TorchCodec-based alternative to torchaudio.save
     with the same API. TorchCodec's AudioEncoder provides efficient encoding
