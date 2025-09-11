@@ -126,7 +126,7 @@ class IntWorkspace {
       cudaMemset(
           GetPointerToAlphaCounters(),
           0,
-          ComputeSizeForAlphaCounters(options_) * sizeof(int));
+          ComputeSizeForAlphaCounters(options_) * sizeof(int32_t));
       cudaMemset(
           GetPointerToBetaCounters(),
           0,
