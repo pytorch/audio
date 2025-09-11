@@ -17,7 +17,7 @@ jobs:
         python_version: ["3.10"]
         cuda_arch_version: ["12.6"]
       fail-fast: false
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@release/2.9
     permissions:
       id-token: write
       contents: read
@@ -63,7 +63,8 @@ jobs:
         echo "::group::Install PyTorch"
         export GPU_ARCH_ID="cu126"  # TODO this is currently hardcoded, should depend on matrix's value.
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+        pip install --progress-bar=off --pre torchcodec --index-url="https://download.pytorch.org/whl/nightly/${GPU_ARCH_ID}"
         echo "::endgroup::"
 
         echo "::group::Install TorchAudio"

@@ -16,7 +16,7 @@ jobs:
         python-version: ["3.11"]
         ffmpeg-version: ["7"]
       fail-fast: false
-    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@release/2.9
     permissions:
       id-token: write
       contents: read
@@ -62,7 +62,8 @@ jobs:
 
         echo "::group::Install PyTorch and TorchCodec"
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
-        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -m pip install --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -m pip install --pre torchcodec --index-url="https://download.pytorch.org/whl/nightly/cpu"
         python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
         python -c 'import torchcodec; print(f"{torchcodec.__version__}"); print(f"{torchcodec.__file__}")'
         echo "::endgroup::"
