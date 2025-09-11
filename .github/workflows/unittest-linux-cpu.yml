@@ -49,11 +49,11 @@ jobs:
         conda create -c conda-forge --strict-channel-priority -y -n ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
         conda activate ci_env
         conda info
-        conda list
         ffmpeg -version
         python -m pip install --upgrade pip
+        # We add conda library path as otherwise torchcodec is not
+        # able to load ffmpeg shared libraries:
         export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
-        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
         echo "::endgroup::"
 
         echo "::group::Install TorchAudio test and PyTorch dependencies"
@@ -64,8 +64,6 @@ jobs:
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
         python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
         python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
-        ls -la /opt/conda/envs/ci_env/lib/python3.11/site-packages/torchcodec/
-        ldd /opt/conda/envs/ci_env/lib/python3.11/site-packages/torchcodec/libtorchcodec_core7.so
         python -c 'import torchcodec; print(f"{torchcodec.__version__}"); print(f"{torchcodec.__file__}")'
         echo "::endgroup::"
 
