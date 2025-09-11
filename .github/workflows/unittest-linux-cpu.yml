@@ -43,7 +43,6 @@ jobs:
           export UPLOAD_CHANNEL=nightly
         fi
 
-        export PATH="${PWD}/third_party/install/bin/:${PATH}"
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
