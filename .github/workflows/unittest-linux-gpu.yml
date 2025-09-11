@@ -81,7 +81,6 @@ jobs:
 
         echo "::endgroup::"
         echo "::group::Run tests"
-        export PATH="${PWD}/third_party/install/bin/:${PATH}"
 
         declare -a args=(
             '-v'

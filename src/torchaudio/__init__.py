@@ -36,6 +36,7 @@ def load(
         https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.
         Because of the reliance on Torchcodec, the parameters ``normalize``, ``buffer_size``, and
         ``backend`` are ignored and accepted only for backwards compatibility.
+        To install torchcodec, follow the instructions at https://github.com/pytorch/torchcodec#installing-torchcodec.
 
 
     Args:
@@ -118,6 +119,7 @@ def save(
         Because of the reliance on Torchcodec, the parameters ``format``, ``encoding``,
         ``bits_per_sample``, ``buffer_size``, and ``backend``, are ignored and accepted only for
         backwards compatibility.
+        To install torchcodec, follow the instructions at https://github.com/pytorch/torchcodec#installing-torchcodec.
 
     Args:
         uri (path-like object):
