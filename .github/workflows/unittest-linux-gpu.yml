@@ -10,12 +10,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  tests:
+  build:
     strategy:
       matrix:
-        # TODO add up to 3.13
-        python_version: ["3.10"]
-        cuda_arch_version: ["12.6"]
+        python-version: ["3.11"]
+        cuda-version: ["12.6"]
+        ffmpeg-version: ["7"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:
@@ -25,17 +25,18 @@ jobs:
       runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
-      gpu-arch-version: ${{ matrix.cuda_arch_version }}
+      gpu-arch-version: ${{ matrix.cuda-version }}
       timeout: 120
+      job-name: Run tests
 
       script: |
         set -ex
         # Set up Environment Variables
-        export PYTHON_VERSION="${{ matrix.python_version }}"
+        export PYTHON_VERSION="${{ matrix.python-version }}"
+        export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
+        export CU_VERSION_WITHOUT_PERIODS="$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')"
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
-        export CU_VERSION="${{ matrix.cuda_arch_version }}"
-        export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_CUDA_SMALL_MEMORY=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_ON_PYTHON_310=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
@@ -43,8 +44,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_demucs=true
-        # Avoid reproducibility errors with CUBLAS: https://docs.nvidia.com/cuda/cublas/index.html#results-reproducibility
-        export CUBLAS_WORKSPACE_CONFIG=:4096:8
+        export CUBLAS_WORKSPACE_CONFIG=:16:8
 
         # Set UPLOAD_CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
@@ -56,30 +56,27 @@ jobs:
         echo "::group::Create conda env"
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
-        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
+        conda create -c conda-forge --strict-channel-priority -y --prefix ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
         conda activate ./ci_env
-
-        echo "::endgroup::"
-        echo "::group::Install PyTorch"
-        export GPU_ARCH_ID="cu126"  # TODO this is currently hardcoded, should depend on matrix's value.
-        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${GPU_ARCH_ID}"
-        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        conda info
+        python -m pip install --upgrade pip
         echo "::endgroup::"
 
-        echo "::group::Install TorchAudio"
-        conda install --quiet --yes cmake ninja
-        pip3 install --progress-bar off -v -e . --no-use-pep517
-
+        echo "::group::Install PyTorch and TorchCodec"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cu${CU_VERSION_WITHOUT_PERIODS}"
+        python -m pip install numpy
+        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
         echo "::endgroup::"
-        echo "::group::Build FFmpeg"
-        .github/scripts/ffmpeg/build_gpu.sh
 
+        echo "::group::Build and install TorchAudio"
+        python -m pip install . -v --no-build-isolation
         echo "::endgroup::"
-        echo "::group::Install other Dependencies"
-        
-        pip3 install parameterized requests coverage pytest pytest-cov scipy numpy expecttest 
 
+        echo "::group::Install Python Dependencies"
+        pip install parameterized requests coverage pytest pytest-cov scipy expecttest
         echo "::endgroup::"
+
         echo "::group::Run tests"
 
         declare -a args=(
@@ -88,6 +85,7 @@ jobs:
             "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
             '--durations' '100'
             '-k' '(cuda or gpu) and not (torchscript and rnnt) and not torchscript_consistency'
+            '-x'
         )
 
         cd test

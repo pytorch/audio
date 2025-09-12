@@ -32,6 +32,8 @@ fi
 printf "Installing PyTorch\n"
 pip install --pre torch --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
 
+python -c "import torch; print(torch.__version__)"
+
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
 
@@ -41,6 +43,12 @@ if [ ! -z "${CUDA_VERSION:-}" ] ; then
         exit 1
     fi
 fi
+
+printf "Installing TorchCodec\n"
+# torchcodec nightly has no Windows+CUDA wheels, so we'll use CPU-only
+# torchcodec also under CUDA-enabled torch:
+pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu
+python -c "import torchcodec; print(torchcodec.__version__)"
 
 # 2. Install torchaudio
 printf "* Installing fsspec\n"   # TODO: is this required for torchaudio??

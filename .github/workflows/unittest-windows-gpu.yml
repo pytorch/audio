@@ -1,4 +1,4 @@
-name: Unittests on Windows GPU
+name: Unit-tests on Windows GPU
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  unittests-windows-gpu:
+  build:
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
     with:
       repository: pytorch/audio
