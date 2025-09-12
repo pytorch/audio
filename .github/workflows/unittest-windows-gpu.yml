@@ -1,4 +1,4 @@
-name: Unittests on Windows GPU
+name: Unit-tests on Windows GPU
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  unittests-windows-gpu:
+  build:
     uses: pytorch/test-infra/.github/workflows/windows_job.yml@main
     with:
       repository: pytorch/audio
@@ -21,8 +21,8 @@ jobs:
         git config --global --add safe.directory /__w/audio/audio
 
         # Set up Environment Variables
-        export PYTHON_VERSION="3.10"
-        export CUDA_VERSION=12.6
+        export PYTHON_VERSION="3.11"
+        export CUDA_VERSION=12.8
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
         export USE_CUDA=1
