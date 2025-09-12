@@ -46,14 +46,16 @@ if [ ! -z "${CUDA_VERSION:-}" ] ; then
     fi
 fi
 
-printf "Installing TorchCodec\n"
 if [ "$torch_cuda" == "False" ]; then
+    printf "Installing TorchCodec\n"
     pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
+    python -c "import torchcodec; print(torchcodec.__version__)"
 else
     # torchcodec nightly has no Windows+CUDA wheels
-    conda install -y -c conda-forge "torchcodec=*=*${cwheel}*"
+    printf "Warning: TorchCodec is unavailable\n"
+    pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu
+    python -c "import torchcodec; print(torchcodec.__version__)"
 fi
-python -c "import torchcodec; print(torchcodec.__version__)"
 
 # 2. Install torchaudio
 printf "* Installing fsspec\n"   # TODO: is this required for torchaudio??
