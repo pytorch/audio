@@ -26,10 +26,8 @@ pip install numpy
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
     wheel="cpu"
-    cwheel="cpu"
 else
     wheel="cu$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cwheel="cuda$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 fi
 printf "Installing PyTorch\n"
 pip install --pre torch --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
@@ -46,16 +44,11 @@ if [ ! -z "${CUDA_VERSION:-}" ] ; then
     fi
 fi
 
-if [ "$torch_cuda" == "False" ]; then
-    printf "Installing TorchCodec\n"
-    pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
-    python -c "import torchcodec; print(torchcodec.__version__)"
-else
-    # torchcodec nightly has no Windows+CUDA wheels
-    printf "Warning: TorchCodec is unavailable\n"
-    pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu
-    python -c "import torchcodec; print(torchcodec.__version__)"
-fi
+printf "Installing TorchCodec\n"
+# torchcodec nightly has no Windows+CUDA wheels, so we'll use CPU-only
+# torchcodec also under CUDA-enabled torch:
+pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu
+python -c "import torchcodec; print(torchcodec.__version__)"
 
 # 2. Install torchaudio
 printf "* Installing fsspec\n"   # TODO: is this required for torchaudio??

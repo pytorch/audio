@@ -21,8 +21,8 @@ jobs:
         git config --global --add safe.directory /__w/audio/audio
 
         # Set up Environment Variables
-        export PYTHON_VERSION="3.11"
-        export CUDA_VERSION=12.8
+        export PYTHON_VERSION="3.10"
+        export CUDA_VERSION=12.6
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
         export USE_CUDA=1
