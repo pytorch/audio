@@ -9,7 +9,6 @@ conda activate ci
 python -m torch.utils.collect_env
 env | grep TORCHAUDIO || true
 
-export PATH="${PWD}/third_party/install/bin/:${PATH}"
 
 declare -a args=(
     '--continue-on-collection-errors'

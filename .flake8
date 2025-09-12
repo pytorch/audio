@@ -6,7 +6,7 @@ ignore = E203,E402,E741,W503
 
 # Note: exclude is not honnored when flake8 is executed from pre-commit.
 # pre-commit has a separate config
-exclude = build,docs/src,third_party
+exclude = build,docs/src
 
 per-file-ignores =
   examples/tutorials/*.py: E501
