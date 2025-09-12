@@ -22,7 +22,7 @@ jobs:
       id-token: write
       contents: read
     with:
-      runner: linux.4xlarge.nvidia.gpu
+      runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       gpu-arch-type: cuda
       gpu-arch-version: ${{ matrix.cuda-version }}
@@ -85,6 +85,7 @@ jobs:
             "--junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml"
             '--durations' '100'
             '-k' '(cuda or gpu) and not (torchscript and rnnt) and not torchscript_consistency'
+            '-x'
         )
 
         cd test
