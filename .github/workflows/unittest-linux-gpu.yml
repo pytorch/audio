@@ -44,6 +44,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_demucs=true
+        export CUBLAS_WORKSPACE_CONFIG=:4096:8
 
         # Set UPLOAD_CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
