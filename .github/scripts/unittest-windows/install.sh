@@ -30,7 +30,10 @@ else
     wheel="cu$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 fi
 printf "Installing PyTorch\n"
-pip install --pre torch --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
+pip install --pre torch torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
+
+python -c "import torch; print(torch.__version__)"
+python -c "import torchcodec; print(torchcodec.__version__)"
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
