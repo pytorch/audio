@@ -7,55 +7,69 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
 
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+        ffmpeg-version: ["7"]
+      fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:
       id-token: write
       contents: read
     with:
-      job-name: Integration Tests
-      runner: linux.g5.4xlarge.nvidia.gpu
+      runner: linux.12xlarge
       repository: pytorch/audio
-      gpu-arch-type: cuda
-      gpu-arch-version: "12.6"  # See GPU_ARCH_ID below
+      gpu-arch-type: cpu
+      gpu-arch-version:
       timeout: 120
+      job-name: linux-cpu-integration-tests
+
       script: |
         set -ex
-        
         # Set up Environment Variables
-        export PYTHON_VERSION="3.10"
-        export CU_VERSION="11.8"
-        export CUDATOOLKIT="pytorch-cuda=${CU_VERSION}"
-        
-        # Install miniforge
-        wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-        bash Miniforge3.sh -b -p "${HOME}/conda"
-        source "${HOME}/conda/etc/profile.d/conda.sh"
+        export PYTHON_VERSION="${{ matrix.python-version }}"
+        export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
+        export PIP_PROGRESS_BAR=off
+        export CONDA_QUIET=1
+
+        # Set UPLOAD_CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export UPLOAD_CHANNEL=test
+        else
+          export UPLOAD_CHANNEL=nightly
+        fi
 
         echo "::group::Create conda env"
         # Mark Build Directory Safe
         git config --global --add safe.directory /__w/audio/audio
-        conda create --quiet -y --prefix ci_env python="${PYTHON_VERSION}"
-        conda activate ./ci_env
-        conda install -q -y pip numpy
-
+        conda create -c conda-forge --strict-channel-priority -y -n ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
+        conda activate ci_env
+        conda info
+        ffmpeg -version
+        python -m pip install --upgrade pip
+        # We add conda library path as otherwise torchcodec is not
+        # able to load ffmpeg shared libraries:
+        export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
         echo "::endgroup::"
-        echo "::group::Install PyTorch"
-        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/nightly/cpu"
-        pip install --progress-bar=off --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
 
+        echo "::group::Install TorchAudio integration test and PyTorch dependencies"
+        python -m pip install parameterized pytest numpy expecttest deep-phonemizer sentencepiece flashlight-text git+https://github.com/kpu/kenlm
         echo "::endgroup::"
-        echo "::group::Install TorchAudio"
-        conda install --quiet --yes cmake>=3.18.0 ninja
-        pip install --progress-bar off -v . --no-build-isolation
 
+        echo "::group::Install PyTorch and TorchCodec"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
+        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
+        python -c 'import torchcodec; print(f"{torchcodec.__version__}"); print(f"{torchcodec.__file__}")'
         echo "::endgroup::"
-        echo "::group::Build FFmpeg"
-        conda install -q -y "ffmpeg<=7"
 
+        echo "::group::Build and install TorchAudio"
+        python -m pip install . -v --no-build-isolation
         echo "::endgroup::"
-        
-        echo "::group::Run Integration Tests"
-        pip install pytest expecttest parameterized
-        cd test && pytest integration_tests -v --use-tmp-hub-dir
+
+        echo "::group::Run TorchAudio integration tests"
+        pytest test/integration_tests/ -x --use-tmp-hub-dir
+        echo "::endgroup::"
