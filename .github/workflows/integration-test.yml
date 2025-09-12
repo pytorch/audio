@@ -54,7 +54,7 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Install TorchAudio integration test and PyTorch dependencies"
-        python -m pip install parameterized pytest numpy expecttest deep-phonemizer sentencepiece flashlight-text git+https://github.com/kpu/kenlm
+        python -m pip install parameterized pytest numpy expecttest
         echo "::endgroup::"
 
         echo "::group::Install PyTorch and TorchCodec"
@@ -69,5 +69,6 @@ jobs:
         echo "::endgroup::"
 
         echo "::group::Run TorchAudio integration tests"
+        python -m pip install deep-phonemizer sentencepiece flashlight-text git+https://github.com/kpu/kenlm
         pytest test/integration_tests/ -x --use-tmp-hub-dir
         echo "::endgroup::"
