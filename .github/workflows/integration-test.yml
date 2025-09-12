@@ -1,4 +1,4 @@
-name: Integration Test
+name: Integration tests
 
 on:
   pull_request:
@@ -23,7 +23,7 @@ jobs:
       gpu-arch-type: cpu
       gpu-arch-version:
       timeout: 120
-      job-name: linux-cpu-integration-tests
+      job-name: linux-cpu
 
       script: |
         set -ex
