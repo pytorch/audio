@@ -1,35 +1,74 @@
-# name: Integration Test
+name: Integration tests
 
-# on:
-#   pull_request:
-#     branches: [ main ]
+on:
+  pull_request:
+    branches: [ main ]
 
-#   workflow_dispatch:
+  workflow_dispatch:
 
-# jobs:
-#   build:
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+        ffmpeg-version: ["7"]
+      fail-fast: false
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      runner: linux.12xlarge
+      repository: pytorch/audio
+      gpu-arch-type: cpu
+      gpu-arch-version:
+      timeout: 120
+      job-name: linux-cpu
 
-#     runs-on: ubuntu-22.04
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         python-version: [ 3.9 ]
+      script: |
+        set -ex
+        # Set up Environment Variables
+        export PYTHON_VERSION="${{ matrix.python-version }}"
+        export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
+        export PIP_PROGRESS_BAR=off
+        export CONDA_QUIET=1
 
-#     steps:
-#     - uses: actions/checkout@v2
-#     - name: Set up Python ${{ matrix.python-version }}
-#       uses: actions/setup-python@v2
-#       with:
-#         python-version: ${{ matrix.python-version }}
-#     - name: Install dependencies
-#       run: |
-#         sudo apt install -y -qq libavfilter-dev libavdevice-dev
-#     - name: Install packages
-#       run: |
-#         python -m pip install --quiet --upgrade pip
-#         python -m pip install --quiet --pre torch -f https://download.pytorch.org/whl/nightly/cpu/torch_nightly.html
-#         python -m pip install --quiet pytest requests cmake ninja deep-phonemizer sentencepiece flashlight-text git+https://github.com/kpu/kenlm
-#         python -m pip install . -v --no-build-isolation
-#     - name: Run integration test
-#       run: |
-#         cd test && pytest integration_tests -v --use-tmp-hub-dir
+        # Set UPLOAD_CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export UPLOAD_CHANNEL=test
+        else
+          export UPLOAD_CHANNEL=nightly
+        fi
+
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create -c conda-forge --strict-channel-priority -y -n ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
+        conda activate ci_env
+        conda info
+        ffmpeg -version
+        python -m pip install --upgrade pip
+        # We add conda library path as otherwise torchcodec is not
+        # able to load ffmpeg shared libraries:
+        export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
+        echo "::endgroup::"
+
+        echo "::group::Install TorchAudio integration test and PyTorch dependencies"
+        python -m pip install parameterized pytest numpy expecttest
+        echo "::endgroup::"
+
+        echo "::group::Install PyTorch and TorchCodec"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
+        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
+        python -c 'import torchcodec; print(f"{torchcodec.__version__}"); print(f"{torchcodec.__file__}")'
+        echo "::endgroup::"
+
+        echo "::group::Build and install TorchAudio"
+        python -m pip install . -v --no-build-isolation
+        echo "::endgroup::"
+
+        echo "::group::Run TorchAudio integration tests"
+        python -m pip install deep-phonemizer sentencepiece flashlight-text git+https://github.com/kpu/kenlm
+        pytest test/integration_tests/ -x --use-tmp-hub-dir
+        echo "::endgroup::"
