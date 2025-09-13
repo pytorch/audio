@@ -35,6 +35,7 @@ jobs:
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
         export CU_VERSION=""
+        export USE_OPENMP="0"
 
         # Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
