@@ -9,12 +9,17 @@ on:
       - release/*
   workflow_dispatch:
 
-env:
-  CHANNEL: "nightly"
-
 jobs:
-  tests:
+  build:
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+        ffmpeg-version: ["7"]
+      fail-fast: false
     uses: pytorch/test-infra/.github/workflows/macos_job.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       runner: macos-m1-stable
       repository: pytorch/audio
@@ -25,13 +30,12 @@ jobs:
         git config --global --add safe.directory /__w/audio/audio
 
         # Set up Environment Variables
-        export PYTHON_VERSION="3.10"
+        export PYTHON_VERSION="${{ matrix.python-version }}"
+        export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
         export CU_VERSION=""
-        export CUDATOOLKIT=""
         export USE_OPENMP="0"
-        unset CUDA_VERSION
 
         # Set CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
@@ -40,6 +44,37 @@ jobs:
           export UPLOAD_CHANNEL=nightly
         fi
 
+        echo "::group::Create conda environment"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create -c conda-forge --strict-channel-priority -y -n ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
+        conda activate ci_env
+        conda info
+        ffmpeg -version
+        python -m pip install --upgrade pip
+        echo "::endgroup::"
+
+        echo "::group::Install TorchAudio test and PyTorch dependencies"
+        python -m pip install parameterized requests coverage pytest pytest-cov scipy numpy expecttest
+        echo "::endgroup::"
+
+        echo "::group::Install PyTorch and TorchCodec"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
+        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
+        python -c 'import torchcodec; print(f"{torchcodec.__version__}"); print(f"{torchcodec.__file__}")'
+        echo "::endgroup::"
+
+        echo "::group::Build and install TorchAudio"
+        export BUILD_CPP_TEST=1
+        python -m pip install . -v --no-build-isolation
+        echo "::endgroup::"
+
+        echo "::group::Run TorchAudio C tests"
+        (cd build/temp*/test/cpp && ./wall_collision)
+        echo "::endgroup::"
+
+        echo "::group::Run TorchAudio tests"
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
@@ -54,15 +89,10 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
-        echo '::endgroup::'
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
 
-        set -euxo pipefail
-
-        echo '::group::Install PyTorch and Torchaudio'
-        ./.github/scripts/unittest-linux/install.sh
-        echo '::endgroup::'
-
-        echo '::group::Run Tests'
-        export PYTEST_K_EXTRA="and not librosa"
-        ./.github/scripts/unittest-linux/run_test.sh
-        echo '::endgroup::'
+        pytest test/torchaudio_unittest -k "not torchscript and not fairseq and not demucs and not librosa" -x
+        echo "::endgroup::"
