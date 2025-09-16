@@ -1,6 +1,10 @@
 #include <c10/cuda/CUDAStream.h>
-#include <libtorchaudio/rnnt/gpu/gpu_transducer.h>
 #include <torch/types.h>
+#ifdef __HIP_PLATFORM_AMD__
+#include <libtorchaudio/rnnt/hip/gpu_transducer_hip.h>
+#else
+#include <libtorchaudio/rnnt/gpu/gpu_transducer.h>
+#endif
 
 namespace torchaudio {
 namespace rnnt {
