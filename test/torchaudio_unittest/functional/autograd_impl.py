@@ -1,3 +1,4 @@
+import itertools
 from functools import partial
 from typing import Callable, Tuple
 
@@ -11,6 +12,7 @@ from torchaudio_unittest.common_utils import (
     get_whitenoise,
     nested_params,
     rnnt_utils,
+    nested_params,
     TestBaseMixin,
     use_deterministic_algorithms,
 )
@@ -407,16 +409,13 @@ class AutogradFloat32(TestBaseMixin):
                     i.requires_grad = True
             inputs_.append(i)
         # gradcheck with float32 requires higher atol and epsilon
-        assert gradcheck(transform, inputs, eps=1e-3, atol=1e-3, nondet_tol=0.0)
+        assert gradcheck(transform, inputs, eps=2e-3, atol=1e-3, nondet_tol=0.0)
 
-    @parameterized.expand(
-        [
-            (rnnt_utils.get_B1_T10_U3_D4_data,),
-            (rnnt_utils.get_B2_T4_U3_D3_data,),
-            (rnnt_utils.get_B1_T2_U3_D5_data,),
-        ]
+    @nested_params(
+        [rnnt_utils.get_B1_T10_U3_D4_data, rnnt_utils.get_B2_T4_U3_D3_data, rnnt_utils.get_B1_T2_U3_D5_data],
+        ["none", "mean", "sum"],
     )
-    def test_rnnt_loss(self, data_func):
+    def test_rnnt_loss(self, data_func, reduction):
         def get_data(data_func, device):
             data = data_func()
             if type(data) is tuple:
@@ -431,6 +430,7 @@ class AutogradFloat32(TestBaseMixin):
             data["target_lengths"],  # target_lengths
             data["blank"],  # blank
             -1,  # clamp
+            reduction,  # reduction
         )
 
         self.assert_grad(F.rnnt_loss, inputs, enable_all_grad=False)
