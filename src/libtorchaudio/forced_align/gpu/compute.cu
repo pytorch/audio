@@ -209,7 +209,7 @@ void forced_align_impl(
     if (backPtrBufferLen == kBackPtrBufferSize || t == T - 1) {
       cpuDataTranferStream.synchronize();
       // GPU -> GPU copy
-      bufferCopy = torchaudio::stable::clone(backPtrBuffer);
+      bufferCopy = torch::stable::clone(backPtrBuffer);
       STD_TORCH_CHECK(bufferCopy.is_contiguous(), "unexpected fail, need to implement stable::Tensor::contiguous()")
       defaultStream.synchronize();
       at::cuda::setCurrentCUDAStream(cpuDataTranferStream);
@@ -316,13 +316,13 @@ void boxed_forced_align_gpu(StableIValue* stack, uint64_t num_args, uint64_t num
   STD_TORCH_CHECK(num_args == 5, "num_args must be 5");
   STD_TORCH_CHECK(num_outputs == 2, "num_outputs must be 2");
   std::tuple<Tensor, Tensor> res = compute(
-      /*logProbs*/to<Tensor>(stack[0]),
-      /*targets*/to<Tensor>(stack[1]),
-      /*logit_lengths*/to<Tensor>(stack[2]),
-      /*target_lengths*/to<Tensor>(stack[3]),
-      /*blank*/float(to<int64_t>(stack[4])));
-  stack[0] = from(std::get<0>(res));
-  stack[1] = from(std::get<1>(res));
+      /*logProbs*/torch::stable::detail::to<Tensor>(stack[0]),
+      /*targets*/torch::stable::detail::to<Tensor>(stack[1]),
+      /*logit_lengths*/torch::stable::detail::to<Tensor>(stack[2]),
+      /*target_lengths*/torch::stable::detail::to<Tensor>(stack[3]),
+      /*blank*/float(torch::stable::detail::to<int64_t>(stack[4])));
+  stack[0] = torch::stable::detail::from(std::get<0>(res));
+  stack[1] = torch::stable::detail::from(std::get<1>(res));
 }
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {

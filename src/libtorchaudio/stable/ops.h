@@ -61,7 +61,6 @@ const T* const_data_ptr(const Tensor& t) {
 
 // TODO: When accessor is implemented in torch::stable, eliminate
 // accessor template below.
-
 template <typename T, size_t N>
 torchaudio::stable::TensorAccessor<T, N> accessor(const Tensor& t) {
   static_assert(
@@ -117,10 +116,6 @@ generic_packed_accessor(const Tensor& t) {
           sizes_.data(),
           strides_.data());
 }
-// template<typename T, size_t N, template <typename U> class PtrTraits =
-// torchaudio::stable::DefaultPtrTraits, typename index_t = int64_t>
-// GenericPackedTensorAccessor<T,N> generic_packed_accessor(const Tensor& t) &&
-// = delete;
 
 template <
     typename T,
@@ -134,9 +129,6 @@ torchaudio::stable::PackedTensorAccessor32<T, N, PtrTraits> packed_accessor32(
       "numel needs to be smaller than int32_t max; otherwise, please use packed_accessor64");
   return generic_packed_accessor<T, N, PtrTraits, int32_t>(t);
 }
-// template<typename T, size_t N, template <typename U> class PtrTraits =
-// torchaudio::stable::DefaultPtrTraits> PackedTensorAccessor32<T,N,PtrTraits>
-// packed_accessor32(const Tensor& t) && = delete;
 
 template <
     typename T,
@@ -146,23 +138,6 @@ template <
 torchaudio::stable::PackedTensorAccessor64<T, N, PtrTraits> packed_accessor64(
     const Tensor& t) {
   return generic_packed_accessor<T, N, PtrTraits, int64_t>();
-}
-// template<typename T, size_t N, template <typename U> class PtrTraits =
-// DefaultPtrTraits> PackedTensorAccessor64<T,N,PtrTraits>
-// packed_accessor64(const Tensor& t) && = delete;
-
-// TODO: When https://github.com/pytorch/pytorch/pull/161895 lands, eliminate
-// copy_ function below.
-inline Tensor copy_(
-    Tensor& self,
-    const Tensor& src,
-    std::optional<bool> non_blocking = std::nullopt) {
-  const auto num_args = 3;
-  std::array<StableIValue, num_args> stack{
-      from(self), from(src), from(non_blocking.value_or(false))};
-  TORCH_ERROR_CODE_CHECK(
-      aoti_torch_call_dispatcher("aten::copy_", "", stack.data()));
-  return to<Tensor>(stack[0]);
 }
 
 // TODO: When cpu is implemented in torch::stable, eliminate
@@ -224,7 +199,8 @@ inline Tensor new_zeros(
     std::optional<bool> pin_memory = std::nullopt) {
   int32_t target_dtype{};
   if (dtype.has_value()) {
-    target_dtype = to<int32_t>(from(dtype.value()));
+    target_dtype = torch::stable::detail::to<int32_t>(
+        torch::stable::detail::from(dtype.value()));
   } else {
     TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(self.get(), &target_dtype));
   }
@@ -266,13 +242,6 @@ inline Tensor new_zeros(
   auto result = Tensor(ret0);
   torch::stable::zero_(result);
   return result;
-}
-
-// TODO: https://github.com/pytorch/pytorch/pull/161896
-inline Tensor clone(const Tensor& self) {
-  AtenTensorHandle ret = nullptr;
-  TORCH_ERROR_CODE_CHECK(aoti_torch_clone(self.get(), &ret));
-  return Tensor(ret);
 }
 
 // An analog of item template function defined in

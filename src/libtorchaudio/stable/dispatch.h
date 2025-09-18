@@ -24,6 +24,19 @@ using torch::headeronly::ScalarType;
 
 namespace impl {
 
+inline const char* toString(ScalarType t) {
+#define DEFINE_CASE(_, name) \
+  case ScalarType::name:     \
+    return #name;
+
+  switch (t) {
+    AT_FORALL_SCALAR_TYPES_WITH_COMPLEX_AND_QINTS(DEFINE_CASE)
+    default:
+      return "UNKNOWN_SCALAR";
+  }
+#undef DEFINE_CASE
+}
+
 template <ScalarType N>
 struct ScalarTypeToCPPType;
 
@@ -51,21 +64,28 @@ using ScalarTypeToCPPTypeT = typename ScalarTypeToCPPType<N>::type;
     return __VA_ARGS__();                                          \
   }
 
-#define STABLE_DISPATCH_SWITCH(TYPE, NAME, ...)    \
-  [&] {                                            \
-    const auto& the_type = TYPE;                   \
-    constexpr const char* at_dispatch_name = NAME; \
-    switch (the_type) {                            \
-      __VA_ARGS__                                  \
-      default:                                     \
-        STD_TORCH_CHECK(                           \
-            false,                                 \
-            '"',                                   \
-            at_dispatch_name,                      \
-            "\" not implemented for '",            \
-            toString(the_type),                    \
-            "'");                                  \
-    }                                              \
+#define STABLE_DISPATCH_CASE_INDEX(enum_type, ...)                 \
+  case enum_type: {                                                \
+    using index_t [[maybe_unused]] =                               \
+        torchaudio::stable::impl::ScalarTypeToCPPTypeT<enum_type>; \
+    return __VA_ARGS__();                                          \
+  }
+
+#define STABLE_DISPATCH_SWITCH(TYPE, NAME, ...)           \
+  [&] {                                                   \
+    const auto& the_type = TYPE;                          \
+    constexpr const char* at_dispatch_name = NAME;        \
+    switch (the_type) {                                   \
+      __VA_ARGS__                                         \
+      default:                                            \
+        STD_TORCH_CHECK(                                  \
+            false,                                        \
+            '"',                                          \
+            at_dispatch_name,                             \
+            "\" not implemented for '",                   \
+            torchaudio::stable::impl::toString(the_type), \
+            "'");                                         \
+    }                                                     \
   }()
 
 #define STABLE_DISPATCH_CASE_FLOATING_TYPES_AND_HALF(...) \
@@ -76,3 +96,15 @@ using ScalarTypeToCPPTypeT = typename ScalarTypeToCPPType<N>::type;
 #define STABLE_DISPATCH_FLOATING_TYPES_AND_HALF(TYPE, NAME, ...) \
   STABLE_DISPATCH_SWITCH(                                        \
       TYPE, NAME, STABLE_DISPATCH_CASE_FLOATING_TYPES_AND_HALF(__VA_ARGS__))
+
+#define STABLE_DISPATCH_FLOATING_TYPES_AND_HALF(TYPE, NAME, ...) \
+  STABLE_DISPATCH_SWITCH(                                        \
+      TYPE, NAME, STABLE_DISPATCH_CASE_FLOATING_TYPES_AND_HALF(__VA_ARGS__))
+
+#define STABLE_DISPATCH_CASE_INDEX_TYPES(...)              \
+  STABLE_DISPATCH_CASE_INDEX(ScalarType::Int, __VA_ARGS__) \
+  STABLE_DISPATCH_CASE_INDEX(ScalarType::Long, __VA_ARGS__)
+
+#define STABLE_DISPATCH_INDEX_TYPES(TYPE, NAME, ...) \
+  STABLE_DISPATCH_SWITCH(                            \
+      TYPE, NAME, STABLE_DISPATCH_CASE_INDEX_TYPES(__VA_ARGS__))

@@ -2,6 +2,7 @@
 #include <libtorchaudio/stable/ops.h>
 #include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
+#include <torch/csrc/stable/tensor.h>
 
 namespace torchaudio {
 namespace alignment {
@@ -177,14 +178,18 @@ std::tuple<Tensor, Tensor> compute(
   STD_TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
-
-  STD_TORCH_CHECK(
-      logProbs.size(1) == torchaudio::util::max<int>(inputLengths),
-      "input length mismatch");
-  STD_TORCH_CHECK(
-      targets.size(1) == torchaudio::util::max<int>(targetLengths),
-      "target length mismatch");
-
+  STABLE_DISPATCH_INDEX_TYPES(
+      inputLengths.scalar_type(), "forced_align_impl", [&] {
+        STD_TORCH_CHECK(
+            logProbs.size(1) == torchaudio::util::max<index_t>(inputLengths),
+            "input length mismatch");
+      });
+  STABLE_DISPATCH_INDEX_TYPES(
+      targetLengths.scalar_type(), "forced_align_impl", [&] {
+        STD_TORCH_CHECK(
+            targets.size(1) == torchaudio::util::max<index_t>(targetLengths),
+            "target length mismatch");
+      });
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
   Tensor paths = torchaudio::stable::new_zeros(targets, {B, T});
@@ -209,13 +214,13 @@ void boxed_forced_align_cpu(
   STD_TORCH_CHECK(num_args == 5, "num_args must be 5");
   STD_TORCH_CHECK(num_outputs == 2, "num_outputs must be 2");
   std::tuple<Tensor, Tensor> res = compute(
-      /*logProbs*/ to<Tensor>(stack[0]),
-      /*targets*/ to<Tensor>(stack[1]),
-      /*logit_lengths*/ to<Tensor>(stack[2]),
-      /*target_lengths*/ to<Tensor>(stack[3]),
-      /*blank*/ float(to<int64_t>(stack[4])));
-  stack[0] = from(std::get<0>(res));
-  stack[1] = from(std::get<1>(res));
+      /*logProbs*/ torch::stable::detail::to<Tensor>(stack[0]),
+      /*targets*/ torch::stable::detail::to<Tensor>(stack[1]),
+      /*logit_lengths*/ torch::stable::detail::to<Tensor>(stack[2]),
+      /*target_lengths*/ torch::stable::detail::to<Tensor>(stack[3]),
+      /*blank*/ float(torch::stable::detail::to<int64_t>(stack[4])));
+  stack[0] = torch::stable::detail::from(std::get<0>(res));
+  stack[1] = torch::stable::detail::from(std::get<1>(res));
 }
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
