@@ -1,3 +1,5 @@
+#include <libtorchaudio/stable/dispatch.h>
+#include <libtorchaudio/stable/ops.h>
 #include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
 
@@ -5,8 +7,8 @@ namespace torchaudio {
 namespace alignment {
 namespace cpu {
 
-using torch::stable::Tensor;
 using torch::headeronly::ScalarType;
+using torch::stable::Tensor;
 
 // Inspired from
 // https://github.com/flashlight/sequence/blob/main/flashlight/lib/sequence/criterion/cpu/ConnectionistTemporalClassificationCriterion.cpp
@@ -34,17 +36,16 @@ void forced_align_impl(
   for (int i = 0; i < T * S; i++) {
     backPtr_a[i] = -1;
   }
-
-  auto logProbs_a = logProbs.accessor<scalar_t, 3>();
-  auto targets_a = targets.accessor<target_t, 2>();
-  auto paths_a = paths.accessor<target_t, 2>();
+  auto logProbs_a = torchaudio::stable::accessor<scalar_t, 3>(logProbs);
+  auto targets_a = torchaudio::stable::accessor<target_t, 2>(targets);
+  auto paths_a = torchaudio::stable::accessor<target_t, 2>(paths);
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
       ++R;
     }
   }
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       T >= L + R,
       "targets length is too long for CTC. Found log_probs length: ",
       T,
@@ -145,14 +146,16 @@ std::tuple<Tensor, Tensor> compute(
   STD_TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
   STD_TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
   STD_TORCH_CHECK(inputLengths.is_cpu(), "input_lengths must be a CPU tensor");
-  STD_TORCH_CHECK(targetLengths.is_cpu(), "target_lengths must be a CPU tensor");
+  STD_TORCH_CHECK(
+      targetLengths.is_cpu(), "target_lengths must be a CPU tensor");
   STD_TORCH_CHECK(
       logProbs.scalar_type() == ScalarType::Double ||
           logProbs.scalar_type() == ScalarType::Float ||
           logProbs.scalar_type() == ScalarType::Half,
       "log_probs must be float64, float32 or float16 (half) type");
   STD_TORCH_CHECK(
-      targets.scalar_type() == ScalarType::Int || targets.scalar_type() == ScalarType::Long,
+      targets.scalar_type() == ScalarType::Int ||
+          targets.scalar_type() == ScalarType::Long,
       "targets must be int32 or int64 type");
   STD_TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
   STD_TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
@@ -184,57 +187,33 @@ std::tuple<Tensor, Tensor> compute(
 
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
-  Tensor paths = torch::stable::new_empty(targets, {B, T});
-  torch::stable::zero_(paths);
+  Tensor paths = torchaudio::stable::new_zeros(targets, {B, T});
 
-  switch (logProbs.scalar_type()) {
-  case ScalarType::Double: {
-    if (targets.scalar_type() == ScalarType::Long) {
-      forced_align_impl<double, ScalarType::Long>(logProbs, targets, blank, paths);
-    } else if (targets.scalar_type() == ScalarType::Int) {
-      forced_align_impl<double, ScalarType::Int>(logProbs, targets, blank, paths);
-    } else {
-      STD_TORCH_CHECK(false, "unreachable");
-    }
-    break;
-  }
-  case ScalarType::Float: {
-    if (targets.scalar_type() == ScalarType::Long) {
-      forced_align_impl<float, ScalarType::Long>(logProbs, targets, blank, paths);
-    } else if (targets.scalar_type() == ScalarType::Int) {
-      forced_align_impl<float, ScalarType::Int>(logProbs, targets, blank, paths);
-    } else {
-      STD_TORCH_CHECK(false, "unreachable");
-    }
-    break;
-  }
-  case ScalarType::Half: {
-    if (targets.scalar_type() == ScalarType::Long) {
-      forced_align_impl<c10::Half, ScalarType::Long>(logProbs, targets, blank, paths);
-    } else if (targets.scalar_type() == ScalarType::Int) {
-      forced_align_impl<c10::Half, ScalarType::Int>(logProbs, targets, blank, paths);
-    } else {
-      STD_TORCH_CHECK(false, "unreachable");
-    }
-    break;
-  }
-  default: {
-    STD_TORCH_CHECK(false, "unreachable");
-  }
-  };
-
+  STABLE_DISPATCH_FLOATING_TYPES_AND_HALF(
+      logProbs.scalar_type(), "forced_align_impl", [&] {
+        if (targets.scalar_type() == ScalarType::Long) {
+          forced_align_impl<scalar_t, ScalarType::Long>(
+              logProbs, targets, blank, paths);
+        } else {
+          forced_align_impl<scalar_t, ScalarType::Int>(
+              logProbs, targets, blank, paths);
+        }
+      });
   return std::make_tuple(paths, logProbs);
 }
 
-void boxed_forced_align_cpu(StableIValue* stack, uint64_t num_args, uint64_t num_outputs) {
+void boxed_forced_align_cpu(
+    StableIValue* stack,
+    uint64_t num_args,
+    uint64_t num_outputs) {
   STD_TORCH_CHECK(num_args == 5, "num_args must be 5");
   STD_TORCH_CHECK(num_outputs == 2, "num_outputs must be 2");
   std::tuple<Tensor, Tensor> res = compute(
-      /*logProbs*/to<Tensor>(stack[0]),
-      /*targets*/to<Tensor>(stack[1]),
-      /*logit_lengths*/to<Tensor>(stack[2]),
-      /*target_lengths*/to<Tensor>(stack[3]),
-      /*blank*/float(to<int64_t>(stack[4])));
+      /*logProbs*/ to<Tensor>(stack[0]),
+      /*targets*/ to<Tensor>(stack[1]),
+      /*logit_lengths*/ to<Tensor>(stack[2]),
+      /*target_lengths*/ to<Tensor>(stack[3]),
+      /*blank*/ float(to<int64_t>(stack[4])));
   stack[0] = from(std::get<0>(res));
   stack[1] = from(std::get<1>(res));
 }

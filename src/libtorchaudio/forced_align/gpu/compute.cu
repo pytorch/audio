@@ -1,4 +1,6 @@
 #include <libtorchaudio/utils.h>
+#include <libtorchaudio/stable/TensorAccessor.h>
+#include <libtorchaudio/stable/dispatch.h>
 #include <torch/csrc/stable/library.h>
 
 #include <cub/cub.cuh>
@@ -20,9 +22,9 @@ using torch::headeronly::ScalarType;
 
 template <typename scalar_t, typename target_t>
 __global__ void falign_cuda_step_kernel(
-    const at::PackedTensorAccessor32<scalar_t, 3, at::RestrictPtrTraits>
+    const torchaudio::stable::PackedTensorAccessor32<scalar_t, 3, torchaudio::stable::RestrictPtrTraits>
         logProbs_a,
-    const at::PackedTensorAccessor32<target_t, 2, at::RestrictPtrTraits>
+    const torchaudio::stable::PackedTensorAccessor32<target_t, 2, torchaudio::stable::RestrictPtrTraits>
         targets_a,
     const int T,
     const int L,
@@ -33,9 +35,9 @@ __global__ void falign_cuda_step_kernel(
     int start,
     int end,
     int backPtrBufferLen,
-    at::PackedTensorAccessor32<scalar_t, 2, at::RestrictPtrTraits>
+    torchaudio::stable::PackedTensorAccessor32<scalar_t, 2, torchaudio::stable::RestrictPtrTraits>
         alphas_a,
-    at::PackedTensorAccessor32<int8_t, 2, at::RestrictPtrTraits>
+    torchaudio::stable::PackedTensorAccessor32<int8_t, 2, torchaudio::stable::RestrictPtrTraits>
         backPtrBuffer_a) {
   scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   const int batchIndex =
@@ -122,7 +124,7 @@ void forced_align_impl(
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   using target_t = typename std::
       conditional<target_scalar_type == ScalarType::Int, int, int64_t>::type;
-  auto paths_a = paths.accessor<target_t, 2>();
+  auto paths_a = torchaudio::stable::accessor<target_t, 2>(paths);
   const int batchIndex =
       0; // TODO: support batch version and use the real batch index
   const int T = logProbs.size(1); // num frames
@@ -130,7 +132,7 @@ void forced_align_impl(
   const int L = targets.size(1); // label length
   const int S = 2 * L + 1;
 
-  auto targetsCpu = torch::stable::cpu(targets);
+  auto targetsCpu = torchaudio::stable::cpu(targets);
   // backPtrBuffer stores the index offset fthe best path at current position
   // We copy the values to CPU after running every kBackPtrBufferSize of
   // frames.
@@ -147,8 +149,8 @@ void forced_align_impl(
   torch::stable::fill_(alphas, kNegInfinity);
 
   // CPU accessors
-  auto targetsCpu_a = targetsCpu.accessor<target_t, 2>();
-  auto backPtrCpu_a = backPtrCpu.accessor<int8_t, 2>();
+  auto targetsCpu_a = torchaudio::stable::accessor<target_t, 2>(targetsCpu);
+  auto backPtrCpu_a = torchaudio::stable::accessor<int8_t, 2>(backPtrCpu);
   // count the number of repeats in label
   int R = 0;
   for (int i = 1; i < L; ++i) {
@@ -189,8 +191,8 @@ void forced_align_impl(
     }
     falign_cuda_step_kernel<scalar_t, target_t>
         <<<1, kNumThreads, 0, defaultStream>>>(
-            logProbs.packed_accessor32<scalar_t, 3, at::RestrictPtrTraits>(),
-            targets.packed_accessor32<target_t, 2, at::RestrictPtrTraits>(),
+            torchaudio::stable::packed_accessor32<scalar_t, 3, torchaudio::stable::RestrictPtrTraits>(logProbs),
+            torchaudio::stable::packed_accessor32<target_t, 2, torchaudio::stable::RestrictPtrTraits>(targets),
             T,
             L,
             N,
@@ -200,15 +202,14 @@ void forced_align_impl(
             start,
             end,
             backPtrBufferLen,
-            alphas.packed_accessor32<scalar_t, 2, at::RestrictPtrTraits>(),
-            backPtrBuffer
-                .packed_accessor32<int8_t, 2, at::RestrictPtrTraits>());
+            torchaudio::stable::packed_accessor32<scalar_t, 2, torchaudio::stable::RestrictPtrTraits>(alphas),
+            torchaudio::stable::packed_accessor32<int8_t, 2, torchaudio::stable::RestrictPtrTraits>(backPtrBuffer));
     C10_CUDA_KERNEL_LAUNCH_CHECK();
     ++backPtrBufferLen;
     if (backPtrBufferLen == kBackPtrBufferSize || t == T - 1) {
       cpuDataTranferStream.synchronize();
       // GPU -> GPU copy
-      bufferCopy = backPtrBuffer.clone();
+      bufferCopy = torchaudio::stable::clone(backPtrBuffer);
       STD_TORCH_CHECK(bufferCopy.is_contiguous(), "unexpected fail, need to implement stable::Tensor::contiguous()")
       defaultStream.synchronize();
       at::cuda::setCurrentCUDAStream(cpuDataTranferStream);
@@ -227,8 +228,8 @@ void forced_align_impl(
   }
   cpuDataTranferStream.synchronize();
 
-  auto alphasCpu = torch::stable::cpu(alphas);
-  auto alphasCpu_a = alphasCpu.accessor<scalar_t, 2>();
+  auto alphasCpu = torchaudio::stable::cpu(alphas);
+  auto alphasCpu_a = torchaudio::stable::accessor<scalar_t, 2>(alphasCpu);
   int curIdxOffset = ((T - 1) % 2);
   int ltrIdx =
       alphasCpu_a[curIdxOffset][S - 1] > alphasCpu_a[curIdxOffset][S - 2]
@@ -294,50 +295,20 @@ std::tuple<Tensor, Tensor> compute(
   auto B = logProbs.size(0);
   auto T = logProbs.size(1); // num frames
 
-  Tensor paths = torch::stable::new_empty(targets, {B, T}, std::nullopt, aoti_torch_device_type_cpu());
-  torch::stable::zero_(paths);
+  Tensor paths = torchaudio::stable::new_zeros(targets, {B, T}, /*dtype=*/std::nullopt, /*layout=*/std::nullopt, /*device=*/torchaudio::stable::cpu_device());
 
-  switch (logProbs.scalar_type()) {
-  case ScalarType::Double: {
-    if (targets.scalar_type() == ScalarType::Long) {
-      forced_align_impl<double, ScalarType::Long>(logProbs, targets, blank, paths);
-    } else if (targets.scalar_type() == ScalarType::Int) {
-      forced_align_impl<double, ScalarType::Int>(logProbs, targets, blank, paths);
-    } else {
-      STD_TORCH_CHECK(false, "unreachable");
-    }
-    break;
-  }
-  case ScalarType::Float: {
-    if (targets.scalar_type() == ScalarType::Long) {
-      forced_align_impl<float, ScalarType::Long>(logProbs, targets, blank, paths);
-    } else if (targets.scalar_type() == ScalarType::Int) {
-      forced_align_impl<float, ScalarType::Int>(logProbs, targets, blank, paths);
-    } else {
-      STD_TORCH_CHECK(false, "unreachable");
-    }
-    break;
-  }
-  case ScalarType::Half: {
-    if (targets.scalar_type() == ScalarType::Long) {
-      forced_align_impl<c10::Half, ScalarType::Long>(logProbs, targets, blank, paths);
-    } else if (targets.scalar_type() == ScalarType::Int) {
-      forced_align_impl<c10::Half, ScalarType::Int>(logProbs, targets, blank, paths);
-    } else {
-      STD_TORCH_CHECK(false, "unreachable");
-    }
-    break;
-  }
-  default: {
-    STD_TORCH_CHECK(false, "unreachable");
-  }
-  };
-  Tensor pathsCuda = torch::stable::new_empty(paths,
-                                              torchaudio::util::sizes(paths),
-                                              std::nullopt,
-                                              aoti_torch_device_type_cuda(),
-                                              logProbs.get_device_index());
-  torch::stable::copy_(pathsCuda, paths);
+  STABLE_DISPATCH_FLOATING_TYPES_AND_HALF(
+      logProbs.scalar_type(), "forced_align_impl", [&] {
+        if (targets.scalar_type() == ScalarType::Long) {
+          forced_align_impl<scalar_t, ScalarType::Long>(
+              logProbs, targets, blank, paths);
+        } else {
+          forced_align_impl<scalar_t, ScalarType::Int>(
+              logProbs, targets, blank, paths);
+        }
+      });
+
+  Tensor pathsCuda = torchaudio::stable::cuda(paths, logProbs.get_device_index());
   return std::make_tuple(pathsCuda, logProbs);
 }
 
