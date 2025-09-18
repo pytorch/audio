@@ -13,13 +13,11 @@
 
 namespace torchaudio::stable {
 
-  using DeviceType = int32_t;
-  using torch::stable::accelerator::DeviceIndex;
+using DeviceType = int32_t;
+using torch::stable::accelerator::DeviceIndex;
 
 struct Device {
-
-  Device(DeviceType type, DeviceIndex index = -1)
-      : type_(type), index_(index) {
+  Device(DeviceType type, DeviceIndex index = -1) : type_(type), index_(index) {
     // TODO: validate();
   }
 
@@ -33,7 +31,7 @@ struct Device {
     return index_;
   }
 
-private:
+ private:
   DeviceType type_;
   DeviceIndex index_ = -1;
 };
@@ -44,4 +42,4 @@ inline Device cpu_device() {
   return d;
 }
 
-}  // namespace torchaudio::stable
+} // namespace torchaudio::stable
