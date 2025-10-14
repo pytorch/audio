@@ -83,4 +83,3 @@ jobs:
           cp -r docs/build/html/* "${RUNNER_DOCS_DIR}"
         fi
         echo "::endgroup::"
-
