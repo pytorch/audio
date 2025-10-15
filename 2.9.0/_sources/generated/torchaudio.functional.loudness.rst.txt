@@ -1,0 +1,6 @@
+﻿torchaudio.functional.loudness
+==============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: loudness

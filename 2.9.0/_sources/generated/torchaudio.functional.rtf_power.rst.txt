@@ -1,0 +1,6 @@
+﻿torchaudio.functional.rtf\_power
+================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: rtf_power

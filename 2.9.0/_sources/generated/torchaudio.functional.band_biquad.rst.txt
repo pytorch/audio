@@ -1,0 +1,6 @@
+﻿torchaudio.functional.band\_biquad
+==================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: band_biquad

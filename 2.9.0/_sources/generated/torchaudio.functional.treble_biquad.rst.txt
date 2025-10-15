@@ -1,0 +1,6 @@
+﻿torchaudio.functional.treble\_biquad
+====================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: treble_biquad

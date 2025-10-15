@@ -1,0 +1,6 @@
+﻿torchaudio.save
+===============
+
+.. currentmodule:: torchaudio
+
+.. autofunction:: save

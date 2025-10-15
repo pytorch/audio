@@ -1,0 +1,6 @@
+torchaudio.models.squim\_objective\_base
+========================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: squim_objective_base

@@ -1,0 +1,6 @@
+torchaudio.models.hubert\_pretrain\_large
+=========================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: hubert_pretrain_large

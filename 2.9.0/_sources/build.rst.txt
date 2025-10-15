@@ -1,0 +1,35 @@
+Building from source
+====================
+
+TorchAudio integrates PyTorch for numerical computation. It requires the following tools to build from source.
+
+- `PyTorch <https://pytorch.org>`_
+- `CMake <https://cmake.org/>`_
+- `Ninja <https://ninja-build.org/>`_
+- C++ complier with C++ 17 support
+   - `GCC <https://gcc.gnu.org/>`_ (Linux)
+   - `Clang <https://clang.llvm.org/>`_ (macOS)
+   - `MSVC <https://visualstudio.microsoft.com>`_  2019 or newer (Windows)
+- `CUDA toolkit <https://developer.nvidia.com/cudnn>`_ and `cuDNN <https://developer.nvidia.com/cudnn>`_ (if building CUDA extension)
+
+.. toctree::
+   :maxdepth: 1
+
+   build.linux
+   build.windows
+   build.jetson
+
+Customizing the build
+---------------------
+
+Optional features of torchaudio can be enabled/disabled via
+environment variables.
+
+They can be enabled by passing ``1`` and disabled by ``0``.
+
+- ``BUILD_RNNT``: Enable/disable custom RNN-T loss function.
+- ``USE_ROCM``: Enable/disable AMD ROCm support.
+- ``USE_CUDA``: Enable/disable CUDA support.
+
+For the latest configurations and their default values, please check the source code.
+https://github.com/pytorch/audio/blob/main/tools/setup_helpers/extension.py

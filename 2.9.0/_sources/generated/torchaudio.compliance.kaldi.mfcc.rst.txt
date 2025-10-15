@@ -1,0 +1,6 @@
+﻿torchaudio.compliance.kaldi.mfcc
+================================
+
+.. currentmodule:: torchaudio.compliance.kaldi
+
+.. autofunction:: mfcc

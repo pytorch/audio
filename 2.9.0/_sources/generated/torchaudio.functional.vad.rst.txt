@@ -1,0 +1,6 @@
+﻿torchaudio.functional.vad
+=========================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: vad

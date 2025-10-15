@@ -1,0 +1,6 @@
+﻿torchaudio.functional.bandreject\_biquad
+========================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: bandreject_biquad

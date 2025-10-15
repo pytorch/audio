@@ -1,0 +1,6 @@
+﻿torchaudio.save\_with\_torchcodec
+=================================
+
+.. currentmodule:: torchaudio
+
+.. autofunction:: save_with_torchcodec

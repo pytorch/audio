@@ -1,0 +1,6 @@
+﻿torchaudio.functional.frechet\_distance
+=======================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: frechet_distance

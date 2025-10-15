@@ -1,0 +1,6 @@
+﻿torchaudio.load
+===============
+
+.. currentmodule:: torchaudio
+
+.. autofunction:: load

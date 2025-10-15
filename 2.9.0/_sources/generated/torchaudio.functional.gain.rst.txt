@@ -1,0 +1,6 @@
+﻿torchaudio.functional.gain
+==========================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: gain

@@ -1,0 +1,6 @@
+﻿torchaudio.functional.spectral\_centroid
+========================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: spectral_centroid

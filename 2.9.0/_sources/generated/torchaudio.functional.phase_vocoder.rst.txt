@@ -1,0 +1,6 @@
+﻿torchaudio.functional.phase\_vocoder
+====================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: phase_vocoder

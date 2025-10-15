@@ -1,0 +1,6 @@
+﻿torchaudio.compliance.kaldi.spectrogram
+=======================================
+
+.. currentmodule:: torchaudio.compliance.kaldi
+
+.. autofunction:: spectrogram

@@ -1,0 +1,6 @@
+torchaudio.models.conv\_tasnet\_base
+====================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: conv_tasnet_base

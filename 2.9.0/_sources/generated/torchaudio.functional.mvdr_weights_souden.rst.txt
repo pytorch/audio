@@ -1,0 +1,6 @@
+﻿torchaudio.functional.mvdr\_weights\_souden
+===========================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: mvdr_weights_souden
