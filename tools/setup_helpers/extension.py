@@ -34,10 +34,8 @@ def _get_build(var, default=False):
 
 
 _BUILD_CPP_TEST = _get_build("BUILD_CPP_TEST", False)
-_BUILD_SOX = False if platform.system() == "Windows" else _get_build("BUILD_SOX", True)
 _BUILD_RIR = _get_build("BUILD_RIR", True)
 _BUILD_RNNT = _get_build("BUILD_RNNT", True)
-_USE_FFMPEG = _get_build("USE_FFMPEG", True)
 _USE_ROCM = _get_build("USE_ROCM", torch.backends.cuda.is_built() and torch.version.hip is not None)
 _USE_CUDA = _get_build("USE_CUDA", torch.backends.cuda.is_built() and torch.version.hip is None)
 _BUILD_ALIGN = _get_build("BUILD_ALIGN", True)
@@ -51,13 +49,6 @@ def get_ext_modules():
         Extension(name="torchaudio.lib.libtorchaudio", sources=[]),
         Extension(name="torchaudio.lib._torchaudio", sources=[]),
     ]
-    if _BUILD_SOX:
-        modules.extend(
-            [
-                Extension(name="torchaudio.lib.libtorchaudio_sox", sources=[]),
-                Extension(name="torchaudio.lib._torchaudio_sox", sources=[]),
-            ]
-        )
     if _BUILD_CUDA_CTC_DECODER:
         modules.extend(
             [
@@ -65,26 +56,6 @@ def get_ext_modules():
                 Extension(name="torchaudio.lib.pybind11_prefixctc", sources=[]),
             ]
         )
-    if _USE_FFMPEG:
-        if "FFMPEG_ROOT" in os.environ:
-            # single version ffmpeg mode
-            modules.extend(
-                [
-                    Extension(name="torio.lib.libtorio_ffmpeg", sources=[]),
-                    Extension(name="torio.lib._torio_ffmpeg", sources=[]),
-                ]
-            )
-        else:
-            modules.extend(
-                [
-                    Extension(name="torio.lib.libtorio_ffmpeg4", sources=[]),
-                    Extension(name="torio.lib._torio_ffmpeg4", sources=[]),
-                    Extension(name="torio.lib.libtorio_ffmpeg5", sources=[]),
-                    Extension(name="torio.lib._torio_ffmpeg5", sources=[]),
-                    Extension(name="torio.lib.libtorio_ffmpeg6", sources=[]),
-                    Extension(name="torio.lib._torio_ffmpeg6", sources=[]),
-                ]
-            )
     return modules
 
 
@@ -129,7 +100,6 @@ class CMakeBuild(build_ext):
             "-DCMAKE_VERBOSE_MAKEFILE=ON",
             f"-DPython_INCLUDE_DIR={distutils.sysconfig.get_python_inc()}",
             f"-DBUILD_CPP_TEST={'ON' if _BUILD_CPP_TEST else 'OFF'}",
-            f"-DBUILD_SOX:BOOL={'ON' if _BUILD_SOX else 'OFF'}",
             f"-DBUILD_RIR:BOOL={'ON' if _BUILD_RIR else 'OFF'}",
             f"-DBUILD_RNNT:BOOL={'ON' if _BUILD_RNNT else 'OFF'}",
             f"-DBUILD_ALIGN:BOOL={'ON' if _BUILD_ALIGN else 'OFF'}",
@@ -139,7 +109,6 @@ class CMakeBuild(build_ext):
             f"-DUSE_ROCM:BOOL={'ON' if _USE_ROCM else 'OFF'}",
             f"-DUSE_CUDA:BOOL={'ON' if _USE_CUDA else 'OFF'}",
             f"-DUSE_OPENMP:BOOL={'ON' if _USE_OPENMP else 'OFF'}",
-            f"-DUSE_FFMPEG:BOOL={'ON' if _USE_FFMPEG else 'OFF'}",
         ]
         build_args = ["--target", "install"]
         # Pass CUDA architecture to cmake
@@ -161,9 +130,13 @@ class CMakeBuild(build_ext):
             import sys
 
             python_version = sys.version_info
+
+            cxx_compiler = os.environ.get("CXX", "cl")
+            c_compiler = os.environ.get("CC", "cl")
+
             cmake_args += [
-                "-DCMAKE_C_COMPILER=cl",
-                "-DCMAKE_CXX_COMPILER=cl",
+                f"-DCMAKE_C_COMPILER={c_compiler}",
+                f"-DCMAKE_CXX_COMPILER={cxx_compiler}",
                 f"-DPYTHON_VERSION={python_version.major}.{python_version.minor}",
             ]
 

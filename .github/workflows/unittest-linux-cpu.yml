@@ -13,31 +13,74 @@ jobs:
   tests:
     strategy:
       matrix:
-        python_version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.11"]
+        ffmpeg-version: ["7"]
       fail-fast: false
-    uses: pytorch/test-infra/.github/workflows/linux_job.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
     with:
       runner: linux.12xlarge
       repository: pytorch/audio
+      gpu-arch-type: cpu
+      gpu-arch-version:
       timeout: 120
+      job-name: linux-cpu
+
       script: |
-        echo '::group::Setup Environment Variables'
-        # Mark Build Directory Safe
-        git config --global --add safe.directory /__w/audio/audio
-
+        set -ex
         # Set up Environment Variables
-        export PYTHON_VERSION="${{ matrix.python_version }}"
-        export CUDA_TESTS_ONLY="0"
-        unset CUDA_VERSION
+        export PYTHON_VERSION="${{ matrix.python-version }}"
+        export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
+        export PIP_PROGRESS_BAR=off
+        export CONDA_QUIET=1
 
-        # Set CHANNEL
+        # Set UPLOAD_CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
           export UPLOAD_CHANNEL=test
         else
           export UPLOAD_CHANNEL=nightly
         fi
 
-        export PATH="${PWD}/third_party/install/bin/:${PATH}"
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create -c conda-forge --strict-channel-priority -y -n ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
+        conda activate ci_env
+        conda info
+        ffmpeg -version
+        python -m pip install --upgrade pip
+        # We add conda library path as otherwise torchcodec is not
+        # able to load ffmpeg shared libraries:
+        export LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}
+        echo "::endgroup::"
+
+        echo "::group::Install TorchAudio test and PyTorch dependencies"
+        python -m pip install parameterized requests coverage pytest pytest-cov scipy numpy expecttest
+        echo "::endgroup::"
+
+        echo "::group::Install PyTorch and TorchCodec"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu"
+        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}")'
+        python -c 'import torchcodec; print(f"{torchcodec.__version__}"); print(f"{torchcodec.__file__}")'
+        echo "::endgroup::"
+
+        echo "::group::Build and install TorchAudio"
+        export BUILD_CPP_TEST=1
+        python -m pip install . -v --no-build-isolation
+        echo "::endgroup::"
+
+        echo "::group::Run TorchAudio C tests"
+        (cd build/temp*/test/cpp && ./wall_collision)
+        echo "::endgroup::"
+
+        echo "::group::Run TorchAudio tests"
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_APPLY_CMVN_SLIDING=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_FBANK_FEATS=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CMD_COMPUTE_KALDI_PITCH_FEATS=true
@@ -52,14 +95,6 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_TEMPORARY_DISABLED=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
-        echo '::endgroup::'
-
-        set -euxo pipefail
-
-        echo '::group::Install PyTorch and Torchaudio'
-        ./.github/scripts/unittest-linux/install.sh
-        echo '::endgroup::'
-
-        echo '::group::Run Tests'
-        ./.github/scripts/unittest-linux/run_test.sh
-        echo '::endgroup::'
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
+        pytest test/torchaudio_unittest -k "not torchscript and not fairseq and not demucs" -x
+        echo "::endgroup::"

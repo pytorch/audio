@@ -2,7 +2,11 @@
 
 This directory contains sample implementations of training and evaluation pipelines for an DNN Beamforming model.
 
-The `DNNBeamformer` model composes the following componenst:
+> [!NOTE]
+> The code uses the `torchaudio.info` function which was removed from the library in version 2.9. As such, this code will
+> not run as written without modification. It is preserved for reference purposes only.
+
+The `DNNBeamformer` model composes the following components:
 
 + [`torchaudio.transforms.Spectrogram`](https://pytorch.org/audio/stable/generated/torchaudio.transforms.Spectrogram.html#spectrogram) that applies Short-time Fourier Transform (STFT) to the waveform.
 + ConvTasNet without encoder/decoder that predicts T-F masks for speech and noise, respectively.

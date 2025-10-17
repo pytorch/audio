@@ -6,7 +6,7 @@ namespace rnnt {
 namespace cpu {
 
 // Entry point into RNNT Loss
-std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
+std::tuple<torch::Tensor, std::optional<torch::Tensor>> compute(
     torch::Tensor& logits,
     const torch::Tensor& targets,
     const torch::Tensor& logit_lengths,
@@ -89,7 +89,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   torch::Tensor costs = torch::empty(
       options.batchSize_ * options.nHypos_,
       torch::TensorOptions().device(logits.device()).dtype(logits.dtype()));
-  c10::optional<torch::Tensor> gradients = torch::zeros_like(logits);
+  std::optional<torch::Tensor> gradients = torch::zeros_like(logits);
 
   torch::Tensor int_workspace = torch::empty(
       IntWorkspace::ComputeSizeFromOptions(options),
@@ -116,8 +116,8 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
           /*workspace=*/workspace,
           /*logits=*/logits.data_ptr<float>(),
           /*targets=*/targets.data_ptr<int>(),
-          /*logit_lengths=*/logit_lengths.data_ptr<int>(),
-          /*target_lengths=*/target_lengths.data_ptr<int>(),
+          /*srcLengths=*/logit_lengths.data_ptr<int>(),
+          /*tgtLengths=*/target_lengths.data_ptr<int>(),
           /*costs=*/costs.data_ptr<float>(),
           /*gradients=*/gradients->data_ptr<float>());
       break;
@@ -127,8 +127,8 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
           /*workspace=*/workspace,
           /*logits=*/logits.data_ptr<c10::Half>(),
           /*targets=*/targets.data_ptr<int>(),
-          /*logit_lengths=*/logit_lengths.data_ptr<int>(),
-          /*target_lengths=*/target_lengths.data_ptr<int>(),
+          /*srcLengths=*/logit_lengths.data_ptr<int>(),
+          /*tgtLengths=*/target_lengths.data_ptr<int>(),
           /*costs=*/costs.data_ptr<c10::Half>(),
           /*gradients=*/gradients->data_ptr<c10::Half>());
       break;

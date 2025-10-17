@@ -12,7 +12,8 @@ namespace cu_ctc {
  * @tparam IntType data type (checked only for integers)
  */
 template <typename IntType>
-constexpr __device__ IntType log2(IntType num, IntType ret = IntType(0)) {
+constexpr __host__ __device__ IntType
+log2(IntType num, IntType ret = IntType(0)) {
   return num <= IntType(1) ? ret : log2(num >> IntType(1), ++ret);
 }
 

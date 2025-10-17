@@ -313,7 +313,7 @@ class warp_sort_filtered : public warp_sort<Capacity, Ascending, T, IdxT> {
 
   __device__ __forceinline__ void merge_buf_() {
     topk::bitonic<kMaxBufLen>(!Ascending, kWarpWidth).sort(val_buf_, idx_buf_);
-    this->merge_in<kMaxBufLen>(val_buf_, idx_buf_);
+    this->template merge_in<kMaxBufLen>(val_buf_, idx_buf_);
     buf_len_ = 0;
     set_k_th_(); // contains warp sync
 #pragma unroll
@@ -385,7 +385,7 @@ class warp_sort_immediate : public warp_sort<Capacity, Ascending, T, IdxT> {
     if (buf_len_ == kMaxArrLen) {
       topk::bitonic<kMaxArrLen>(!Ascending, kWarpWidth)
           .sort(val_buf_, idx_buf_);
-      this->merge_in<kMaxArrLen>(val_buf_, idx_buf_);
+      this->template merge_in<kMaxArrLen>(val_buf_, idx_buf_);
 #pragma unroll
       for (int i = 0; i < kMaxArrLen; i++) {
         val_buf_[i] = kDummy;
@@ -398,7 +398,7 @@ class warp_sort_immediate : public warp_sort<Capacity, Ascending, T, IdxT> {
     if (buf_len_ != 0) {
       topk::bitonic<kMaxArrLen>(!Ascending, kWarpWidth)
           .sort(val_buf_, idx_buf_);
-      this->merge_in<kMaxArrLen>(val_buf_, idx_buf_);
+      this->template merge_in<kMaxArrLen>(val_buf_, idx_buf_);
     }
   }
 
@@ -421,7 +421,7 @@ constexpr inline __host__ __device__ IntType ceildiv(IntType a, IntType b) {
   return (a + b - 1) / b;
 }
 template <typename IntType>
-constexpr inline __device__ IntType roundUp256(IntType num) {
+constexpr inline __host__ __device__ IntType roundUp256(IntType num) {
   // return (num + 255) / 256 * 256;
   constexpr int MASK = 255;
   return (num + MASK) & (~MASK);

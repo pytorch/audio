@@ -312,7 +312,7 @@ class HuBERTDataSet(Dataset):
         with open(label_dir / f"label_{subset}.pt") as f:
             labels = [line.rstrip() for line in f]
             labels = [labels[i] for i in self.ind_list]
-        return np.asarray(labels, dtype=np.string_)
+        return np.asarray(labels, dtype=np.bytes_)
 
     def __getitem__(self, index):
         waveform = self._load_audio(index)

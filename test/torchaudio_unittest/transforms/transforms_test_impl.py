@@ -481,15 +481,20 @@ class TransformsTestBase(TestBaseMixin):
 
     @parameterized.expand(
         [
-            ((32000,), (0,), 16000),
-            ((1, 32000), (1, 0), 32000),
-            ((2, 44100), (2, 0), 32000),
-            ((2, 2, 44100), (2, 2, 0), 32000),
+            ((32000,), (0,), 16000, 0.0),
+            ((1, 32000), (1, 0), 32000, 0.0),
+            ((2, 44100), (2, 0), 32000, 0.0),
+            ((2, 2, 44100), (2, 2, 0), 32000, 0.0),
+            ((32000,), (16000,), 16000, 1.0),
+            ((32000,), (32000,), 16000, 4.0),
+            ((1, 32000), (1, 32000), 32000, 1.0),
+            ((2, 44100), (2, 32000), 32000, 1.0),
+            ((2, 2, 44100), (2, 2, 32000), 32000, 1.0),
         ]
     )
-    def test_vad_on_zero_audio(self, input_shape, output_shape, sample_rate: int):
-        """VAD should return zero when input is zero Tensor"""
+    def test_vad_on_zero_audio(self, input_shape, output_shape, sample_rate: int, pre_trigger_time: float):
+        """VAD should return zero when input is zero Tensor when pre_trigger_time=0"""
         inpt = torch.zeros(input_shape, dtype=self.dtype, device=self.device)
         expected_output = torch.zeros(output_shape, dtype=self.dtype, device=self.device)
-        result = T.Vad(sample_rate)(inpt)
+        result = T.Vad(sample_rate, pre_trigger_time=pre_trigger_time)(inpt)
         self.assertEqual(result, expected_output)

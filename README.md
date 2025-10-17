@@ -7,6 +7,17 @@ torchaudio: an audio library for PyTorch
 
 ![TorchAudio Logo](docs/source/_static/img/logo.png)
 
+> [!NOTE]
+> **We have transitioned TorchAudio into a
+>  maintenance phase. This process removed some user-facing
+>  features. These features were deprecated from TorchAudio 2.8 and removed in 2.9.
+>  Our main goals were to reduce redundancies with the rest of the
+>  PyTorch ecosystem, make it easier to maintain, and create a version of
+>  TorchAudio that is more tightly scoped to its strengths: processing audio
+>  data for ML. Please see
+>  [our community message](https://github.com/pytorch/audio/issues/3902)
+>  for more details.**
+
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
 of providing strong GPU acceleration, having a focus on trainable features through
@@ -16,9 +27,6 @@ processing library. The benefits of PyTorch can be seen in torchaudio through
 having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
-- [Support audio I/O (Load files, Save files)](http://pytorch.org/audio/main/)
-  - Load a variety of audio formats, such as `wav`, `mp3`, `ogg`, `flac`, `opus`, `sphere`, into a torch Tensor using SoX
-  - [Kaldi (ark/scp)](http://pytorch.org/audio/main/kaldi_io.html)
 - [Dataloaders for common audio datasets](http://pytorch.org/audio/main/datasets.html)
 - Audio and speech processing functions
   - [forced_align](https://pytorch.org/audio/main/generated/torchaudio.functional.forced_align.html)
@@ -59,7 +67,7 @@ If you find this package useful, please cite as:
 
 ```bibtex
 @misc{hwang2023torchaudio,
-      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch}, 
+      title={TorchAudio 2.1: Advancing speech recognition, self-supervised learning, and audio processing components for PyTorch},
       author={Jeff Hwang and Moto Hira and Caroline Chen and Xiaohui Zhang and Zhaoheng Ni and Guangzhi Sun and Pingchuan Ma and Ruizhe Huang and Vineel Pratap and Yuekai Zhang and Anurag Kumar and Chin-Yun Yu and Chuang Zhu and Chunxi Liu and Jacob Kahn and Mirco Ravanelli and Peng Sun and Shinji Watanabe and Yangyang Shi and Yumeng Tao and Robin Scheibler and Samuele Cornell and Sean Kim and Stavros Petridis},
       year={2023},
       eprint={2310.17864},

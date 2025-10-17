@@ -25,7 +25,7 @@ from flashlight.lib.text.dictionary import (
     Dictionary as _Dictionary,
     load_words as _load_words,
 )
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 try:
     from flashlight.lib.text.decoder.kenlm import KenLM as _KenLM
@@ -69,7 +69,7 @@ def _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word):
 
     if lexicon and word_dict is None:
         word_dict = _create_word_dict(lexicon)
-    elif not lexicon and word_dict is None and type(lm) == str:
+    elif not lexicon and word_dict is None and type(lm) is str:
         d = {tokens_dict.get_entry(i): [[tokens_dict.get_entry(i)]] for i in range(tokens_dict.index_size())}
         d[unk_word] = [[unk_word]]
         word_dict = _create_word_dict(d)
@@ -499,7 +499,7 @@ def ctc_decoder(
     # construct word dict and language model
     word_dict = _get_word_dict(lexicon, lm, lm_dict, tokens_dict, unk_word)
 
-    if type(lm) == str:
+    if type(lm) is str:
         if _KenLM is None:
             raise RuntimeError(
                 "flashlight-text is installed, but KenLM is not installed. "
@@ -554,10 +554,10 @@ def download_pretrained_files(model: str) -> _PretrainedFiles:
     """
 
     files = _get_filenames(model)
-    lexicon_file = download_asset(files.lexicon)
-    tokens_file = download_asset(files.tokens)
+    lexicon_file = _download_asset(files.lexicon)
+    tokens_file = _download_asset(files.tokens)
     if files.lm is not None:
-        lm_file = download_asset(files.lm)
+        lm_file = _download_asset(files.lm)
     else:
         lm_file = None
 

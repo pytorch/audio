@@ -20,17 +20,19 @@ conda activate "${env_dir}"
 
 source "$this_dir/set_cuda_envs.sh"
 
+printf "* Installing torch import-time dependencies\n"
+pip install numpy
+
 # 1. Install PyTorch
 if [ -z "${CUDA_VERSION:-}" ] ; then
-    cudatoolkit="cpuonly"
-    version="cpu"
+    wheel="cpu"
 else
-    version="$(python -c "print('.'.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
-    cudatoolkit="pytorch-cuda=${version}"
+    wheel="cu$(python -c "print(''.join(\"${CUDA_VERSION}\".split('.')[:2]))")"
 fi
-printf "Installing PyTorch with %s\n" "${cudatoolkit}"
-conda install -y -c "pytorch-${UPLOAD_CHANNEL}" -c nvidia pytorch "${cudatoolkit}"  pytest
-conda install -y -c conda-forge mkl=2020.4
+printf "Installing PyTorch\n"
+pip install --pre torch --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
+
+python -c "import torch; print(torch.__version__)"
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
 echo torch.cuda.is_available is $torch_cuda
@@ -42,32 +44,24 @@ if [ ! -z "${CUDA_VERSION:-}" ] ; then
     fi
 fi
 
+printf "Installing TorchCodec\n"
+# torchcodec nightly has no Windows+CUDA wheels, so we'll use CPU-only
+# torchcodec also under CUDA-enabled torch:
+pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu
+python -c "import torchcodec; print(torchcodec.__version__)"
+
 # 2. Install torchaudio
-printf "* Installing fsspec\n"
+printf "* Installing fsspec\n"   # TODO: is this required for torchaudio??
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
 
 printf "* Installing torchaudio\n"
-"$root_dir/packaging/vc_env_helper.bat" python setup.py install
+"$root_dir/packaging/vc_env_helper.bat" pip install . -v --no-build-isolation
 
 # 3. Install Test tools
 printf "* Installing test tools\n"
-NUMBA_DEV_CHANNEL=""
 SENTENCEPIECE_DEPENDENCY="sentencepiece"
-case "$(python --version)" in
-    *3.9*)
-        # Numba isn't available for Python 3.9 except on the numba dev channel and building from source fails
-        # See https://github.com/librosa/librosa/issues/1270#issuecomment-759065048
-        NUMBA_DEV_CHANNEL="-c numba/label/dev"
-        ;;
-    *3.10*)
-        # Don't install sentencepiece, no python 3.10 dependencies available for windows yet
-        SENTENCEPIECE_DEPENDENCY=""
-        NUMBA_DEV_CHANNEL="-c numba/label/dev"
-        ;;
-esac
-# Note: installing librosa via pip fail because it will try to compile numba.
 (
-    conda install -y -c conda-forge ${NUMBA_DEV_CHANNEL} 'librosa==0.10.0' parameterized 'requests>=2.20'
+    conda install -y -c conda-forge parameterized 'requests>=2.20'
     # Need to disable shell check since this'll fail out if SENTENCEPIECE_DEPENDENCY is empty
     # shellcheck disable=SC2086
     pip install \
@@ -77,21 +71,7 @@ esac
         coverage \
         expecttest \
         inflect \
-        kaldi-io \
         pytest \
         pytest-cov \
-        pytorch-lightning \
-        'scipy==1.7.3' \
-        unidecode \
-        'protobuf<4.21.0' \
-        demucs \
-        tinytag \
-        pyroomacoustics \
-        flashlight-text \
-        git+https://github.com/kpu/kenlm/
+        scipy
 )
-# Install fairseq
-git clone https://github.com/pytorch/fairseq
-cd fairseq
-git checkout e47a4c8
-pip install .

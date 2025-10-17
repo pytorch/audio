@@ -15,6 +15,7 @@ from torchaudio.functional.functional import (
     _check_convolve_mode,
     _fix_waveform_shape,
     _get_sinc_resample_kernel,
+    _rnnt_loss,
     _stretch_waveform,
 )
 
@@ -1184,7 +1185,7 @@ class _AxisMasking(torch.nn.Module):
         self.iid_masks = iid_masks
         self.p = p
 
-    def forward(self, specgram: Tensor, mask_value: float = 0.0) -> Tensor:
+    def forward(self, specgram: Tensor, mask_value: Union[float, torch.Tensor] = 0.0) -> Tensor:
         r"""
         Args:
             specgram (Tensor): Tensor of dimension `(..., freq, time)`.
@@ -1846,7 +1847,7 @@ class RNNTLoss(torch.nn.Module):
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size (batch),
             otherwise scalar.
         """
-        return F.rnnt_loss(
+        return _rnnt_loss(
             logits,
             targets,
             logit_lengths,
@@ -2134,4 +2135,4 @@ class Deemphasis(torch.nn.Module):
         Returns:
             torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
         """
-        return F.deemphasis(waveform, coeff=self.coeff)
+        return F.functional.deemphasis(waveform, coeff=self.coeff)

@@ -14,4 +14,4 @@ if [ "${USE_CUDA}" == "1" ] ; then
     fi
 fi
 shopt -u nocasematch
-python setup.py install --single-version-externally-managed --record=record.txt
+python -m pip install . -vv --no-build-isolation

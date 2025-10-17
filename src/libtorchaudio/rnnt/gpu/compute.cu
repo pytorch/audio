@@ -7,7 +7,7 @@ namespace rnnt {
 namespace gpu {
 
 // Entry point into RNNT Loss
-std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
+std::tuple<torch::Tensor, std::optional<torch::Tensor>> compute(
     torch::Tensor& logits,
     const torch::Tensor& targets,
     const torch::Tensor& logit_lengths,
@@ -92,7 +92,7 @@ std::tuple<torch::Tensor, c10::optional<torch::Tensor>> compute(
   torch::Tensor costs = torch::empty(
       options.batchSize_ * options.nHypos_,
       torch::TensorOptions().device(logits.device()).dtype(logits.dtype()));
-  c10::optional<torch::Tensor> gradients = torch::zeros_like(logits);
+  std::optional<torch::Tensor> gradients = torch::zeros_like(logits);
 
   torch::Tensor int_workspace = torch::empty(
       IntWorkspace::ComputeSizeFromOptions(options),

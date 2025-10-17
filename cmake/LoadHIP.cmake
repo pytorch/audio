@@ -1,16 +1,24 @@
 set(PYTORCH_FOUND_HIP FALSE)
 
 if(NOT DEFINED ENV{ROCM_PATH})
-  set(ROCM_PATH /opt/rocm)
+  if(UNIX)
+    set(ROCM_PATH /opt/rocm)
+  else() # Win32
+    set(ROCM_PATH C:/opt/rocm)
+  endif()
 else()
-  set(ROCM_PATH $ENV{ROCM_PATH})
+  file(TO_CMAKE_PATH "$ENV{ROCM_PATH}" ROCM_PATH)
 endif()
 
 # HIP_PATH
 if(NOT DEFINED ENV{HIP_PATH})
-  set(HIP_PATH ${ROCM_PATH}/hip)
+  if(UNIX)
+    set(HIP_PATH ${ROCM_PATH}/hip)
+  else() #Win32
+    set(HIP_PATH ${ROCM_PATH})
+  endif()
 else()
-  set(HIP_PATH $ENV{HIP_PATH})
+  file(TO_CMAKE_PATH "$ENV{HIP_PATH}" HIP_PATH)
 endif()
 
 if(NOT EXISTS ${HIP_PATH})
@@ -21,47 +29,47 @@ endif()
 if(NOT DEFINED ENV{HCC_PATH})
   set(HCC_PATH ${ROCM_PATH}/hcc)
 else()
-  set(HCC_PATH $ENV{HCC_PATH})
+  file(TO_CMAKE_PATH "$ENV{HCC_PATH}" HCC_PATH)
 endif()
 
 # HSA_PATH
 if(NOT DEFINED ENV{HSA_PATH})
   set(HSA_PATH ${ROCM_PATH}/hsa)
 else()
-  set(HSA_PATH $ENV{HSA_PATH})
+  file(TO_CMAKE_PATH "$ENV{HSA_PATH}" HSA_PATH)
 endif()
 
 # ROCBLAS_PATH
 if(NOT DEFINED ENV{ROCBLAS_PATH})
   set(ROCBLAS_PATH ${ROCM_PATH}/rocblas)
 else()
-  set(ROCBLAS_PATH $ENV{ROCBLAS_PATH})
+  file(TO_CMAKE_PATH "$ENV{ROCBLAS_PATH}" ROCBLAS_PATH)
 endif()
 
 # ROCFFT_PATH
 if(NOT DEFINED ENV{ROCFFT_PATH})
   set(ROCFFT_PATH ${ROCM_PATH}/rocfft)
 else()
-  set(ROCFFT_PATH $ENV{ROCFFT_PATH})
+  file(TO_CMAKE_PATH "$ENV{ROCFFT_PATH}" ROCFFT_PATH)
 endif()
 
 # HIPFFT_PATH
 if(NOT DEFINED ENV{HIPFFT_PATH})
   set(HIPFFT_PATH ${ROCM_PATH}/hipfft)
 else()
-  set(HIPFFT_PATH $ENV{HIPFFT_PATH})
+  file(TO_CMAKE_PATH "$ENV{HIPFFT_PATH}" HIPFFT_PATH)
 endif()
 
 # HIPSPARSE_PATH
 if(NOT DEFINED ENV{HIPSPARSE_PATH})
   set(HIPSPARSE_PATH ${ROCM_PATH}/hipsparse)
 else()
-  set(HIPSPARSE_PATH $ENV{HIPSPARSE_PATH})
+  file(TO_CMAKE_PATH "$ENV{HIPSPARSE_PATH}" HIPSPARSE_PATH)
 endif()
 
 # THRUST_PATH
 if(DEFINED ENV{THRUST_PATH})
-  set(THRUST_PATH $ENV{THRUST_PATH})
+  file(TO_CMAKE_PATH "$ENV{THRUST_PATH}" THRUST_PATH)
 else()
   set(THRUST_PATH ${ROCM_PATH}/include)
 endif()
@@ -70,56 +78,56 @@ endif()
 if(NOT DEFINED ENV{HIPRAND_PATH})
   set(HIPRAND_PATH ${ROCM_PATH}/hiprand)
 else()
-  set(HIPRAND_PATH $ENV{HIPRAND_PATH})
+  file(TO_CMAKE_PATH "$ENV{HIPRAND_PATH}" HIPRAND_PATH)
 endif()
 
 # ROCRAND_PATH
 if(NOT DEFINED ENV{ROCRAND_PATH})
   set(ROCRAND_PATH ${ROCM_PATH}/rocrand)
 else()
-  set(ROCRAND_PATH $ENV{ROCRAND_PATH})
+  file(TO_CMAKE_PATH "$ENV{ROCRAND_PATH}" ROCRAND_PATH)
 endif()
 
 # MIOPEN_PATH
 if(NOT DEFINED ENV{MIOPEN_PATH})
   set(MIOPEN_PATH ${ROCM_PATH}/miopen)
 else()
-  set(MIOPEN_PATH $ENV{MIOPEN_PATH})
+  file(TO_CMAKE_PATH "$ENV{MIOPEN_PATH}" MIOPEN_PATH)
 endif()
 
 # RCCL_PATH
 if(NOT DEFINED ENV{RCCL_PATH})
   set(RCCL_PATH ${ROCM_PATH}/rccl)
 else()
-  set(RCCL_PATH $ENV{RCCL_PATH})
+  file(TO_CMAKE_PATH "$ENV{RCCL_PATH}" RCCL_PATH)
 endif()
 
 # ROCPRIM_PATH
 if(NOT DEFINED ENV{ROCPRIM_PATH})
   set(ROCPRIM_PATH ${ROCM_PATH}/rocprim)
 else()
-  set(ROCPRIM_PATH $ENV{ROCPRIM_PATH})
+  file(TO_CMAKE_PATH "$ENV{ROCPRIM_PATH}" ROCPRIM_PATH)
 endif()
 
 # HIPCUB_PATH
 if(NOT DEFINED ENV{HIPCUB_PATH})
   set(HIPCUB_PATH ${ROCM_PATH}/hipcub)
 else()
-  set(HIPCUB_PATH $ENV{HIPCUB_PATH})
+  file(TO_CMAKE_PATH "$ENV{HIPCUB_PATH}" HIPCUB_PATH)
 endif()
 
 # ROCTHRUST_PATH
 if(NOT DEFINED ENV{ROCTHRUST_PATH})
   set(ROCTHRUST_PATH ${ROCM_PATH}/rocthrust)
 else()
-  set(ROCTHRUST_PATH $ENV{ROCTHRUST_PATH})
+  file(TO_CMAKE_PATH "$ENV{ROCTHRUST_PATH}" ROCTHRUST_PATH)
 endif()
 
 # ROCTRACER_PATH
 if(NOT DEFINED ENV{ROCTRACER_PATH})
   set(ROCTRACER_PATH ${ROCM_PATH}/roctracer)
 else()
-  set(ROCTRACER_PATH $ENV{ROCTRACER_PATH})
+  file(TO_CMAKE_PATH "$ENV{ROCTRACER_PATH}" ROCTRACER_PATH)
 endif()
 
 if(NOT DEFINED ENV{PYTORCH_ROCM_ARCH})
@@ -129,7 +137,9 @@ else()
 endif()
 
 # Add HIP to the CMAKE Module Path
-set(CMAKE_MODULE_PATH ${HIP_PATH}/cmake ${CMAKE_MODULE_PATH})
+# needed because the find_package call to this module uses the Module mode search
+# https://cmake.org/cmake/help/latest/command/find_package.html#search-modes
+set(CMAKE_MODULE_PATH ${HIP_PATH}/lib/cmake/hip ${CMAKE_MODULE_PATH})
 
 # Disable Asserts In Code (Can't use asserts on HIP stack.)
 add_definitions(-DNDEBUG)
@@ -145,29 +155,49 @@ find_package_and_print_version(HIP 1.0)
 if(HIP_FOUND)
   set(PYTORCH_FOUND_HIP TRUE)
 
-  # Find ROCM version for checks
-  file(READ "${ROCM_PATH}/.info/version-dev" ROCM_VERSION_DEV_RAW)
-  string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+)-.*$" ROCM_VERSION_DEV_MATCH ${ROCM_VERSION_DEV_RAW})
-  if(ROCM_VERSION_DEV_MATCH)
-    set(ROCM_VERSION_DEV_MAJOR ${CMAKE_MATCH_1})
-    set(ROCM_VERSION_DEV_MINOR ${CMAKE_MATCH_2})
-    set(ROCM_VERSION_DEV_PATCH ${CMAKE_MATCH_3})
-    set(ROCM_VERSION_DEV "${ROCM_VERSION_DEV_MAJOR}.${ROCM_VERSION_DEV_MINOR}.${ROCM_VERSION_DEV_PATCH}")
+  if(UNIX)
+    set(ROCM_LIB_NAME "ROCM")
+  else() # Win32
+    set(ROCM_LIB_NAME "HIP")
   endif()
-  message("\n***** ROCm version from ${ROCM_PATH}/.info/version-dev ****\n")
-  message("ROCM_VERSION_DEV: ${ROCM_VERSION_DEV}")
-  message("ROCM_VERSION_DEV_MAJOR: ${ROCM_VERSION_DEV_MAJOR}")
-  message("ROCM_VERSION_DEV_MINOR: ${ROCM_VERSION_DEV_MINOR}")
-  message("ROCM_VERSION_DEV_PATCH: ${ROCM_VERSION_DEV_PATCH}")
+  if(UNIX)
+    # Find ROCM version for checks
+    file(READ "${ROCM_PATH}/.info/version-dev" ${ROCM_LIB_NAME}_VERSION_DEV_RAW)
+  else() #Win32
+    # Find HIP version from hipconfig execution
+    execute_process(
+        COMMAND ${ROCM_PATH}/bin/hipconfig.bat --version
+        OUTPUT_VARIABLE ${ROCM_LIB_NAME}_VERSION_DEV_RAW
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+  endif()
+  string(REGEX MATCH "^([0-9]+)\.([0-9]+)\.([0-9]+).*$" ${ROCM_LIB_NAME}_VERSION_DEV_MATCH ${${ROCM_LIB_NAME}_VERSION_DEV_RAW})
+  if(${ROCM_LIB_NAME}_VERSION_DEV_MATCH)
+    set(${ROCM_LIB_NAME}_VERSION_DEV_MAJOR ${CMAKE_MATCH_1})
+    set(${ROCM_LIB_NAME}_VERSION_DEV_MINOR ${CMAKE_MATCH_2})
+    set(${ROCM_LIB_NAME}_VERSION_DEV_PATCH ${CMAKE_MATCH_3})
+    set(${ROCM_LIB_NAME}_VERSION_DEV "${${ROCM_LIB_NAME}_VERSION_DEV_MAJOR}.${${ROCM_LIB_NAME}_VERSION_DEV_MINOR}.${${ROCM_LIB_NAME}_VERSION_DEV_PATCH}")
+  endif()
+  if(UNIX)
+    message("\n***** ROCm version from ${ROCM_PATH}/.info/version-dev ****\n")
+  else() #Win32
+    message("\n***** HIP version from ${ROCM_PATH}/bin/hipconfig.bat --version ****\n")
+  endif()
+  message("${ROCM_LIB_NAME}_VERSION_DEV: ${${ROCM_LIB_NAME}_VERSION_DEV}")
+  message("${ROCM_LIB_NAME}_VERSION_DEV_MAJOR: ${${ROCM_LIB_NAME}_VERSION_DEV_MAJOR}")
+  message("${ROCM_LIB_NAME}_VERSION_DEV_MINOR: ${${ROCM_LIB_NAME}_VERSION_DEV_MINOR}")
+  message("${ROCM_LIB_NAME}_VERSION_DEV_PATCH: ${${ROCM_LIB_NAME}_VERSION_DEV_PATCH}")
 
-  message("\n***** Library versions from dpkg *****\n")
-  execute_process(COMMAND dpkg -l COMMAND grep rocm-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep rocm-libs COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep hsakmt-roct COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep rocr-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep -w hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep hip_base COMMAND awk "{print $2 \" VERSION: \" $3}")
-  execute_process(COMMAND dpkg -l COMMAND grep hip_hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
+  if(UNIX)
+    message("\n***** Library versions from dpkg *****\n")
+    execute_process(COMMAND dpkg -l COMMAND grep rocm-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep rocm-libs COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep hsakmt-roct COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep rocr-dev COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep -w hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep hip_base COMMAND awk "{print $2 \" VERSION: \" $3}")
+    execute_process(COMMAND dpkg -l COMMAND grep hip_hcc COMMAND awk "{print $2 \" VERSION: \" $3}")
+  endif()
 
   message("\n***** Library versions from cmake find_package *****\n")
 
@@ -176,7 +206,6 @@ if(HIP_FOUND)
   ### Remove setting of Flags when FindHIP.CMake PR #558 is accepted.###
 
   set(hip_DIR ${HIP_PATH}/lib/cmake/hip)
-  set(hsa-runtime64_DIR ${ROCM_PATH}/lib/cmake/hsa-runtime64)
   set(AMDDeviceLibs_DIR ${ROCM_PATH}/lib/cmake/AMDDeviceLibs)
   set(amd_comgr_DIR ${ROCM_PATH}/lib/cmake/amd_comgr)
   set(rocrand_DIR ${ROCRAND_PATH}/lib/cmake/rocrand)
@@ -186,13 +215,11 @@ if(HIP_FOUND)
   set(rocfft_DIR ${ROCFFT_PATH}/lib/cmake/rocfft)
   set(hipfft_DIR ${HIPFFT_PATH}/lib/cmake/hipfft)
   set(hipsparse_DIR ${HIPSPARSE_PATH}/lib/cmake/hipsparse)
-  set(rccl_DIR ${RCCL_PATH}/lib/cmake/rccl)
   set(rocprim_DIR ${ROCPRIM_PATH}/lib/cmake/rocprim)
   set(hipcub_DIR ${HIPCUB_PATH}/lib/cmake/hipcub)
   set(rocthrust_DIR ${ROCTHRUST_PATH}/lib/cmake/rocthrust)
 
   find_package_and_print_version(hip REQUIRED)
-  find_package_and_print_version(hsa-runtime64 REQUIRED)
   find_package_and_print_version(amd_comgr REQUIRED)
   find_package_and_print_version(rocrand REQUIRED)
   find_package_and_print_version(hiprand REQUIRED)
@@ -203,7 +230,6 @@ if(HIP_FOUND)
     find_package_and_print_version(hipfft REQUIRED)
   endif()
   find_package_and_print_version(hipsparse REQUIRED)
-  find_package_and_print_version(rccl)
   find_package_and_print_version(rocprim REQUIRED)
   find_package_and_print_version(hipcub REQUIRED)
   find_package_and_print_version(rocthrust REQUIRED)
@@ -223,12 +249,21 @@ if(HIP_FOUND)
   # TODO: miopen_LIBRARIES should return fullpath to the library file,
   # however currently it's just the lib name
   find_library(PYTORCH_MIOPEN_LIBRARIES ${miopen_LIBRARIES} HINTS ${MIOPEN_PATH}/lib)
-  # TODO: rccl_LIBRARIES should return fullpath to the library file,
-  # however currently it's just the lib name
-  find_library(PYTORCH_RCCL_LIBRARIES ${rccl_LIBRARIES} HINTS ${RCCL_PATH}/lib)
   # hiprtc is part of HIP
   find_library(ROCM_HIPRTC_LIB ${hip_library_name} HINTS ${HIP_PATH}/lib)
-  # roctx is part of roctracer
-  find_library(ROCM_ROCTX_LIB roctx64 HINTS ${ROCTRACER_PATH}/lib)
-  set(roctracer_INCLUDE_DIRS ${ROCTRACER_PATH}/include)
+  
+  if(UNIX)
+    set(hsa-runtime64_DIR ${ROCM_PATH}/lib/cmake/hsa-runtime64)
+    set(rccl_DIR ${RCCL_PATH}/lib/cmake/rccl)
+
+    find_package_and_print_version(hsa-runtime64 REQUIRED)
+    find_package_and_print_version(rccl)
+
+    # TODO: rccl_LIBRARIES should return fullpath to the library file,
+    # however currently it's just the lib name
+    find_library(PYTORCH_RCCL_LIBRARIES ${rccl_LIBRARIES} HINTS ${RCCL_PATH}/lib)
+    # roctx is part of roctracer
+    find_library(ROCM_ROCTX_LIB roctx64 HINTS ${ROCTRACER_PATH}/lib)
+    set(roctracer_INCLUDE_DIRS ${ROCTRACER_PATH}/include)
+  endif() 
 endif()

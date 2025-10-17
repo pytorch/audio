@@ -9,7 +9,6 @@ conda activate ci
 python -m torch.utils.collect_env
 env | grep TORCHAUDIO || true
 
-export PATH="${PWD}/third_party/install/bin/:${PATH}"
 
 declare -a args=(
     '--continue-on-collection-errors'
@@ -29,7 +28,10 @@ fi
 )
 
 (
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
     cd test
-    pytest "${args[@]}" torchaudio_unittest
-    coverage html
+    pytest torchaudio_unittest -k "not torchscript and not fairseq and not demucs ${PYTEST_K_EXTRA}" 
 )

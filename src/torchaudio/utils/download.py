@@ -31,7 +31,7 @@ def _get_hash(path, hash, chunk_size=1028):
     return m.hexdigest()
 
 
-def download_asset(
+def _download_asset(
     key: str,
     hash: str = "",
     path: Union[str, PathLike] = "",

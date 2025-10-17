@@ -285,7 +285,7 @@ def squim_objective_model(
     chunk_size: int,
     chunk_stride: Optional[int] = None,
 ) -> SquimObjective:
-    """Build a custome :class:`torchaudio.prototype.models.SquimObjective` model.
+    """Build a custome :class:`torchaudio.models.squim.SquimObjective` model.
 
     Args:
         feat_dim (int, optional): The feature dimension after Encoder module.
@@ -313,7 +313,7 @@ def squim_objective_model(
 
 
 def squim_objective_base() -> SquimObjective:
-    """Build :class:`torchaudio.prototype.models.SquimObjective` model with default arguments."""
+    """Build :class:`torchaudio.models.squim.SquimObjective` model with default arguments."""
     return squim_objective_model(
         feat_dim=256,
         win_len=64,

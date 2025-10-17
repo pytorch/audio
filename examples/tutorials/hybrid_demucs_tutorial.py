@@ -48,15 +48,10 @@ print(torchaudio.__version__)
 import matplotlib.pyplot as plt
 
 ######################################################################
-# In addition to ``torchaudio``, ``mir_eval`` is required to perform
-# signal-to-distortion ratio (SDR) calculations. To install ``mir_eval``
-# please use ``pip3 install mir_eval``.
-#
 
 from IPython.display import Audio
-from mir_eval import separation
 from torchaudio.pipelines import HDEMUCS_HIGH_MUSDB_PLUS
-from torchaudio.utils import download_asset
+from torchaudio.utils import _download_asset
 
 ######################################################################
 # 3. Construct the pipeline
@@ -186,7 +181,7 @@ def plot_spectrogram(stft, title="Spectrogram"):
 #
 
 # We download the audio file from our storage. Feel free to download another file and use audio from a specific path
-SAMPLE_SONG = download_asset("tutorial-assets/hdemucs_mix.wav")
+SAMPLE_SONG = _download_asset("tutorial-assets/hdemucs_mix.wav")
 waveform, sample_rate = torchaudio.load(SAMPLE_SONG)  # replace SAMPLE_SONG with desired path for different song
 waveform = waveform.to(device)
 mixture = waveform
@@ -247,10 +242,8 @@ stft = torchaudio.transforms.Spectrogram(
 
 
 def output_results(original_source: torch.Tensor, predicted_source: torch.Tensor, source: str):
-    print(
-        "SDR score is:",
-        separation.bss_eval_sources(original_source.detach().numpy(), predicted_source.detach().numpy())[0].mean(),
-    )
+    # If you have installed the mir_eval package, you can calculate the SDR score with
+    # `mir_eval.separation.bss_eval_sources(original_source.detach().numpy(), predicted_source.detach().numpy())[0].mean()`
     plot_spectrogram(stft(predicted_source)[0], f"Spectrogram - {source}")
     return Audio(predicted_source, rate=sample_rate)
 
@@ -261,10 +254,10 @@ segment_end = 155
 frame_start = segment_start * sample_rate
 frame_end = segment_end * sample_rate
 
-drums_original = download_asset("tutorial-assets/hdemucs_drums_segment.wav")
-bass_original = download_asset("tutorial-assets/hdemucs_bass_segment.wav")
-vocals_original = download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
-other_original = download_asset("tutorial-assets/hdemucs_other_segment.wav")
+drums_original = _download_asset("tutorial-assets/hdemucs_drums_segment.wav")
+bass_original = _download_asset("tutorial-assets/hdemucs_bass_segment.wav")
+vocals_original = _download_asset("tutorial-assets/hdemucs_vocals_segment.wav")
+other_original = _download_asset("tutorial-assets/hdemucs_other_segment.wav")
 
 drums_spec = audios["drums"][:, frame_start:frame_end].cpu()
 drums, sample_rate = torchaudio.load(drums_original)

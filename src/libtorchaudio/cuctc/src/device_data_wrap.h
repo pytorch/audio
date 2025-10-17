@@ -24,9 +24,26 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
+#include <cuda_runtime.h>
 #include <iostream>
 #include <vector>
-#include "include/ctc_prefix_decoder_host.h"
+#include "../include/ctc_prefix_decoder_host.h"
+
+#define CUDA_CHECK(X)                                   \
+  do {                                                  \
+    auto result = X;                                    \
+    if (result != cudaSuccess) {                        \
+      const char* p_err_str = cudaGetErrorName(result); \
+      fprintf(                                          \
+          stderr,                                       \
+          "File %s Line %d %s returned %s.\n",          \
+          __FILE__,                                     \
+          __LINE__,                                     \
+          #X,                                           \
+          p_err_str);                                   \
+      abort();                                          \
+    }                                                   \
+  } while (0)
 
 namespace cu_ctc {
 constexpr size_t ALIGN_BYTES = 128;

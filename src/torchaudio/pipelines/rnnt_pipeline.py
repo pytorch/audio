@@ -244,7 +244,7 @@ class RNNTBundle:
 
     def _get_model(self) -> RNNT:
         model = self._rnnt_factory_func()
-        path = torchaudio.utils.download_asset(self._rnnt_path)
+        path = torchaudio.utils._download_asset(self._rnnt_path)
         state_dict = torch.load(path)
         model.load_state_dict(state_dict)
         model.eval()
@@ -313,7 +313,7 @@ class RNNTBundle:
         Returns:
             FeatureExtractor
         """
-        local_path = torchaudio.utils.download_asset(self._global_stats_path)
+        local_path = torchaudio.utils._download_asset(self._global_stats_path)
         return _ModuleFeatureExtractor(
             torch.nn.Sequential(
                 torchaudio.transforms.MelSpectrogram(
@@ -332,7 +332,7 @@ class RNNTBundle:
         Returns:
             FeatureExtractor
         """
-        local_path = torchaudio.utils.download_asset(self._global_stats_path)
+        local_path = torchaudio.utils._download_asset(self._global_stats_path)
         return _ModuleFeatureExtractor(
             torch.nn.Sequential(
                 torchaudio.transforms.MelSpectrogram(
@@ -350,7 +350,7 @@ class RNNTBundle:
         Returns:
             TokenProcessor
         """
-        local_path = torchaudio.utils.download_asset(self._sp_model_path)
+        local_path = torchaudio.utils._download_asset(self._sp_model_path)
         return _SentencePieceTokenProcessor(local_path)
 
 

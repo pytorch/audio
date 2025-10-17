@@ -39,7 +39,11 @@ __global__ void ReduceMax2D(
 
   CAST_DTYPE shf;
   for (int stride = (WARP_SIZE >> 1); stride > 0; stride >>= 1) {
+#ifndef USE_ROCM
     shf = __shfl_down_sync(0xFFFFFFFF, val, stride);
+#else
+    shf = __shfl_down(val, stride);
+#endif
     if (threadIdx.x < stride && threadIdx.x + stride < dim) {
       if (shf > val) {
         val = shf;
@@ -81,7 +85,11 @@ __global__ void ReduceLogSumExpGivenMax2D(
 
   CAST_DTYPE shf;
   for (int stride = (WARP_SIZE >> 1); stride > 0; stride >>= 1) {
+#ifndef USE_ROCM
     shf = __shfl_down_sync(0xFFFFFFFF, val, stride);
+#else
+    shf = __shfl_down(val, stride);
+#endif
     if (threadIdx.x < stride && threadIdx.x + stride < dim) {
       val = val + shf;
     }

@@ -128,7 +128,7 @@ Verify the installation by checking the version and CUDA device accessibility.
 
 .. code-block::
 
-   sudo apt install ffmpeg libavformat-dev libavcodec-dev libavutil-dev libavdevice-dev libavfilter-dev
+   sudo apt install libavformat-dev libavcodec-dev libavutil-dev libavdevice-dev libavfilter-dev
 
 3. Build TorchAudio
 ~~~~~~~~~~~~~~~~~~~
@@ -147,8 +147,6 @@ Verify the installation by checking the version and CUDA device accessibility.
    import torchaudio
 
    print(torchaudio.__version__)
-
-   torchaudio.utils.ffmpeg_utils.get_build_config()
 
 .. code-block::
 

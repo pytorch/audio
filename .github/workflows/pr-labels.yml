@@ -1,31 +1,33 @@
 name: pr-labels
 
-on:
-  push:
-    branches:
-      - main
+# This workflow is disabled and kept only for reference.
 
-jobs:
-  is-properly-labeled:
-    runs-on: ubuntu-latest
+# on:
+#   push:
+#     branches:
+#       - main
 
-    steps:
-      - name: Set up python
-        uses: actions/setup-python@v2
+# jobs:
+#   is-properly-labeled:
+#     runs-on: ubuntu-latest
 
-      - name: Install requests
-        run: pip install requests
+#     steps:
+#       - name: Set up python
+#         uses: actions/setup-python@v2
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
+#       - name: Install requests
+#         run: pip install requests
 
-      - name: Process commit and find merger responsible for labeling
-        id: commit
-        env:
-          SHA1: ${{ github.sha }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python .github/process_commit.py "${SHA1}"
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
 
-concurrency:
-  group: pr-labels-${{ github.event.pull_request.number || github.sha }}-${{ github.event_name == 'workflow_dispatch' }}
-  cancel-in-progress: true
+#       - name: Process commit and find merger responsible for labeling
+#         id: commit
+#         env:
+#           SHA1: ${{ github.sha }}
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: python .github/process_commit.py "${SHA1}"
+
+# concurrency:
+#   group: pr-labels-${{ github.event.pull_request.number || github.sha }}-${{ github.event_name == 'workflow_dispatch' }}
+#   cancel-in-progress: true

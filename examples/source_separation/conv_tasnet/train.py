@@ -189,8 +189,6 @@ def train(args):
     _LG.info("%s", args)
 
     args.save_dir.mkdir(parents=True, exist_ok=True)
-    if "sox_io" in torchaudio.list_audio_backends():
-        torchaudio.set_audio_backend("sox_io")
 
     start_epoch = 1
     if args.resume:

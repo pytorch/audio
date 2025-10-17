@@ -95,7 +95,7 @@ class GlobalStatsNormalization(torch.nn.Module):
 class WarmupLR(torch.optim.lr_scheduler._LRScheduler):
     def __init__(self, optimizer, warmup_updates, last_epoch=-1, verbose=False):
         self.warmup_updates = warmup_updates
-        super().__init__(optimizer, last_epoch=last_epoch, verbose=verbose)
+        super().__init__(optimizer, last_epoch=last_epoch)
 
     def get_lr(self):
         return [(min(1.0, self._step_count / self.warmup_updates)) * base_lr for base_lr in self.base_lrs]

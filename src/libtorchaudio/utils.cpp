@@ -23,7 +23,7 @@ bool is_align_available() {
 #endif
 }
 
-c10::optional<int64_t> cuda_version() {
+std::optional<int64_t> cuda_version() {
 #ifdef USE_CUDA
   return CUDA_VERSION;
 #else

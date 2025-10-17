@@ -1,0 +1,85 @@
+name: Docs
+
+on:
+  pull_request:
+  push:
+    branches:
+      - nightly
+      - main
+      - release/*
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+        cuda-version: ["12.6"]
+        ffmpeg-version: ["7"]
+      fail-fast: false
+    uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      runner: linux.4xlarge.nvidia.gpu
+      repository: pytorch/audio
+      upload-artifact: docs
+      gpu-arch-type: cuda
+      gpu-arch-version: ${{ matrix.cuda-version }}
+      timeout: 120
+      job-name: docs
+
+      script: |
+        set -ex
+        # Set up Environment Variables
+        export PYTHON_VERSION="${{ matrix.python-version }}"
+        export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
+        export CU_VERSION_WITHOUT_PERIODS="$(echo "${{ matrix.cuda-version }}" | sed 's/\.//g')"
+        export PIP_PROGRESS_BAR=off
+        export CONDA_QUIET=1
+
+        # Set UPLOAD_CHANNEL
+        if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
+          export UPLOAD_CHANNEL=test
+        else
+          export UPLOAD_CHANNEL=nightly
+        fi
+
+        echo "::group::Create conda env"
+        # Mark Build Directory Safe
+        git config --global --add safe.directory /__w/audio/audio
+        conda create -c conda-forge --strict-channel-priority -y --prefix ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
+        conda activate ./ci_env
+        conda info
+        python -m pip install --upgrade pip
+        echo "::endgroup::"
+
+        echo "::group::Install PyTorch and TorchCodec"
+        PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cu${CU_VERSION_WITHOUT_PERIODS}"
+        python -m pip install numpy
+        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
+        echo "::endgroup::"
+
+        echo "::group::Build and install TorchAudio"
+        python -m pip install . -v --no-build-isolation
+        echo "::endgroup::"
+
+        echo "::group::Install TorchAudio documentation build requirements"
+        python -m pip install -r docs/requirements.txt -r docs/requirements-tutorials.txt
+        echo "::endgroup::"
+
+        echo "::group::Build TorchAudio documentation"
+        export BUILD_GALLERY=true
+        (cd docs && make html)
+        echo "::endgroup::"
+
+        echo "::group::Copy artifacts"
+        cp -r docs/build/html "${RUNNER_ARTIFACT_DIR}"
+
+        # On PRs we also want to upload the docs into our S3 bucket for preview.
+        if [[ ${{ github.event_name == 'pull_request' }} ]]; then
+          cp -r docs/build/html/* "${RUNNER_DOCS_DIR}"
+        fi
+        echo "::endgroup::"
