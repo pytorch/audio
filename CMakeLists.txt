@@ -52,7 +52,6 @@ endif()
 
 
 # Options
-option(BUILD_RIR "Enable RIR simulation" ON)
 option(BUILD_RNNT "Enable RNN transducer" ON)
 option(BUILD_ALIGN "Enable forced alignment" ON)
 option(BUILD_CUDA_CTC_DECODER "Build CUCTC decoder" OFF)
@@ -169,7 +168,4 @@ if (BUILD_CUDA_CTC_DECODER)
     message(FATAL "BUILD_CUDA_CTC_DECODER=1 but USE_CUDA=0.")
   endif()
   add_subdirectory(src/libtorchaudio/cuctc)
-endif()
-if (BUILD_CPP_TEST)
-  add_subdirectory(test/cpp)
 endif()

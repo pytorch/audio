@@ -23,11 +23,6 @@ if [[ "${CUDA_TESTS_ONLY}" = "1" ]]; then
 fi
 
 (
-    cd build/temp*/test/cpp
-    ctest
-)
-
-(
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_CTC_DECODER=true
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true

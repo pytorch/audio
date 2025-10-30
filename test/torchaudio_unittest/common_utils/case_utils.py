@@ -9,7 +9,6 @@ import unittest
 from itertools import zip_longest
 
 import torch
-import torchaudio
 from torch.testing._internal.common_utils import TestCase as PytorchTestCase
 from torchaudio._internal.module_utils import eval_env, is_module_available
 
@@ -201,12 +200,6 @@ skipIfCudaSmallMemory = _skipIf(
     "CI" in os.environ and torch.cuda.is_available(),  # temporary
     reason="CUDA does not have enough memory.",
     key="CUDA_SMALL_MEMORY",
-)
-
-skipIfNoRIR = _skipIf(
-    not torchaudio._extension._IS_RIR_AVAILABLE,
-    reason="RIR features are not available.",
-    key="NO_RIR",
 )
 skipIfNoCtcDecoder = _skipIf(
     not is_ctc_decoder_available(),

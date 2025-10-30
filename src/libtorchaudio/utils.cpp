@@ -7,14 +7,6 @@
 
 namespace torchaudio {
 
-bool is_rir_available() {
-#ifdef INCLUDE_RIR
-  return true;
-#else
-  return false;
-#endif
-}
-
 bool is_align_available() {
 #ifdef INCLUDE_ALIGN
   return true;

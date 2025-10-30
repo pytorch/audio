@@ -16,7 +16,6 @@ _LG = logging.getLogger(__name__)
 __all__ = [
     "_check_cuda_version",
     "_IS_TORCHAUDIO_EXT_AVAILABLE",
-    "_IS_RIR_AVAILABLE",
 ]
 
 
@@ -28,10 +27,6 @@ if os.name == "nt" and (3, 8) <= sys.version_info < (3, 9):
 # In case of an error, we do not catch the failure as it suggests there is something
 # wrong with the installation.
 _IS_TORCHAUDIO_EXT_AVAILABLE = is_module_available("torchaudio.lib._torchaudio")
-# RIR features are implemented in _torchaudio extension, but they can be individually
-# turned on/off at build time. Available means that _torchaudio is loaded properly, and
-# RIR features are found there.
-_IS_RIR_AVAILABLE = False
 _IS_ALIGN_AVAILABLE = False
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     _load_lib("libtorchaudio")
@@ -39,17 +34,8 @@ if _IS_TORCHAUDIO_EXT_AVAILABLE:
     import torchaudio.lib._torchaudio  # noqa
 
     _check_cuda_version()
-    _IS_RIR_AVAILABLE = torchaudio.lib._torchaudio.is_rir_available()
     _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
 
-
-fail_if_no_rir = (
-    no_op
-    if _IS_RIR_AVAILABLE
-    else fail_with_message(
-        "requires RIR extension, but TorchAudio is not compiled with it. Please build TorchAudio with RIR support."
-    )
-)
 
 fail_if_no_align = (
     no_op

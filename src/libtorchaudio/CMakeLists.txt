@@ -34,11 +34,6 @@ if(BUILD_RNNT)
   endif()
 endif()
 
-if(BUILD_RIR)
-  list(APPEND sources rir/rir.cpp rir/ray_tracing.cpp)
-  list(APPEND compile_definitions INCLUDE_RIR)
-endif()
-
 if(BUILD_ALIGN)
   list(
     APPEND
