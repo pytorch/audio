@@ -154,13 +154,13 @@ void boxed_rnnt_loss(
   STD_TORCH_CHECK(num_args == 7, "num_args must be 7");
   STD_TORCH_CHECK(num_outputs == 2, "num_outputs must be 2");
   std::tuple<Tensor, Tensor> res = compute(
-      /*logits*/ torch::stable::detail::to<Tensor>(stack[0]),
-      /*targets*/ torch::stable::detail::to<Tensor>(stack[1]),
-      /*logit_lengths*/ torch::stable::detail::to<Tensor>(stack[2]),
-      /*target_lengths*/ torch::stable::detail::to<Tensor>(stack[3]),
-      /*blank*/ float(torch::stable::detail::to<int64_t>(stack[4])),
-      /*clamp*/ torch::stable::detail::to<double>(stack[5]),
-      /*fused_log_softmax*/ torch::stable::detail::to<bool>(stack[6]));
+      /*logits*/ stack[0].toTensor(),
+      /*targets*/ stack[1].toTensor(),
+      /*logit_lengths*/ stack[2].toTensor(),
+      /*target_lengths*/ stack[3].toTensor(),
+      /*blank*/ stack[4].toTensor(),
+      /*clamp*/ stack[5].toTensor(),
+      /*fused_log_softmax*/ stack[6].toTensor();
   stack[0] = torch::stable::detail::from(std::get<0>(res));
   stack[1] = torch::stable::detail::from(std::get<1>(res));
 }
