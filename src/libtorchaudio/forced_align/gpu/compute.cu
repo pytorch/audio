@@ -1,6 +1,7 @@
 #include <ATen/core/TensorAccessor.h>
 #include <ATen/cuda/CUDAContext.h>
 #include <c10/cuda/CUDAException.h>
+#include <c10/cuda/CUDAGuard.h>
 #include <limits.h>
 #include <torch/torch.h>
 #include <cub/cub.cuh>
@@ -115,6 +116,10 @@ void forced_align_impl(
     const torch::Tensor& targets,
     const int64_t blank,
     torch::Tensor& paths) {
+
+  // only guard logProbs, since in L263 it'll be verified on targets
+  const at::cuda::OptionalCUDAGuard device_guard(logProbs.device());
+
   auto defaultStream = at::cuda::getCurrentCUDAStream();
   auto cpuDataTranferStream = at::cuda::getStreamFromPool();
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
