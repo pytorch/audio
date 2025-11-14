@@ -1,8 +1,9 @@
-#include <libtorchaudio/stable/dispatch.h>
 #include <libtorchaudio/stable/ops.h>
 #include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/tensor.h>
+#include <torch/headeronly/core/Dispatch_v2.h>
+#include <torch/headeronly/core/ScalarType.h>
 
 namespace torchaudio {
 namespace alignment {
@@ -138,6 +139,13 @@ void forced_align_impl(
   delete[] backPtr_a;
 }
 
+template <typename scalar_t>
+const auto forced_align_long_impl =
+    forced_align_impl<scalar_t, ScalarType::Long>;
+
+template <typename scalar_t>
+const auto forced_align_int_impl = forced_align_impl<scalar_t, ScalarType::Int>;
+
 std::tuple<Tensor, Tensor> compute(
     const Tensor& logProbs,
     const Tensor& targets,
@@ -178,32 +186,41 @@ std::tuple<Tensor, Tensor> compute(
   STD_TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
-  STABLE_DISPATCH_INDEX_TYPES(
-      inputLengths.scalar_type(), "forced_align_impl", [&] {
+  THO_DISPATCH_V2(
+      inputLengths.scalar_type(),
+      "forced_align_impl",
+      AT_WRAP([&] {
         STD_TORCH_CHECK(
-            logProbs.size(1) == torchaudio::util::max<index_t>(inputLengths),
+            logProbs.size(1) == torchaudio::util::max<scalar_t>(inputLengths),
             "input length mismatch");
-      });
-  STABLE_DISPATCH_INDEX_TYPES(
-      targetLengths.scalar_type(), "forced_align_impl", [&] {
+      }),
+      ScalarType::Int,
+      ScalarType::Long);
+  THO_DISPATCH_V2(
+      targetLengths.scalar_type(),
+      "forced_align_impl",
+      AT_WRAP([&] {
         STD_TORCH_CHECK(
-            targets.size(1) == torchaudio::util::max<index_t>(targetLengths),
+            targets.size(1) == torchaudio::util::max<scalar_t>(targetLengths),
             "target length mismatch");
-      });
+      }),
+      ScalarType::Int,
+      ScalarType::Long);
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
   Tensor paths = torchaudio::stable::new_zeros(targets, {B, T});
-
-  STABLE_DISPATCH_FLOATING_TYPES_AND_HALF(
-      logProbs.scalar_type(), "forced_align_impl", [&] {
+  THO_DISPATCH_V2(
+      logProbs.scalar_type(),
+      "forced_align_impl",
+      AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
-          forced_align_impl<scalar_t, ScalarType::Long>(
-              logProbs, targets, blank, paths);
+          forced_align_long_impl<scalar_t>(logProbs, targets, blank, paths);
         } else {
-          forced_align_impl<scalar_t, ScalarType::Int>(
-              logProbs, targets, blank, paths);
+          forced_align_int_impl<scalar_t>(logProbs, targets, blank, paths);
         }
-      });
+      }),
+      AT_EXPAND(AT_FLOATING_TYPES),
+      ScalarType::Half);
   return std::make_tuple(paths, logProbs);
 }
 

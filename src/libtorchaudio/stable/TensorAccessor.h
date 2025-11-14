@@ -44,7 +44,7 @@ class TensorAccessorBase {
     // Originally, TensorAccessor is a view of sizes and strides as
     // these are ArrayRef instances. Until torch::stable supports
     // ArrayRef-like features, we store copies of sizes and strides:
-    for (auto i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       this->sizes_[i] = sizes_[i];
       this->strides_[i] = strides_[i];
     }
@@ -146,7 +146,7 @@ class GenericPackedTensorAccessorBase {
       const source_index_t* sizes_,
       const source_index_t* strides_)
       : data_(data_) {
-    for (auto i = 0; i < N; ++i) {
+    for (size_t i = 0; i < N; ++i) {
       this->sizes_[i] = sizes_[i];
       this->strides_[i] = strides_[i];
     }

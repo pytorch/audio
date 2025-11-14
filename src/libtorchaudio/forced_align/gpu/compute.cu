@@ -1,7 +1,8 @@
 #include <libtorchaudio/utils.h>
 #include <libtorchaudio/stable/TensorAccessor.h>
-#include <libtorchaudio/stable/dispatch.h>
 #include <torch/csrc/stable/library.h>
+#include <torch/headeronly/core/Dispatch_v2.h>
+#include <torch/headeronly/core/ScalarType.h>
 
 #include <cub/cub.cuh>
 #include <limits.h>
@@ -243,6 +244,13 @@ void forced_align_impl(
   }
 }
 
+template <typename scalar_t>
+const auto forced_align_long_impl =
+    forced_align_impl<scalar_t, ScalarType::Long>;
+
+template <typename scalar_t>
+const auto forced_align_int_impl = forced_align_impl<scalar_t, ScalarType::Int>;
+
 std::tuple<Tensor, Tensor> compute(
     const Tensor& logProbs,
     const Tensor& targets,
@@ -297,16 +305,13 @@ std::tuple<Tensor, Tensor> compute(
 
   Tensor paths = torchaudio::stable::new_zeros(targets, {B, T}, /*dtype=*/std::nullopt, /*layout=*/std::nullopt, /*device=*/torchaudio::stable::cpu_device());
 
-  STABLE_DISPATCH_FLOATING_TYPES_AND_HALF(
-      logProbs.scalar_type(), "forced_align_impl", [&] {
+  THO_DISPATCH_V2(logProbs.scalar_type(), "forced_align_impl", AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
-          forced_align_impl<scalar_t, ScalarType::Long>(
-              logProbs, targets, blank, paths);
+          forced_align_long_impl<scalar_t>(logProbs, targets, blank, paths);
         } else {
-          forced_align_impl<scalar_t, ScalarType::Int>(
-              logProbs, targets, blank, paths);
+          forced_align_int_impl<scalar_t>(logProbs, targets, blank, paths);
         }
-      });
+      }), AT_EXPAND(AT_FLOATING_TYPES), ScalarType::Half);
 
   Tensor pathsCuda = torchaudio::stable::cuda(paths, logProbs.get_device_index());
   return std::make_tuple(pathsCuda, logProbs);
