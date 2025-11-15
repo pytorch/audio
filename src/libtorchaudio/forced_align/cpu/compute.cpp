@@ -1,26 +1,28 @@
-#include <torch/csrc/inductor/aoti_torch/c/shim.h>
+#include <libtorchaudio/stable/ops.h>
+#include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
-#include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
-#include <torch/script.h>
-#include <torch/torch.h>
-
-using namespace std;
+#include <torch/headeronly/core/Dispatch_v2.h>
+#include <torch/headeronly/core/ScalarType.h>
 
 namespace torchaudio {
 namespace alignment {
 namespace cpu {
+
+using torch::headeronly::ScalarType;
+using torch::stable::Tensor;
+
 // Inspired from
 // https://github.com/flashlight/sequence/blob/main/flashlight/lib/sequence/criterion/cpu/ConnectionistTemporalClassificationCriterion.cpp
-template <typename scalar_t, at::ScalarType target_scalar_type>
+template <typename scalar_t, ScalarType target_scalar_type>
 void forced_align_impl(
-    const torch::Tensor& logProbs,
-    const torch::Tensor& targets,
+    const Tensor& logProbs,
+    const Tensor& targets,
     const int64_t blank,
-    torch::Tensor& paths) {
+    Tensor& paths) {
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   using target_t = typename std::
-      conditional<target_scalar_type == torch::kInt, int, int64_t>::type;
+      conditional<target_scalar_type == ScalarType::Int, int, int64_t>::type;
   const auto batchIndex =
       0; // TODO: support batch version and use the real batch index
   const auto T = logProbs.size(1);
@@ -36,17 +38,16 @@ void forced_align_impl(
   for (int i = 0; i < T * S; i++) {
     backPtr_a[i] = -1;
   }
-
-  auto logProbs_a = logProbs.accessor<scalar_t, 3>();
-  auto targets_a = targets.accessor<target_t, 2>();
-  auto paths_a = paths.accessor<target_t, 2>();
+  auto logProbs_a = torchaudio::stable::accessor<scalar_t, 3>(logProbs);
+  auto targets_a = torchaudio::stable::accessor<target_t, 2>(targets);
+  auto paths_a = torchaudio::stable::accessor<target_t, 2>(paths);
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
       ++R;
     }
   }
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       T >= L + R,
       "targets length is too long for CTC. Found log_probs length: ",
       T,
@@ -138,73 +139,109 @@ void forced_align_impl(
   delete[] backPtr_a;
 }
 
-std::tuple<torch::Tensor, torch::Tensor> compute(
-    const torch::Tensor& logProbs,
-    const torch::Tensor& targets,
-    const torch::Tensor& inputLengths,
-    const torch::Tensor& targetLengths,
+template <typename scalar_t>
+const auto forced_align_long_impl =
+    forced_align_impl<scalar_t, ScalarType::Long>;
+
+template <typename scalar_t>
+const auto forced_align_int_impl = forced_align_impl<scalar_t, ScalarType::Int>;
+
+std::tuple<Tensor, Tensor> compute(
+    const Tensor& logProbs,
+    const Tensor& targets,
+    const Tensor& inputLengths,
+    const Tensor& targetLengths,
     const int64_t blank) {
-  TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
-  TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
-  TORCH_CHECK(
-      logProbs.device() == targets.device(),
-      "log_probs and targets need to be on the same device");
-  TORCH_CHECK(
-      logProbs.dtype() == torch::kFloat64 ||
-          logProbs.dtype() == torch::kFloat32 ||
-          logProbs.dtype() == torch::kFloat16,
+  STD_TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
+  STD_TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
+  STD_TORCH_CHECK(inputLengths.is_cpu(), "input_lengths must be a CPU tensor");
+  STD_TORCH_CHECK(
+      targetLengths.is_cpu(), "target_lengths must be a CPU tensor");
+  STD_TORCH_CHECK(
+      logProbs.scalar_type() == ScalarType::Double ||
+          logProbs.scalar_type() == ScalarType::Float ||
+          logProbs.scalar_type() == ScalarType::Half,
       "log_probs must be float64, float32 or float16 (half) type");
-  TORCH_CHECK(
-      targets.dtype() == torch::kInt32 || targets.dtype() == torch::kInt64,
+  STD_TORCH_CHECK(
+      targets.scalar_type() == ScalarType::Int ||
+          targets.scalar_type() == ScalarType::Long,
       "targets must be int32 or int64 type");
-  TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
-  TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
-  TORCH_CHECK(
+  STD_TORCH_CHECK(logProbs.is_contiguous(), "log_probs must be contiguous");
+  STD_TORCH_CHECK(targets.is_contiguous(), "targets must be contiguous");
+  STD_TORCH_CHECK(
       logProbs.dim() == 3,
       "log_probs must be 3-D (batch_size, input length, num classes)");
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       targets.dim() == 2, "targets must be 2-D (batch_size, target length,)");
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       inputLengths.dim() == 1, "input_lengths must be 1-D (batch_size,)");
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       targetLengths.dim() == 1, "target_lengths must be 1-D (batch_size,)");
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       logProbs.size(0) == 1,
       "The batch dimension for log_probs must be 1 at the current version.")
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       targets.size(0) == 1,
       "The batch dimension for targets must be 1 at the current version.")
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
-
-  TORCH_CHECK(
-      logProbs.size(1) == at::max(inputLengths).item().toInt(),
-      "input length mismatch");
-  TORCH_CHECK(
-      targets.size(1) == at::max(targetLengths).item().toInt(),
-      "target length mismatch");
-
+  THO_DISPATCH_V2(
+      inputLengths.scalar_type(),
+      "forced_align_impl",
+      AT_WRAP([&] {
+        STD_TORCH_CHECK(
+            logProbs.size(1) == torchaudio::util::max<scalar_t>(inputLengths),
+            "input length mismatch");
+      }),
+      ScalarType::Int,
+      ScalarType::Long);
+  THO_DISPATCH_V2(
+      targetLengths.scalar_type(),
+      "forced_align_impl",
+      AT_WRAP([&] {
+        STD_TORCH_CHECK(
+            targets.size(1) == torchaudio::util::max<scalar_t>(targetLengths),
+            "target length mismatch");
+      }),
+      ScalarType::Int,
+      ScalarType::Long);
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
-  auto paths = torch::zeros(
-      {B, T},
-      torch::TensorOptions().device(targets.device()).dtype(targets.dtype()));
-  AT_DISPATCH_FLOATING_TYPES_AND_HALF(
-      logProbs.scalar_type(), "forced_align_impl", [&] {
-        if (targets.scalar_type() == torch::kInt64) {
-          forced_align_impl<scalar_t, torch::kInt64>(
-              logProbs, targets, blank, paths);
+  Tensor paths = torchaudio::stable::new_zeros(targets, {B, T});
+  THO_DISPATCH_V2(
+      logProbs.scalar_type(),
+      "forced_align_impl",
+      AT_WRAP([&] {
+        if (targets.scalar_type() == ScalarType::Long) {
+          forced_align_long_impl<scalar_t>(logProbs, targets, blank, paths);
         } else {
-          forced_align_impl<scalar_t, torch::kInt32>(
-              logProbs, targets, blank, paths);
+          forced_align_int_impl<scalar_t>(logProbs, targets, blank, paths);
         }
-      });
+      }),
+      AT_EXPAND(AT_FLOATING_TYPES),
+      ScalarType::Half);
   return std::make_tuple(paths, logProbs);
 }
 
-TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("forced_align", &compute);
+void boxed_forced_align_cpu(
+    StableIValue* stack,
+    uint64_t num_args,
+    uint64_t num_outputs) {
+  STD_TORCH_CHECK(num_args == 5, "num_args must be 5");
+  STD_TORCH_CHECK(num_outputs == 2, "num_outputs must be 2");
+  std::tuple<Tensor, Tensor> res = compute(
+      /*logProbs*/ torch::stable::detail::to<Tensor>(stack[0]),
+      /*targets*/ torch::stable::detail::to<Tensor>(stack[1]),
+      /*logit_lengths*/ torch::stable::detail::to<Tensor>(stack[2]),
+      /*target_lengths*/ torch::stable::detail::to<Tensor>(stack[3]),
+      /*blank*/ float(torch::stable::detail::to<int64_t>(stack[4])));
+  stack[0] = torch::stable::detail::from(std::get<0>(res));
+  stack[1] = torch::stable::detail::from(std::get<1>(res));
+}
+
+STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
+  m.impl("forced_align", &boxed_forced_align_cpu);
 }
 
 } // namespace cpu
