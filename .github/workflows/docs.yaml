@@ -51,6 +51,7 @@ jobs:
         git config --global --add safe.directory /__w/audio/audio
         conda create -c conda-forge --strict-channel-priority -y --prefix ci_env python="${PYTHON_VERSION}" ffmpeg="${FFMPEG_VERSION}" cmake ninja
         conda activate ./ci_env
+        export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
         conda info
         python -m pip install --upgrade pip
         echo "::endgroup::"
