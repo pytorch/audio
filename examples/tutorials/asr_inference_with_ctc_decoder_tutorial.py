@@ -149,7 +149,7 @@ print(tokens)
 #
 # .. code-block::
 #
-#    # lexcion.txt
+#    # lexicon.txt
 #    a a |
 #    able a b l e |
 #    about a b o u t |
