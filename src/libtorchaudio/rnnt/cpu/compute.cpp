@@ -2,6 +2,7 @@
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
+#include <torch/headeronly/core/Dispatch_v2.h>
 
 namespace torchaudio {
 namespace rnnt {
@@ -109,6 +110,8 @@ std::tuple<Tensor, Tensor> compute(
       {DtypeWorkspace<float>::ComputeSizeFromOptions(options)},
       ScalarType::Float);
 
+  // TODO: use t.mutable_data_ptr<..>() instead of reinterpret_cast
+  // when stable ABI Tensor supports mutable_data_ptr templates.
   Workspace<float> workspace(
       /*options=*/options,
       /*dtype_data=*/reinterpret_cast<float*>(float_workspace.data_ptr()),
@@ -116,33 +119,21 @@ std::tuple<Tensor, Tensor> compute(
       /*int_data=*/reinterpret_cast<int*>(int_workspace.data_ptr()),
       /*int_size=*/int_workspace.numel());
 
-  switch (logits.scalar_type()) {
-    case ScalarType::Float: {
-      Compute</*DTYPE=*/float, /*CAST_DTYPE=*/float>(
-          /*workspace=*/workspace,
-          /*logits=*/reinterpret_cast<float*>(logits.data_ptr()),
-          /*targets=*/reinterpret_cast<int*>(targets.data_ptr()),
-          /*srcLengths=*/reinterpret_cast<int*>(logit_lengths.data_ptr()),
-          /*tgtLengths=*/reinterpret_cast<int*>(target_lengths.data_ptr()),
-          /*costs=*/reinterpret_cast<float*>(costs.data_ptr()),
-          /*gradients=*/reinterpret_cast<float*>(gradients.data_ptr()));
-      break;
-    }
-    case ScalarType::Half: {
-      Compute</*DTYPE=*/c10::Half, /*CAST_DTYPE=*/float>(
-          /*workspace=*/workspace,
-          /*logits=*/reinterpret_cast<c10::Half*>(logits.data_ptr()),
-          /*targets=*/reinterpret_cast<int*>(targets.data_ptr()),
-          /*srcLengths=*/reinterpret_cast<int*>(logit_lengths.data_ptr()),
-          /*tgtLengths=*/reinterpret_cast<int*>(target_lengths.data_ptr()),
-          /*costs=*/reinterpret_cast<c10::Half*>(costs.data_ptr()),
-          /*gradients=*/reinterpret_cast<c10::Half*>(gradients.data_ptr()));
-      break;
-    }
-    default: {
-      STD_TORCH_CHECK(false, "unreachable");
-    }
-  };
+  THO_DISPATCH_V2(
+      logits.scalar_type(),
+      "rnnt:compute",
+      AT_WRAP([&] {
+        (Compute</*DTYPE=*/scalar_t, /*CAST_DTYPE=*/float>(
+            /*workspace=*/workspace,
+            /*logits=*/reinterpret_cast<scalar_t*>(logits.data_ptr()),
+            /*targets=*/reinterpret_cast<int*>(targets.data_ptr()),
+            /*srcLengths=*/reinterpret_cast<int*>(logit_lengths.data_ptr()),
+            /*tgtLengths=*/reinterpret_cast<int*>(target_lengths.data_ptr()),
+            /*costs=*/reinterpret_cast<scalar_t*>(costs.data_ptr()),
+            /*gradients=*/reinterpret_cast<scalar_t*>(gradients.data_ptr())));
+      }),
+      ScalarType::Float,
+      ScalarType::Half);
 
   return std::make_tuple(costs, gradients);
 }

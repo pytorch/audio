@@ -5,7 +5,6 @@
 
 #include <cub/cub.cuh>
 #include <limits.h>
-#include <iostream>
 
 namespace {
 constexpr int kNumThreads =
@@ -23,9 +22,9 @@ using torch::headeronly::ScalarType;
 
 template <typename scalar_t, typename target_t>
 __global__ void falign_cuda_step_kernel(
-    const PackedTensorAccessor32<scalar_t, 3>
+    const torchaudio::PackedTensorAccessor32<scalar_t, 3>
         logProbs_a,
-    const PackedTensorAccessor32<target_t, 2>
+    const torchaudio::PackedTensorAccessor32<target_t, 2>
         targets_a,
     const int T,
     const int L,
@@ -36,9 +35,9 @@ __global__ void falign_cuda_step_kernel(
     int start,
     int end,
     int backPtrBufferLen,
-    PackedTensorAccessor32<scalar_t, 2>
+    torchaudio::PackedTensorAccessor32<scalar_t, 2>
         alphas_a,
-    PackedTensorAccessor32<int8_t, 2>
+    torchaudio::PackedTensorAccessor32<int8_t, 2>
         backPtrBuffer_a) {
   scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   const int batchIndex =
@@ -120,13 +119,12 @@ void forced_align_impl(
     const Tensor& targets,
     const int64_t blank,
     Tensor& paths) {
-  std::cout << "forced_align_impl: entering" << std::endl;
   auto defaultStream = at::cuda::getCurrentCUDAStream();
   auto cpuDataTranferStream = at::cuda::getStreamFromPool();
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   using target_t = typename std::
       conditional<target_scalar_type == ScalarType::Int, int, int64_t>::type;
-  auto paths_a = accessor<target_t, 2>(paths);
+  auto paths_a = torchaudio::accessor<target_t, 2>(paths);
   const int batchIndex =
       0; // TODO: support batch version and use the real batch index
   const int T = logProbs.size(1); // num frames
@@ -134,30 +132,25 @@ void forced_align_impl(
   const int L = targets.size(1); // label length
   const int S = 2 * L + 1;
 
-  std::cout << "forced_align_impl: 1" << std::endl;
   auto targetsCpu = torchaudio::stable::cpu(targets);
   // backPtrBuffer stores the index offset fthe best path at current position
   // We copy the values to CPU after running every kBackPtrBufferSize of
   // frames.
-  std::cout << "forced_align_impl: 2" << std::endl;
   Tensor backPtrBuffer = torch::stable::new_empty(logProbs, {min(kBackPtrBufferSize, T), S}, ScalarType::Char);
   torch::stable::fill_(backPtrBuffer, -1);
 
-  std::cout << "forced_align_impl: 3" << std::endl;
   Tensor backPtrCpu = torch::stable::new_empty(targetsCpu, {T, S}, ScalarType::Char);
   torch::stable::fill_(backPtrCpu, -1);
 
   // we store only two time frames for alphas
   // alphas for compute current timeframe can be computed only from previous
   // time frame.
-  std::cout << "forced_align_impl: 4" << std::endl;
   Tensor alphas = torch::stable::new_empty(logProbs, {2, S});
   torch::stable::fill_(alphas, kNegInfinity);
 
   // CPU accessors
-  std::cout << "forced_align_impl: 5" << std::endl;
-  auto targetsCpu_a = accessor<target_t, 2>(targetsCpu);
-  auto backPtrCpu_a = accessor<int8_t, 2>(backPtrCpu);
+  auto targetsCpu_a = torchaudio::accessor<target_t, 2>(targetsCpu);
+  auto backPtrCpu_a = torchaudio::accessor<int8_t, 2>(backPtrCpu);
   // count the number of repeats in label
   int R = 0;
   for (int i = 1; i < L; ++i) {
@@ -177,7 +170,6 @@ void forced_align_impl(
   int end = (S == 1) ? 1 : 2;
   int backPtrBufferLen = 0;
   Tensor bufferCopy;
-  std::cout << "forced_align_impl: 6" << std::endl;
   for (int t = 0; t < T; ++t) {
     if (t > 0) {
       if (T - t <= L + R) {
@@ -197,11 +189,10 @@ void forced_align_impl(
         end = end + 1;
       }
     }
-    std::cout << "forced_align_impl: t=" << t << std::endl;
     falign_cuda_step_kernel<scalar_t, target_t>
         <<<1, kNumThreads, 0, defaultStream>>>(
-            packed_accessor32<scalar_t, 3>(logProbs),
-            packed_accessor32<target_t, 2>(targets),
+            torchaudio::packed_accessor32<scalar_t, 3>(logProbs),
+            torchaudio::packed_accessor32<target_t, 2>(targets),
             T,
             L,
             N,
@@ -211,13 +202,12 @@ void forced_align_impl(
             start,
             end,
             backPtrBufferLen,
-            packed_accessor32<scalar_t, 2>(alphas),
-            packed_accessor32<int8_t, 2>(backPtrBuffer));
+            torchaudio::packed_accessor32<scalar_t, 2>(alphas),
+            torchaudio::packed_accessor32<int8_t, 2>(backPtrBuffer));
     C10_CUDA_KERNEL_LAUNCH_CHECK();
     ++backPtrBufferLen;
     if (backPtrBufferLen == kBackPtrBufferSize || t == T - 1) {
       cpuDataTranferStream.synchronize();
-
       // GPU -> GPU copy
       bufferCopy = torch::stable::clone(backPtrBuffer);
       STD_TORCH_CHECK(bufferCopy.is_contiguous(), "unexpected fail, need to implement stable::Tensor::contiguous()")
@@ -236,23 +226,20 @@ void forced_align_impl(
       backPtrBufferLen = 0;
     }
   }
-  std::cout << "forced_align_impl: 7" << std::endl;
   cpuDataTranferStream.synchronize();
   auto alphasCpu = torchaudio::stable::cpu(alphas);
-  auto alphasCpu_a = accessor<scalar_t, 2>(alphasCpu);
+  auto alphasCpu_a = torchaudio::accessor<scalar_t, 2>(alphasCpu);
   int curIdxOffset = ((T - 1) % 2);
   int ltrIdx =
       alphasCpu_a[curIdxOffset][S - 1] > alphasCpu_a[curIdxOffset][S - 2]
       ? S - 1
       : S - 2;
-  std::cout << "forced_align_impl: 8" << std::endl;
   for (int t = T - 1; t >= 0; --t) {
     auto lbl_idx =
         ltrIdx % 2 == 0 ? blank : targetsCpu_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
     ltrIdx -= backPtrCpu_a[t][ltrIdx];
   }
-  std::cout << "forced_align_impl: leaving" << std::endl;
 }
 
 std::tuple<Tensor, Tensor> compute(
@@ -261,7 +248,7 @@ std::tuple<Tensor, Tensor> compute(
     Tensor inputLengths,
     Tensor targetLengths,
     const int64_t blank) {
-  std::cout << "forced_align: compute" << std::endl;
+
   STD_TORCH_CHECK(logProbs.is_cuda(), "log_probs must be a CUDA tensor");
   STD_TORCH_CHECK(targets.is_cuda(), "targets must be a CUDA tensor");
   STD_TORCH_CHECK(
@@ -306,30 +293,21 @@ std::tuple<Tensor, Tensor> compute(
 
   auto B = logProbs.size(0);
   auto T = logProbs.size(1); // num frames
-  std::cout << "forced_align: compute: 1" << std::endl;
+
   Tensor paths = torchaudio::stable::new_zeros(targets, {B, T}, /*dtype=*/std::nullopt, /*layout=*/std::nullopt, /*device=*/torchaudio::stable::cpu_device());
-  std::cout << "forced_align: compute: 2" << std::endl;
+
   THO_DISPATCH_V2(logProbs.scalar_type(), "forced_align_impl", AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
-          std::cout << "forced_align: compute: 2.1" << std::endl;
           (forced_align_impl<scalar_t, ScalarType::Long>(logProbs, targets, blank, paths));
-          std::cout << "forced_align: compute: 2.2" << std::endl;
         } else {
-          STD_TORCH_CHECK(targets.scalar_type() == ScalarType::Int, "unexpected dtype");
-          std::cout << "forced_align: compute: 2.3" << std::endl;
           (forced_align_impl<scalar_t, ScalarType::Int>(logProbs, targets, blank, paths));
-          std::cout << "forced_align: compute: 2.4" << std::endl;
-        }
+          }
       }), AT_EXPAND(AT_FLOATING_TYPES), ScalarType::Half);
-  std::cout << "forced_align: compute: 3" << std::endl;
   Tensor pathsCuda = torchaudio::stable::cuda(paths, logProbs.get_device_index());
-  std::cout << "forced_align: compute: 4" << std::endl;
   return std::make_tuple(pathsCuda, logProbs);
 }
 
-
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
-  std::cout << "forced_align: library impl" << std::endl;
   m.impl("forced_align", TORCH_BOX(&compute));
 }
 

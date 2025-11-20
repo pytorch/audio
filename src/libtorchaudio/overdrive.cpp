@@ -1,3 +1,4 @@
+#include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
@@ -5,27 +6,15 @@
 #include <torch/headeronly/core/TensorAccessor.h>
 
 namespace {
-
 using torch::stable::Tensor;
-
-template <typename T, size_t N>
-using TensorAccessor = torch::headeronly::HeaderOnlyTensorAccessor<T, N>;
-
-// TODO: eliminate accessor<T, N>(t) in favor of t.accessor<T, N>
-// after Tensor::accessor is supported in stable ABI
-template <typename T, size_t N>
-inline TensorAccessor<T, N> accessor(Tensor t) {
-  return TensorAccessor<T, N>(
-      reinterpret_cast<T*>(t.data_ptr()), t.sizes().data(), t.strides().data());
-}
 
 template <typename scalar_t>
 void overdrive_cpu_kernel(
-    TensorAccessor<scalar_t, 2> waveform_accessor,
-    TensorAccessor<scalar_t, 2> temp_accessor,
-    TensorAccessor<scalar_t, 1> last_in_accessor,
-    TensorAccessor<scalar_t, 1> last_out_accessor,
-    TensorAccessor<scalar_t, 2> output_waveform_accessor) {
+    torchaudio::TensorAccessor<scalar_t, 2> waveform_accessor,
+    torchaudio::TensorAccessor<scalar_t, 2> temp_accessor,
+    torchaudio::TensorAccessor<scalar_t, 1> last_in_accessor,
+    torchaudio::TensorAccessor<scalar_t, 1> last_out_accessor,
+    torchaudio::TensorAccessor<scalar_t, 2> output_waveform_accessor) {
   int64_t n_frames = waveform_accessor.size(1);
   int64_t n_channels = waveform_accessor.size(0);
 
@@ -56,11 +45,11 @@ std::tuple<Tensor, Tensor, Tensor> overdrive_core_loop_cpu(
       "overdrive_cpu",
       AT_WRAP([&] {
         overdrive_cpu_kernel<scalar_t>(
-            accessor<scalar_t, 2>(waveform),
-            accessor<scalar_t, 2>(temp),
-            accessor<scalar_t, 1>(last_in),
-            accessor<scalar_t, 1>(last_out),
-            accessor<scalar_t, 2>(output_waveform));
+            torchaudio::accessor<scalar_t, 2>(waveform),
+            torchaudio::accessor<scalar_t, 2>(temp),
+            torchaudio::accessor<scalar_t, 1>(last_in),
+            torchaudio::accessor<scalar_t, 1>(last_out),
+            torchaudio::accessor<scalar_t, 2>(output_waveform));
       }),
       AT_FLOATING_TYPES);
   return std::make_tuple(last_in, last_out, output_waveform);
@@ -70,7 +59,11 @@ std::tuple<Tensor, Tensor, Tensor> overdrive_core_loop_cpu(
 
 STABLE_TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
   m.def(
-      "_overdrive_core_loop(Tensor waveform, Tensor temp, Tensor(a!) last_in, Tensor(b!) last_out, Tensor(c!) output_waveform) -> (Tensor(a!), Tensor(b!), Tensor(c!))");
+      "_overdrive_core_loop(Tensor waveform,"
+      "Tensor temp,"
+      "Tensor(a!) last_in,"
+      "Tensor(b!) last_out,"
+      "Tensor(c!) output_waveform) -> (Tensor(a!), Tensor(b!), Tensor(c!))");
 }
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {

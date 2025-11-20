@@ -38,9 +38,9 @@ void forced_align_impl(
   for (int i = 0; i < T * S; i++) {
     backPtr_a[i] = -1;
   }
-  auto logProbs_a = accessor<scalar_t, 3>(logProbs);
-  auto targets_a = accessor<target_t, 2>(targets);
-  auto paths_a = accessor<target_t, 2>(paths);
+  auto logProbs_a = torchaudio::accessor<scalar_t, 3>(logProbs);
+  auto targets_a = torchaudio::accessor<target_t, 2>(targets);
+  auto paths_a = torchaudio::accessor<target_t, 2>(paths);
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
