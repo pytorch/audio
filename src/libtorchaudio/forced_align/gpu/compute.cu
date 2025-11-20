@@ -5,6 +5,7 @@
 
 #include <cub/cub.cuh>
 #include <limits.h>
+#include <iostream>
 
 namespace {
 constexpr int kNumThreads =
@@ -119,6 +120,7 @@ void forced_align_impl(
     const Tensor& targets,
     const int64_t blank,
     Tensor& paths) {
+  std::cout << "forced_align_impl: entering" << std::endl;
   auto defaultStream = at::cuda::getCurrentCUDAStream();
   auto cpuDataTranferStream = at::cuda::getStreamFromPool();
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
@@ -132,23 +134,28 @@ void forced_align_impl(
   const int L = targets.size(1); // label length
   const int S = 2 * L + 1;
 
+  std::cout << "forced_align_impl: 1" << std::endl;
   auto targetsCpu = torchaudio::stable::cpu(targets);
   // backPtrBuffer stores the index offset fthe best path at current position
   // We copy the values to CPU after running every kBackPtrBufferSize of
   // frames.
+  std::cout << "forced_align_impl: 2" << std::endl;
   Tensor backPtrBuffer = torch::stable::new_empty(logProbs, {min(kBackPtrBufferSize, T), S}, ScalarType::Char);
   torch::stable::fill_(backPtrBuffer, -1);
 
+  std::cout << "forced_align_impl: 3" << std::endl;
   Tensor backPtrCpu = torch::stable::new_empty(targetsCpu, {T, S}, ScalarType::Char);
   torch::stable::fill_(backPtrCpu, -1);
 
   // we store only two time frames for alphas
   // alphas for compute current timeframe can be computed only from previous
   // time frame.
+  std::cout << "forced_align_impl: 4" << std::endl;
   Tensor alphas = torch::stable::new_empty(logProbs, {2, S});
   torch::stable::fill_(alphas, kNegInfinity);
 
   // CPU accessors
+  std::cout << "forced_align_impl: 5" << std::endl;
   auto targetsCpu_a = torchaudio::stable::accessor<target_t, 2>(targetsCpu);
   auto backPtrCpu_a = torchaudio::stable::accessor<int8_t, 2>(backPtrCpu);
   // count the number of repeats in label
@@ -170,6 +177,7 @@ void forced_align_impl(
   int end = (S == 1) ? 1 : 2;
   int backPtrBufferLen = 0;
   Tensor bufferCopy;
+  std::cout << "forced_align_impl: 6" << std::endl;
   for (int t = 0; t < T; ++t) {
     if (t > 0) {
       if (T - t <= L + R) {
@@ -189,6 +197,7 @@ void forced_align_impl(
         end = end + 1;
       }
     }
+    std::cout << "forced_align_impl: t=" << t << std::endl;
     falign_cuda_step_kernel<scalar_t, target_t>
         <<<1, kNumThreads, 0, defaultStream>>>(
             packed_accessor32<scalar_t, 3>(logProbs),
@@ -227,6 +236,7 @@ void forced_align_impl(
       backPtrBufferLen = 0;
     }
   }
+  std::cout << "forced_align_impl: 7" << std::endl;
   cpuDataTranferStream.synchronize();
   auto alphasCpu = torchaudio::stable::cpu(alphas);
   auto alphasCpu_a = torchaudio::stable::accessor<scalar_t, 2>(alphasCpu);
@@ -235,12 +245,14 @@ void forced_align_impl(
       alphasCpu_a[curIdxOffset][S - 1] > alphasCpu_a[curIdxOffset][S - 2]
       ? S - 1
       : S - 2;
+  std::cout << "forced_align_impl: 8" << std::endl;
   for (int t = T - 1; t >= 0; --t) {
     auto lbl_idx =
         ltrIdx % 2 == 0 ? blank : targetsCpu_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
     ltrIdx -= backPtrCpu_a[t][ltrIdx];
   }
+  std::cout << "forced_align_impl: leaving" << std::endl;
 }
 
 template <typename scalar_t>
@@ -256,7 +268,7 @@ std::tuple<Tensor, Tensor> compute(
     Tensor inputLengths,
     Tensor targetLengths,
     const int64_t blank) {
-
+  std::cout << "forced_align: compute" << std::endl;
   STD_TORCH_CHECK(logProbs.is_cuda(), "log_probs must be a CUDA tensor");
   STD_TORCH_CHECK(targets.is_cuda(), "targets must be a CUDA tensor");
   STD_TORCH_CHECK(
@@ -301,9 +313,9 @@ std::tuple<Tensor, Tensor> compute(
 
   auto B = logProbs.size(0);
   auto T = logProbs.size(1); // num frames
-
+  std::cout << "forced_align: compute: 1" << std::endl;
   Tensor paths = torchaudio::stable::new_zeros(targets, {B, T}, /*dtype=*/std::nullopt, /*layout=*/std::nullopt, /*device=*/torchaudio::stable::cpu_device());
-
+  std::cout << "forced_align: compute: 2" << std::endl;
   THO_DISPATCH_V2(logProbs.scalar_type(), "forced_align_impl", AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
           forced_align_long_impl<scalar_t>(logProbs, targets, blank, paths);
@@ -318,6 +330,7 @@ std::tuple<Tensor, Tensor> compute(
 
 
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
+  std::cout << "forced_align: library impl" << std::endl;
   m.impl("forced_align", TORCH_BOX(&compute));
 }
 
