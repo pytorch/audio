@@ -255,13 +255,6 @@ void forced_align_impl(
   std::cout << "forced_align_impl: leaving" << std::endl;
 }
 
-template <typename scalar_t>
-const auto forced_align_long_impl =
-    forced_align_impl<scalar_t, ScalarType::Long>;
-
-template <typename scalar_t>
-const auto forced_align_int_impl = forced_align_impl<scalar_t, ScalarType::Int>;
-
 std::tuple<Tensor, Tensor> compute(
     Tensor logProbs,
     Tensor targets,
@@ -319,12 +312,12 @@ std::tuple<Tensor, Tensor> compute(
   THO_DISPATCH_V2(logProbs.scalar_type(), "forced_align_impl", AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
           std::cout << "forced_align: compute: 2.1" << std::endl;
-          forced_align_long_impl<scalar_t>(logProbs, targets, blank, paths);
+          (forced_align_impl<scalar_t, ScalarType::Long>(logProbs, targets, blank, paths));
           std::cout << "forced_align: compute: 2.2" << std::endl;
         } else {
-          std::cout << "forced_align: compute: 2.3" << std::endl;
           STD_TORCH_CHECK(targets.scalar_type() == ScalarType::Int, "unexpected dtype");
-          forced_align_int_impl<scalar_t>(logProbs, targets, blank, paths);
+          std::cout << "forced_align: compute: 2.3" << std::endl;
+          (forced_align_impl<scalar_t, ScalarType::Int>(logProbs, targets, blank, paths));
           std::cout << "forced_align: compute: 2.4" << std::endl;
         }
       }), AT_EXPAND(AT_FLOATING_TYPES), ScalarType::Half);
