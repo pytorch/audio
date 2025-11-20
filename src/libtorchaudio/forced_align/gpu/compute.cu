@@ -156,8 +156,8 @@ void forced_align_impl(
 
   // CPU accessors
   std::cout << "forced_align_impl: 5" << std::endl;
-  auto targetsCpu_a = torchaudio::stable::accessor<target_t, 2>(targetsCpu);
-  auto backPtrCpu_a = torchaudio::stable::accessor<int8_t, 2>(backPtrCpu);
+  auto targetsCpu_a = accessor<target_t, 2>(targetsCpu);
+  auto backPtrCpu_a = accessor<int8_t, 2>(backPtrCpu);
   // count the number of repeats in label
   int R = 0;
   for (int i = 1; i < L; ++i) {
@@ -239,7 +239,7 @@ void forced_align_impl(
   std::cout << "forced_align_impl: 7" << std::endl;
   cpuDataTranferStream.synchronize();
   auto alphasCpu = torchaudio::stable::cpu(alphas);
-  auto alphasCpu_a = torchaudio::stable::accessor<scalar_t, 2>(alphasCpu);
+  auto alphasCpu_a = accessor<scalar_t, 2>(alphasCpu);
   int curIdxOffset = ((T - 1) % 2);
   int ltrIdx =
       alphasCpu_a[curIdxOffset][S - 1] > alphasCpu_a[curIdxOffset][S - 2]
