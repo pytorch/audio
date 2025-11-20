@@ -318,13 +318,19 @@ std::tuple<Tensor, Tensor> compute(
   std::cout << "forced_align: compute: 2" << std::endl;
   THO_DISPATCH_V2(logProbs.scalar_type(), "forced_align_impl", AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
+          std::cout << "forced_align: compute: 2.1" << std::endl;
           forced_align_long_impl<scalar_t>(logProbs, targets, blank, paths);
+          std::cout << "forced_align: compute: 2.2" << std::endl;
         } else {
+          std::cout << "forced_align: compute: 2.3" << std::endl;
+          STD_TORCH_CHECK(targets.scalar_type() == ScalarType::Int, "unexpected dtype");
           forced_align_int_impl<scalar_t>(logProbs, targets, blank, paths);
+          std::cout << "forced_align: compute: 2.4" << std::endl;
         }
       }), AT_EXPAND(AT_FLOATING_TYPES), ScalarType::Half);
-
+  std::cout << "forced_align: compute: 3" << std::endl;
   Tensor pathsCuda = torchaudio::stable::cuda(paths, logProbs.get_device_index());
+  std::cout << "forced_align: compute: 4" << std::endl;
   return std::make_tuple(pathsCuda, logProbs);
 }
 
