@@ -12,10 +12,10 @@ using torch::stable::Tensor;
 
 // Entry point into RNNT Loss
 std::tuple<Tensor, Tensor> compute(
-    const Tensor& logits,
-    const Tensor& targets,
-    const Tensor& logit_lengths,
-    const Tensor& target_lengths,
+    Tensor logits,
+    Tensor targets,
+    Tensor logit_lengths,
+    Tensor target_lengths,
     int64_t blank,
     double clamp,
     bool fused_log_softmax = true) {
@@ -147,26 +147,8 @@ std::tuple<Tensor, Tensor> compute(
   return std::make_tuple(costs, gradients);
 }
 
-void boxed_rnnt_loss(
-    StableIValue* stack,
-    uint64_t num_args,
-    uint64_t num_outputs) {
-  STD_TORCH_CHECK(num_args == 7, "num_args must be 7");
-  STD_TORCH_CHECK(num_outputs == 2, "num_outputs must be 2");
-  std::tuple<Tensor, Tensor> res = compute(
-      /*logits*/ torch::stable::detail::to<Tensor>(stack[0]),
-      /*targets*/ torch::stable::detail::to<Tensor>(stack[1]),
-      /*logit_lengths*/ torch::stable::detail::to<Tensor>(stack[2]),
-      /*target_lengths*/ torch::stable::detail::to<Tensor>(stack[3]),
-      /*blank*/ float(torch::stable::detail::to<int64_t>(stack[4])),
-      /*clamp*/ torch::stable::detail::to<double>(stack[5]),
-      /*fused_log_softmax*/ torch::stable::detail::to<bool>(stack[6]));
-  stack[0] = torch::stable::detail::from(std::get<0>(res));
-  stack[1] = torch::stable::detail::from(std::get<1>(res));
-}
-
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("rnnt_loss_forward", &boxed_rnnt_loss);
+  m.impl("rnnt_loss_forward", TORCH_BOX(&compute));
 }
 
 } // namespace cpu
