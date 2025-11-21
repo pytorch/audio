@@ -148,11 +148,6 @@ std::tuple<Tensor, Tensor> compute(
   return std::make_tuple(costs, gradients);
 }
 
-STABLE_TORCH_LIBRARY_FRAGMENT(torchaudio, m) {
-  m.def(
-      "rnnt_loss_forward(Tensor logits, Tensor targets, Tensor logit_lengths, Tensor target_lengths, int blank, double clamp, bool fused_log_softmax) -> (Tensor, Tensor)");
-}
-
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
   m.impl("rnnt_loss_forward", TORCH_BOX(&compute));
 }
