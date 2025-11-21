@@ -10,7 +10,6 @@
 */
 
 #include <libtorchaudio/stable/Device.h>
-#include <libtorchaudio/stable/TensorAccessor.h>
 #include <torch/csrc/stable/ops.h>
 
 #ifdef USE_CUDA
@@ -57,87 +56,6 @@ const T* const_data_ptr(const Tensor& t) {
   TORCH_ERROR_CODE_CHECK(
       aoti_torch_get_const_data_ptr(t.get(), const_cast<void**>(&data_ptr)));
   return reinterpret_cast<const T*>(data_ptr);
-}
-
-// TODO: When accessor is implemented in torch::stable, eliminate
-// accessor template below.
-template <typename T, size_t N>
-torchaudio::stable::TensorAccessor<T, N> accessor(const Tensor& t) {
-  static_assert(
-      N > 0,
-      "accessor is used for indexing tensor, for scalars use *data_ptr<T>()");
-  STD_TORCH_CHECK(
-      t.dim() == N,
-      "TensorAccessor expected ",
-      N,
-      " dims but tensor has ",
-      t.dim());
-  T* ptr = nullptr;
-  if constexpr (std::is_const_v<T>) {
-    ptr = const_data_ptr<T>(t);
-  } else {
-    ptr = mutable_data_ptr<T>(t);
-  }
-  auto sizes_ = sizes(t);
-  auto strides_ = strides(t);
-  return torchaudio::stable::TensorAccessor<T, N>(
-      ptr, sizes_.data(), strides_.data());
-}
-
-// TODO: move to TensorAccessor.h?
-template <
-    typename T,
-    size_t N,
-    template <typename U>
-    class PtrTraits = torchaudio::stable::DefaultPtrTraits,
-    typename index_t = int64_t>
-torchaudio::stable::GenericPackedTensorAccessor<T, N, PtrTraits, index_t>
-generic_packed_accessor(const Tensor& t) {
-  static_assert(
-      N > 0,
-      "accessor is used for indexing tensor, for scalars use *data_ptr<T>()");
-  STD_TORCH_CHECK(
-      t.dim() == N,
-      "TensorAccessor expected ",
-      N,
-      " dims but tensor has ",
-      t.dim());
-  T* ptr = nullptr;
-  if constexpr (std::is_const_v<T>) {
-    ptr = const_data_ptr<T>(t);
-  } else {
-    ptr = mutable_data_ptr<T>(t);
-  }
-  auto sizes_ = sizes(t);
-  auto strides_ = strides(t);
-  return torchaudio::stable::
-      GenericPackedTensorAccessor<T, N, PtrTraits, index_t>(
-          static_cast<typename PtrTraits<T>::PtrType>(ptr),
-          sizes_.data(),
-          strides_.data());
-}
-
-template <
-    typename T,
-    size_t N,
-    template <typename U>
-    class PtrTraits = torchaudio::stable::DefaultPtrTraits>
-torchaudio::stable::PackedTensorAccessor32<T, N, PtrTraits> packed_accessor32(
-    const Tensor& t) {
-  STD_TORCH_CHECK(
-      t.numel() <= static_cast<int64_t>(std::numeric_limits<int32_t>::max()),
-      "numel needs to be smaller than int32_t max; otherwise, please use packed_accessor64");
-  return generic_packed_accessor<T, N, PtrTraits, int32_t>(t);
-}
-
-template <
-    typename T,
-    size_t N,
-    template <typename U>
-    class PtrTraits = torchaudio::stable::DefaultPtrTraits>
-torchaudio::stable::PackedTensorAccessor64<T, N, PtrTraits> packed_accessor64(
-    const Tensor& t) {
-  return generic_packed_accessor<T, N, PtrTraits, int64_t>();
 }
 
 // TODO: When cpu is implemented in torch::stable, eliminate

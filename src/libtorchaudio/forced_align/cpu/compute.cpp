@@ -38,9 +38,9 @@ void forced_align_impl(
   for (int i = 0; i < T * S; i++) {
     backPtr_a[i] = -1;
   }
-  auto logProbs_a = torchaudio::stable::accessor<scalar_t, 3>(logProbs);
-  auto targets_a = torchaudio::stable::accessor<target_t, 2>(targets);
-  auto paths_a = torchaudio::stable::accessor<target_t, 2>(paths);
+  auto logProbs_a = torchaudio::accessor<scalar_t, 3>(logProbs);
+  auto targets_a = torchaudio::accessor<target_t, 2>(targets);
+  auto paths_a = torchaudio::accessor<target_t, 2>(paths);
   auto R = 0;
   for (auto i = 1; i < L; i++) {
     if (targets_a[batchIndex][i] == targets_a[batchIndex][i - 1]) {
@@ -147,10 +147,10 @@ template <typename scalar_t>
 const auto forced_align_int_impl = forced_align_impl<scalar_t, ScalarType::Int>;
 
 std::tuple<Tensor, Tensor> compute(
-    const Tensor& logProbs,
-    const Tensor& targets,
-    const Tensor& inputLengths,
-    const Tensor& targetLengths,
+    Tensor logProbs,
+    Tensor targets,
+    Tensor inputLengths,
+    Tensor targetLengths,
     const int64_t blank) {
   STD_TORCH_CHECK(logProbs.is_cpu(), "log_probs must be a CPU tensor");
   STD_TORCH_CHECK(targets.is_cpu(), "targets must be a CPU tensor");
@@ -224,24 +224,8 @@ std::tuple<Tensor, Tensor> compute(
   return std::make_tuple(paths, logProbs);
 }
 
-void boxed_forced_align_cpu(
-    StableIValue* stack,
-    uint64_t num_args,
-    uint64_t num_outputs) {
-  STD_TORCH_CHECK(num_args == 5, "num_args must be 5");
-  STD_TORCH_CHECK(num_outputs == 2, "num_outputs must be 2");
-  std::tuple<Tensor, Tensor> res = compute(
-      /*logProbs*/ torch::stable::detail::to<Tensor>(stack[0]),
-      /*targets*/ torch::stable::detail::to<Tensor>(stack[1]),
-      /*logit_lengths*/ torch::stable::detail::to<Tensor>(stack[2]),
-      /*target_lengths*/ torch::stable::detail::to<Tensor>(stack[3]),
-      /*blank*/ float(torch::stable::detail::to<int64_t>(stack[4])));
-  stack[0] = torch::stable::detail::from(std::get<0>(res));
-  stack[1] = torch::stable::detail::from(std::get<1>(res));
-}
-
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CPU, m) {
-  m.impl("forced_align", &boxed_forced_align_cpu);
+  m.impl("forced_align", TORCH_BOX(&compute));
 }
 
 } // namespace cpu
