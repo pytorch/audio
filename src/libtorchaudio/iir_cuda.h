@@ -1,8 +1,7 @@
 #pragma once
 
-#include <torch/types.h>
+#include <torch/csrc/stable/tensor.h>
 
-void cuda_lfilter_core_loop(
-    const torch::Tensor& in,
-    const torch::Tensor& a_flipped,
-    torch::Tensor& padded_out);
+using torch::stable::Tensor;
+
+Tensor cuda_lfilter_core_loop(Tensor in, Tensor a_flipped, Tensor padded_out);
