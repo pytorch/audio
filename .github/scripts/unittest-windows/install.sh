@@ -50,13 +50,6 @@ printf "Installing TorchCodec\n"
 pip install --pre torchcodec --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cpu
 python -c "import torchcodec; print(torchcodec.__version__)"
 
-printf "Patching Torch\n"
-TORCH_INCLUDE_DIR="$(python -c "import torch,os;print(os.path.join(os.path.dirname(torch.__file__),'include'))")"
-printf "  TORCH_INCLUDE_DIR=${TORCH_INCLUDE_DIR}"
-#curl -L --silent --output ${TORCH_INCLUDE_DIR}/torch/csrc/stable/stableivalue_conversions.h https://raw.githubusercontent.com/pytorch/pytorch/refs/heads/main/torch/csrc/stable/stableivalue_conversions.h
-curl -L --silent --output ${TORCH_INCLUDE_DIR}/torch/csrc/stable/stableivalue_conversions.h https://raw.githubusercontent.com/pytorch/pytorch/refs/heads/gh/pearu/154/head/torch/csrc/stable/stableivalue_conversions.h
-curl -L --silent --output ${TORCH_INCLUDE_DIR}/torch/headeronly/util/Deprecated.h https://raw.githubusercontent.com/pytorch/pytorch/refs/heads/gh/pearu/154/head/torch/headeronly/util/Deprecated.h
-
 # 2. Install torchaudio
 printf "* Installing fsspec\n"   # TODO: is this required for torchaudio??
 pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org fsspec
