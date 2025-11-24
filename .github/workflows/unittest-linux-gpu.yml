@@ -65,7 +65,7 @@ jobs:
         echo "::group::Install PyTorch and TorchCodec"
         PYTORCH_WHEEL_INDEX="https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/cu${CU_VERSION_WITHOUT_PERIODS}"
         python -m pip install numpy
-        python -m pip install --pre torch torchcodec --index-url="${PYTORCH_WHEEL_INDEX}"
+        python -m pip install --pre torch torchcodec --extra-index-url="${PYTORCH_WHEEL_INDEX}"
         python -c 'import torch; print(f"{torch.__version__}"); print(f"{torch.__file__}"); print(f"{torch.cuda.is_available()=}")'
         echo "::endgroup::"
 
