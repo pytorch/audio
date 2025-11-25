@@ -66,7 +66,7 @@ Tensor cuda_lfilter_core_loop(
   STD_TORCH_CHECK(in.size(2) + a_flipped.size(1) - 1 == padded_out.size(2));
 
   // TODO: enable device guard:
-  //const at::cuda::OptionalCUDAGuard device_guard(in.device());
+  // const at::cuda::OptionalCUDAGuard device_guard(in.device());
 
   const dim3 threads(256);
   const dim3 blocks((N * C + threads.x - 1) / threads.x);
