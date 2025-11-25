@@ -14,15 +14,15 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
-        cuda-version: ["12.6"]
-        ffmpeg-version: ["7"]
+        cuda-version: ["12.9"]
+        ffmpeg-version: ["8"]
       fail-fast: false
     uses: pytorch/test-infra/.github/workflows/linux_job_v2.yml@main
     permissions:
       id-token: write
       contents: read
     with:
-      runner: linux.4xlarge.nvidia.gpu
+      runner: linux.g5.4xlarge.nvidia.gpu
       repository: pytorch/audio
       upload-artifact: docs
       gpu-arch-type: cuda
