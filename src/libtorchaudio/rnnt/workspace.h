@@ -4,8 +4,7 @@
 #include <vector>
 
 #include <libtorchaudio/rnnt/options.h>
-
-#include <c10/util/Logging.h>
+#include <torch/headeronly/util/Exception.h>
 
 namespace torchaudio {
 namespace rnnt {
@@ -29,7 +28,7 @@ class DtypeWorkspace {
   ~DtypeWorkspace() {}
 
   static int ComputeSizeFromOptions(const Options& options) {
-    TORCH_CHECK_NE(options.device_, UNDEFINED);
+    STD_TORCH_CHECK(options.device_ != UNDEFINED);
     return ComputeSizeForDenominators(options) +
         ComputeSizeForLogProbs(options) + ComputeSizeForAlphas(options) +
         ComputeSizeForBetas(options);
@@ -38,7 +37,7 @@ class DtypeWorkspace {
   void Free();
   void Reset(const Options& options, DTYPE* data, int size) {
     int needed_size = ComputeSizeFromOptions(options);
-    TORCH_CHECK_LE(needed_size, size);
+    STD_TORCH_CHECK(needed_size <= size);
     options_ = options;
     data_ = data;
     size_ = size;
@@ -100,7 +99,7 @@ class IntWorkspace {
 
   void Reset(const Options& options, int* data, int size) {
     int needed_size = ComputeSizeFromOptions(options);
-    TORCH_CHECK_LE(needed_size, size);
+    STD_TORCH_CHECK(needed_size <= size);
     options_ = options;
     data_ = data;
     size_ = size;
@@ -111,11 +110,11 @@ class IntWorkspace {
   }
 
   int* GetPointerToAlphaCounters() const {
-    TORCH_CHECK_EQ(options_.device_, GPU);
+    STD_TORCH_CHECK(options_.device_ == GPU);
     return data_;
   }
   int* GetPointerToBetaCounters() const {
-    TORCH_CHECK_EQ(options_.device_, GPU);
+    STD_TORCH_CHECK(options_.device_ == GPU);
     return GetPointerToAlphaCounters() + ComputeSizeForAlphaCounters(options_);
   }
 
