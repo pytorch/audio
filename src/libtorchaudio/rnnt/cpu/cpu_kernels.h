@@ -3,8 +3,7 @@
 #include <libtorchaudio/rnnt/cpu/math.h>
 #include <libtorchaudio/rnnt/options.h>
 #include <libtorchaudio/rnnt/types.h>
-
-#include <c10/util/Logging.h>
+#include <torch/headeronly/util/Exception.h>
 
 #include <cstring>
 #include <limits>
@@ -50,7 +49,7 @@ class TensorView {
   }
 
   DTYPE& operator()(const std::vector<int>& indices) {
-    TORCH_CHECK_EQ(indices.size(), dims_.size());
+    STD_TORCH_CHECK(indices.size() == dims_.size());
     int index = indices.back();
     for (int i = indices.size() - 2; i >= 0; --i) {
       index += indices[i] * strides_[i];
