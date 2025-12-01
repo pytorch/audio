@@ -14,7 +14,6 @@
 
 #ifdef USE_CUDA
 #include <ATen/cuda/CUDAContext.h>
-#include <c10/cuda/CUDAException.h>
 #endif
 
 namespace torchaudio::stable {
@@ -83,10 +82,7 @@ T item(const Tensor& self) {
     return reinterpret_cast<const T*>(self.const_data_ptr())[0];
 #ifdef USE_CUDA
   } else if (self.is_cuda()) {
-    T value;
-    C10_CUDA_CHECK(cudaMemcpyAsync(
-        &value, self.data_ptr(), sizeof(T), cudaMemcpyDeviceToHost));
-    return value;
+    return torchaudio::stable::item<T>(torchaudio::stable::cpu(self));
 #endif
   } else {
     STD_TORCH_CHECK(false, "unreachable"); // not implemented
