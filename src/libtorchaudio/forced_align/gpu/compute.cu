@@ -2,6 +2,7 @@
 #include <torch/csrc/stable/library.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
 #include <torch/headeronly/core/ScalarType.h>
+#include <ATen/cuda/CUDAContext.h>
 
 #include <cub/cub.cuh>
 #include <limits.h>

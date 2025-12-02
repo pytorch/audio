@@ -12,10 +12,6 @@
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
 
-#ifdef USE_CUDA
-#include <ATen/cuda/CUDAContext.h>
-#endif
-
 namespace torchaudio::stable {
 
 using torch::stable::Tensor;

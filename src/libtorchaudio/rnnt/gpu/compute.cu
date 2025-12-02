@@ -1,7 +1,7 @@
 #include <libtorchaudio/rnnt/gpu/gpu_transducer.h>
+#include <libtorchaudio/cuda_utils.h>
 #include <libtorchaudio/stable/ops.h>
 
-#include <c10/cuda/CUDAStream.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
@@ -99,7 +99,7 @@ std::tuple<Tensor, Tensor> compute(
   options.blank_ = blank;
   options.clamp_ = clamp;
   options.fusedLogSmax_ = fused_log_softmax;
-  options.stream_ = at::cuda::getCurrentCUDAStream();
+  options.stream_ = libtorchaudio::cuda::getCurrentCUDAStream(logits.get_device_index());
   cudaSetDevice(logits.get_device());
   options.device_ = GPU;
 
