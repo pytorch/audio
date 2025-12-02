@@ -182,4 +182,51 @@ T item(const Tensor& self) {
   }
 }
 
+inline Tensor unsqueeze(const Tensor& self, int64_t dim) {
+  const auto num_args = 2;
+  std::array<StableIValue, num_args> stack{
+      torch::stable::detail::from(self), torch::stable::detail::from(dim)};
+  TORCH_ERROR_CODE_CHECK(torch_call_dispatcher(
+      "aten::unsqueeze", "", stack.data(), TORCH_ABI_VERSION));
+  return torch::stable::detail::to<torch::stable::Tensor>(stack[0]);
+}
+
+inline Tensor select(const Tensor& self, int64_t dim, int64_t index) {
+  const auto num_args = 3;
+  std::array<StableIValue, num_args> stack{
+      torch::stable::detail::from(self),
+      torch::stable::detail::from(dim),
+      torch::stable::detail::from(index)};
+  TORCH_ERROR_CODE_CHECK(torch_call_dispatcher(
+      "aten::select", "", stack.data(), TORCH_ABI_VERSION));
+  return torch::stable::detail::to<torch::stable::Tensor>(stack[0]);
+}
+
+inline Tensor squeeze(const Tensor& self, int64_t dim) {
+  const auto num_args = 2;
+  std::array<StableIValue, num_args> stack{
+      torch::stable::detail::from(self), torch::stable::detail::from(dim)};
+  TORCH_ERROR_CODE_CHECK(torch_call_dispatcher(
+      "aten::squeeze", "dim", stack.data(), TORCH_ABI_VERSION));
+  return torch::stable::detail::to<torch::stable::Tensor>(stack[0]);
+}
+
+inline Tensor matmul(const Tensor& self, const Tensor& other) {
+  const auto num_args = 2;
+  std::array<StableIValue, num_args> stack{
+      torch::stable::detail::from(self), torch::stable::detail::from(other)};
+  TORCH_ERROR_CODE_CHECK(torch_call_dispatcher(
+      "aten::matmul", "", stack.data(), TORCH_ABI_VERSION));
+  return torch::stable::detail::to<torch::stable::Tensor>(stack[0]);
+}
+
+inline Tensor subtract(const Tensor& self, const Tensor& other) {
+  const auto num_args = 2;
+  std::array<StableIValue, num_args> stack{
+      torch::stable::detail::from(self), torch::stable::detail::from(other)};
+  TORCH_ERROR_CODE_CHECK(torch_call_dispatcher(
+      "aten::subtract", "Tensor", stack.data(), TORCH_ABI_VERSION));
+  return torch::stable::detail::to<torch::stable::Tensor>(stack[0]);
+}
+
 } // namespace torchaudio::stable

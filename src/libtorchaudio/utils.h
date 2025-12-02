@@ -48,6 +48,24 @@ inline PackedTensorAccessor32<T, N> packed_accessor32(Tensor t) {
       t.sizes().data(),
       t.strides().data());
 }
+
+template <typename T, size_t N>
+using PackedTensorAccessorSizeT =
+    torch::headeronly::HeaderOnlyGenericPackedTensorAccessor<
+        T,
+        N,
+        torch::headeronly::RestrictPtrTraits,
+        size_t>;
+
+template <typename T, size_t N>
+inline PackedTensorAccessorSizeT<T, N> packed_accessor_size_t(Tensor t) {
+  return PackedTensorAccessorSizeT<T, N>(
+      static_cast<typename PackedTensorAccessorSizeT<T, N>::PtrType>(
+          t.data_ptr()),
+      t.sizes().data(),
+      t.strides().data());
+}
+
 #endif
 
 } // namespace torchaudio

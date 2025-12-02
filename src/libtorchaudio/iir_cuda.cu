@@ -1,16 +1,18 @@
+#include <libtorchaudio/utils.h>
+#include <torch/headeronly/core/Dispatch_v2.h>
+#include <torch/headeronly/core/ScalarType.h>
 #include <c10/cuda/CUDAException.h>
 #include <c10/cuda/CUDAGuard.h>
-#include <torch/torch.h>
+#include <c10/core/DeviceGuard.h>
+
+using torch::headeronly::ScalarType;
+using torch::stable::Tensor;
 
 template <typename scalar_t>
 __global__ void iir_cu_kernel(
-    const torch::
-        PackedTensorAccessor<scalar_t, 3, torch::RestrictPtrTraits, size_t> in,
-    const torch::
-        PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>
-            a_flipped,
-    torch::PackedTensorAccessor<scalar_t, 3, torch::RestrictPtrTraits, size_t>
-        out) {
+    const torchaudio::PackedTensorAccessorSizeT<scalar_t, 3> in,
+    const torchaudio::PackedTensorAccessorSizeT<scalar_t, 2> a_flipped,
+    torchaudio::PackedTensorAccessorSizeT<scalar_t, 3> out) {
   int64_t tid = blockIdx.x * blockDim.x + threadIdx.x;
   int64_t n = in.size(0);
   int64_t c = in.size(1);
@@ -33,51 +35,48 @@ __global__ void iir_cu_kernel(
   }
 }
 
-void cuda_lfilter_core_loop(
-    const torch::Tensor& in,
-    const torch::Tensor& a_flipped,
-    torch::Tensor& padded_out) {
-  TORCH_CHECK(
-      in.device().is_cuda() && a_flipped.device().is_cuda() &&
-      padded_out.device().is_cuda());
+Tensor cuda_lfilter_core_loop(
+    Tensor in,
+    Tensor a_flipped,
+    Tensor padded_out) {
+  STD_TORCH_CHECK(
+      in.is_cuda() && a_flipped.is_cuda() &&
+      padded_out.is_cuda());
 
-  TORCH_CHECK(
+  STD_TORCH_CHECK(
+      (in.get_device_index() == a_flipped.get_device_index()) &&
+      (in.get_device_index() == padded_out.get_device_index()));
+  
+  STD_TORCH_CHECK(
       in.is_contiguous() && a_flipped.is_contiguous() &&
       padded_out.is_contiguous());
 
-  TORCH_CHECK(
-      (in.dtype() == torch::kFloat32 || in.dtype() == torch::kFloat64) &&
-      (a_flipped.dtype() == torch::kFloat32 ||
-       a_flipped.dtype() == torch::kFloat64) &&
-      (padded_out.dtype() == torch::kFloat32 ||
-       padded_out.dtype() == torch::kFloat64));
+  STD_TORCH_CHECK(
+      (in.scalar_type() == ScalarType::Float || in.scalar_type() == ScalarType::Double) &&
+      (a_flipped.scalar_type() == ScalarType::Float ||
+       a_flipped.scalar_type() == ScalarType::Double) &&
+      (padded_out.scalar_type() == ScalarType::Float ||
+       padded_out.scalar_type() == ScalarType::Double));
 
   const int N = in.size(0);
   const int C = in.size(1);
-  TORCH_CHECK(N == padded_out.size(0));
-  TORCH_CHECK(C == padded_out.size(1));
+  STD_TORCH_CHECK(N == padded_out.size(0));
+  STD_TORCH_CHECK(C == padded_out.size(1));
 
-  TORCH_CHECK(in.size(2) + a_flipped.size(1) - 1 == padded_out.size(2));
+  STD_TORCH_CHECK(in.size(2) + a_flipped.size(1) - 1 == padded_out.size(2));
 
-  const at::cuda::OptionalCUDAGuard device_guard(device_of(in));
+  const at::cuda::OptionalCUDAGuard device_guard(in.get_device_index());
 
   const dim3 threads(256);
   const dim3 blocks((N * C + threads.x - 1) / threads.x);
 
-  AT_DISPATCH_FLOATING_TYPES(
-      in.scalar_type(), "iir_cu_loop", ([&] {
-        iir_cu_kernel<scalar_t><<<blocks, threads>>>(
-            in.packed_accessor<scalar_t, 3, torch::RestrictPtrTraits, size_t>(),
-            a_flipped.packed_accessor<
-                scalar_t,
-                2,
-                torch::RestrictPtrTraits,
-                size_t>(),
-            padded_out.packed_accessor<
-                scalar_t,
-                3,
-                torch::RestrictPtrTraits,
-                size_t>());
+  THO_DISPATCH_V2(
+      in.scalar_type(), "iir_cu_loop", AT_WRAP([&] {
+        (iir_cu_kernel<scalar_t><<<blocks, threads>>>(
+            torchaudio::packed_accessor_size_t<scalar_t, 3>(in),
+            torchaudio::packed_accessor_size_t<scalar_t, 2>(a_flipped),
+            torchaudio::packed_accessor_size_t<scalar_t, 3>(padded_out)));
         C10_CUDA_KERNEL_LAUNCH_CHECK();
-      }));
+        }), AT_FLOATING_TYPES);
+  return padded_out;
 }

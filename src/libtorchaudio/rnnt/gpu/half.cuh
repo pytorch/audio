@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef USE_C10_HALF
-#include "c10/util/Half.h"
+#include <torch/headeronly/util/Half.h>
 #endif // USE_C10_HALF
 
 #include <libtorchaudio/rnnt/macros.h>
