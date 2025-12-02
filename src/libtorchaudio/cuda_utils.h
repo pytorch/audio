@@ -1,6 +1,6 @@
 #pragma once
 
-#include <torch/csrc/inductor/aoti_torch/c/shim.h>
+#include <torch/csrc/stable/c/shim.h>
 #include <torch/csrc/stable/device.h>
 
 #include <cuda_runtime_api.h>
@@ -17,9 +17,27 @@ inline cudaStream_t getCurrentCUDAStream(
   return static_cast<cudaStream_t>(stream_ptr);
 }
 
-// A strip-down version of at::cuda::stream_synchronize
-inline void stream_synchronize(cudaStream_t stream) {
-  TA_CUDA_CHECK(cudaStreamSynchronize(stream));
+inline void setCurrentCUDAStream(
+    cudaStream_t stream,
+    torch::stable::DeviceIndex device_index = -1) {
+  TORCH_ERROR_CODE_CHECK(
+      torch_set_current_cuda_stream(static_cast<void*>(stream), device_index));
+}
+
+inline cudaStream_t getStreamFromPool(
+    const bool isHighPriority = false,
+    torch::stable::DeviceIndex device_index = -1) {
+  void* stream_ptr = nullptr;
+  TORCH_ERROR_CODE_CHECK(torch_get_cuda_stream_from_pool(
+      isHighPriority, device_index, &stream_ptr));
+  return static_cast<cudaStream_t>(stream_ptr);
+}
+
+inline void synchronize(
+    cudaStream_t stream,
+    torch::stable::DeviceIndex device_index = -1) {
+  TORCH_ERROR_CODE_CHECK(
+      torch_cuda_stream_synchronize(static_cast<void*>(stream), device_index));
 }
 
 } // namespace libtorchaudio::cuda

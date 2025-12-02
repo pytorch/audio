@@ -1,8 +1,8 @@
 #include <libtorchaudio/utils.h>
+#include <torch/csrc/stable/accelerator.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
 #include <torch/headeronly/core/ScalarType.h>
-#include <c10/cuda/CUDAGuard.h>
-#include <c10/core/DeviceGuard.h>
+#include <c10/cuda/CUDAException.h>
 
 using torch::headeronly::ScalarType;
 using torch::stable::Tensor;
@@ -64,8 +64,7 @@ Tensor cuda_lfilter_core_loop(
 
   STD_TORCH_CHECK(in.size(2) + a_flipped.size(1) - 1 == padded_out.size(2));
 
-  const at::cuda::OptionalCUDAGuard device_guard(in.get_device_index());
-
+  const torch::stable::accelerator::DeviceGuard device_guard(in.get_device_index());
   const dim3 threads(256);
   const dim3 blocks((N * C + threads.x - 1) / threads.x);
 

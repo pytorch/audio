@@ -1,8 +1,9 @@
+#include <libtorchaudio/cuda_utils.h>
 #include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
 #include <torch/headeronly/core/ScalarType.h>
-#include <ATen/cuda/CUDAContext.h>
+#include <c10/cuda/CUDAException.h>
 
 #include <cub/cub.cuh>
 #include <limits.h>
@@ -120,8 +121,9 @@ void forced_align_impl(
     const Tensor& targets,
     const int64_t blank,
     Tensor& paths) {
-  auto defaultStream = at::cuda::getCurrentCUDAStream();
-  auto cpuDataTranferStream = at::cuda::getStreamFromPool();
+  auto device_index = logProbs.get_device_index();
+  auto defaultStream = libtorchaudio::cuda::getCurrentCUDAStream(device_index);
+  auto cpuDataTranferStream = libtorchaudio::cuda::getStreamFromPool(false, device_index);
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
   using target_t = typename std::
       conditional<target_scalar_type == ScalarType::Int, int, int64_t>::type;
@@ -208,12 +210,14 @@ void forced_align_impl(
     C10_CUDA_KERNEL_LAUNCH_CHECK();
     ++backPtrBufferLen;
     if (backPtrBufferLen == kBackPtrBufferSize || t == T - 1) {
-      cpuDataTranferStream.synchronize();
+      //cpuDataTranferStream.synchronize();
+      libtorchaudio::cuda::synchronize(cpuDataTranferStream, device_index);
       // GPU -> GPU copy
       bufferCopy = torch::stable::clone(backPtrBuffer);
       STD_TORCH_CHECK(bufferCopy.is_contiguous(), "unexpected fail, need to implement stable::Tensor::contiguous()")
-      defaultStream.synchronize();
-      at::cuda::setCurrentCUDAStream(cpuDataTranferStream);
+      //defaultStream.synchronize();
+      libtorchaudio::cuda::synchronize(defaultStream, device_index);
+      libtorchaudio::cuda::setCurrentCUDAStream(cpuDataTranferStream, device_index);
       // Copy ASYNC from GPU to CPU
       int64_t offset =
           static_cast<int64_t>(t + 1 - backPtrBufferLen) * S * sizeof(int8_t);
@@ -223,11 +227,12 @@ void forced_align_impl(
           backPtrBufferLen * S * sizeof(int8_t),
           cudaMemcpyDeviceToHost,
           cpuDataTranferStream));
-      at::cuda::setCurrentCUDAStream(defaultStream);
+      libtorchaudio::cuda::setCurrentCUDAStream(defaultStream, device_index);
       backPtrBufferLen = 0;
     }
   }
-  cpuDataTranferStream.synchronize();
+  //cpuDataTranferStream.synchronize();
+  libtorchaudio::cuda::synchronize(cpuDataTranferStream, device_index);
   auto alphasCpu = torchaudio::stable::cpu(alphas);
   auto alphasCpu_a = torchaudio::accessor<scalar_t, 2>(alphasCpu);
   int curIdxOffset = ((T - 1) % 2);
