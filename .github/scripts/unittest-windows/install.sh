@@ -32,6 +32,10 @@ fi
 printf "Installing PyTorch\n"
 pip install --pre torch --index-url https://download.pytorch.org/whl/${UPLOAD_CHANNEL}/${wheel}
 
+printf "Patching Torch\n"
+TORCH_INCLUDE_DIR="$(python -c "import torch,os;print(os.path.join(os.path.dirname(torch.__file__),'include'))")"
+curl -L --silent --output ${TORCH_INCLUDE_DIR}/torch/csrc/stable/stableivalue_conversions.h https://raw.githubusercontent.com/pytorch/pytorch/refs/heads/gh/mikaylagawarecki/392/head/torch/csrc/stable/stableivalue_conversions.h
+
 python -c "import torch; print(torch.__version__)"
 
 torch_cuda=$(python -c "import torch; print(torch.cuda.is_available())")
