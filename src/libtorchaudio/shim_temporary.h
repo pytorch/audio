@@ -1,6 +1,6 @@
 #pragma once
 // TODO: remove this file once https://github.com/pytorch/pytorch/pull/169376
-// has landed.
+// has landed in nightly.
 
 #include <c10/cuda/CUDAStream.h>
 #include <torch/csrc/inductor/aoti_torch/utils.h>

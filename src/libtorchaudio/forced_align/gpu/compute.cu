@@ -210,12 +210,10 @@ void forced_align_impl(
     C10_CUDA_KERNEL_LAUNCH_CHECK();
     ++backPtrBufferLen;
     if (backPtrBufferLen == kBackPtrBufferSize || t == T - 1) {
-      //cpuDataTranferStream.synchronize();
       libtorchaudio::cuda::synchronize(cpuDataTranferStream, device_index);
       // GPU -> GPU copy
       bufferCopy = torch::stable::clone(backPtrBuffer);
       STD_TORCH_CHECK(bufferCopy.is_contiguous(), "unexpected fail, need to implement stable::Tensor::contiguous()")
-      //defaultStream.synchronize();
       libtorchaudio::cuda::synchronize(defaultStream, device_index);
       libtorchaudio::cuda::setCurrentCUDAStream(cpuDataTranferStream, device_index);
       // Copy ASYNC from GPU to CPU
@@ -231,7 +229,6 @@ void forced_align_impl(
       backPtrBufferLen = 0;
     }
   }
-  //cpuDataTranferStream.synchronize();
   libtorchaudio::cuda::synchronize(cpuDataTranferStream, device_index);
   auto alphasCpu = torchaudio::stable::cpu(alphas);
   auto alphasCpu_a = torchaudio::accessor<scalar_t, 2>(alphasCpu);
