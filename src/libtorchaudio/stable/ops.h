@@ -17,14 +17,12 @@
 #include <c10/cuda/CUDAException.h>
 #endif
 
-using torch::stable::Tensor;
-
 namespace torchaudio::stable {
 
-using Layout = int32_t;
+using torch::stable::Tensor;
 
-// TODO: When cpu is implemented in torch::stable, eliminate
-// cpu function below.
+// TODO: When cpu op is implemented in torch::stable, eliminate cpu
+// function below.
 inline Tensor cpu(const Tensor& self) {
   auto sizes_ = self.sizes();
   int32_t cpu_type = static_cast<int32_t>(torch::stable::DeviceType::CPU);
@@ -48,7 +46,8 @@ inline Tensor cpu(const Tensor& self) {
   return result;
 }
 
-// TODO:
+// TODO: When cuda op is implemented in torch::stable, eliminate cuda
+// function below.
 inline Tensor cuda(const Tensor& self, int32_t cuda_index) {
   auto sizes_ = self.sizes();
   int32_t cuda_type = static_cast<int32_t>(torch::stable::DeviceType::CUDA);
@@ -69,61 +68,6 @@ inline Tensor cuda(const Tensor& self, int32_t cuda_index) {
       &ret0));
   auto result = Tensor(ret0);
   copy_(result, self);
-  return result;
-}
-
-// TODO: remove when torch::stable provides new_zeros
-inline Tensor new_zeros(
-    const Tensor& self,
-    std::vector<int64_t> size,
-    std::optional<c10::ScalarType> dtype = std::nullopt,
-    std::optional<Layout> layout = std::nullopt,
-    std::optional<torch::stable::Device> device = std::nullopt,
-    std::optional<bool> pin_memory = std::nullopt) {
-  int32_t target_dtype{};
-  if (dtype.has_value()) {
-    target_dtype = torch::stable::detail::to<int32_t>(
-        torch::stable::detail::from(dtype.value()));
-  } else {
-    TORCH_ERROR_CODE_CHECK(aoti_torch_get_dtype(self.get(), &target_dtype));
-  }
-
-  Layout layout_;
-  if (layout.has_value()) {
-    layout_ = layout.value();
-  } else {
-    TORCH_ERROR_CODE_CHECK(aoti_torch_get_layout(self.get(), &layout_));
-  }
-
-  int32_t device_type;
-  torch::stable::DeviceIndex device_index = 0;
-  if (device.has_value()) {
-    auto device_ = device.value();
-    device_type = static_cast<int32_t>(device_.type());
-    device_index = device_.index();
-  } else {
-    TORCH_ERROR_CODE_CHECK(
-        aoti_torch_get_device_type(self.get(), &device_type));
-    TORCH_ERROR_CODE_CHECK(
-        aoti_torch_get_device_index(self.get(), &device_index));
-  }
-
-  // TODO: pin_memory
-
-  AtenTensorHandle ret0;
-  TORCH_ERROR_CODE_CHECK(aoti_torch_aten_new_empty(
-      self.get(),
-      size.data(),
-      static_cast<int64_t>(size.size()),
-      &target_dtype,
-      &layout_,
-      &device_type,
-      device_index,
-      nullptr, // pin_memory (nullptr for default)
-      &ret0));
-
-  auto result = Tensor(ret0);
-  torch::stable::zero_(result);
   return result;
 }
 
