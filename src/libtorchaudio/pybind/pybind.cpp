@@ -1,5 +1,6 @@
 #include <libtorchaudio/utils.h>
-#include <torch/extension.h>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace torchaudio {
 namespace {
