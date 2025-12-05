@@ -1,9 +1,9 @@
 #include <libtorchaudio/cuda_utils.h>
 #include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
+#include <torch/csrc/stable/macros.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
 #include <torch/headeronly/core/ScalarType.h>
-#include <c10/cuda/CUDAException.h>
 
 #include <cub/cub.cuh>
 #include <limits.h>
@@ -207,7 +207,7 @@ void forced_align_impl(
             backPtrBufferLen,
             torchaudio::packed_accessor32<scalar_t, 2>(alphas),
             torchaudio::packed_accessor32<int8_t, 2>(backPtrBuffer));
-    C10_CUDA_KERNEL_LAUNCH_CHECK();
+    STD_CUDA_KERNEL_LAUNCH_CHECK();
     ++backPtrBufferLen;
     if (backPtrBufferLen == kBackPtrBufferSize || t == T - 1) {
       libtorchaudio::cuda::synchronize(cpuDataTranferStream, device_index);
@@ -219,7 +219,7 @@ void forced_align_impl(
       // Copy ASYNC from GPU to CPU
       int64_t offset =
           static_cast<int64_t>(t + 1 - backPtrBufferLen) * S * sizeof(int8_t);
-      C10_CUDA_CHECK(cudaMemcpyAsync(
+      STD_CUDA_CHECK(cudaMemcpyAsync(
           static_cast<int8_t*>(backPtrCpu.data_ptr()) + offset,
           bufferCopy.data_ptr(),
           backPtrBufferLen * S * sizeof(int8_t),

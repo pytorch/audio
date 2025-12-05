@@ -1,13 +1,8 @@
 #pragma once
 
+#include <cuda_runtime_api.h>
 #include <torch/csrc/stable/c/shim.h>
 #include <torch/csrc/stable/device.h>
-
-#include <cuda_runtime_api.h>
-
-// TODO: replace TA_CUDA_CHECK with STD_CUDA_CHECK after
-// https://github.com/pytorch/pytorch/pull/169385 has landed.
-#define TA_CUDA_CHECK(...) __VA_ARGS__
 
 namespace libtorchaudio::cuda {
 

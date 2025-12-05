@@ -1,8 +1,8 @@
 #include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/accelerator.h>
+#include <torch/csrc/stable/macros.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
 #include <torch/headeronly/core/ScalarType.h>
-#include <c10/cuda/CUDAException.h>
 
 using torch::headeronly::ScalarType;
 using torch::stable::Tensor;
@@ -74,7 +74,7 @@ Tensor cuda_lfilter_core_loop(
             torchaudio::packed_accessor_size_t<scalar_t, 3>(in),
             torchaudio::packed_accessor_size_t<scalar_t, 2>(a_flipped),
             torchaudio::packed_accessor_size_t<scalar_t, 3>(padded_out)));
-        C10_CUDA_KERNEL_LAUNCH_CHECK();
+        STD_CUDA_KERNEL_LAUNCH_CHECK();
         }), AT_FLOATING_TYPES);
   return padded_out;
 }
