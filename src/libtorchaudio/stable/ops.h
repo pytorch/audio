@@ -9,8 +9,8 @@
   features implemented here.
 */
 
-#include <libtorchaudio/stable/Device.h>
 #include <torch/csrc/stable/ops.h>
+#include <torch/csrc/stable/tensor.h>
 
 #ifdef USE_CUDA
 #include <ATen/cuda/CUDAContext.h>
@@ -113,7 +113,7 @@ inline Tensor new_zeros(
     std::vector<int64_t> size,
     std::optional<c10::ScalarType> dtype = std::nullopt,
     std::optional<Layout> layout = std::nullopt,
-    std::optional<Device> device = std::nullopt,
+    std::optional<torch::stable::Device> device = std::nullopt,
     std::optional<bool> pin_memory = std::nullopt) {
   int32_t target_dtype{};
   if (dtype.has_value()) {
@@ -130,11 +130,11 @@ inline Tensor new_zeros(
     TORCH_ERROR_CODE_CHECK(aoti_torch_get_layout(self.get(), &layout_));
   }
 
-  DeviceType device_type;
-  DeviceIndex device_index = 0;
+  int32_t device_type;
+  torch::stable::DeviceIndex device_index = 0;
   if (device.has_value()) {
     auto device_ = device.value();
-    device_type = device_.type();
+    device_type = static_cast<int32_t>(device_.type());
     device_index = device_.index();
   } else {
     TORCH_ERROR_CODE_CHECK(
