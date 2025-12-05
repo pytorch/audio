@@ -208,7 +208,8 @@ std::tuple<Tensor, Tensor> compute(
       ScalarType::Long);
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
-  Tensor paths = torchaudio::stable::new_zeros(targets, {B, T});
+  Tensor paths = torch::stable::empty({B, T}, targets.scalar_type());
+  torch::stable::zero_(paths);
   THO_DISPATCH_V2(
       logProbs.scalar_type(),
       "forced_align_impl",

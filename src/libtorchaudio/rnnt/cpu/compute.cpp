@@ -114,9 +114,10 @@ std::tuple<Tensor, Tensor> compute(
   // when stable ABI Tensor supports mutable_data_ptr templates.
   Workspace<float> workspace(
       /*options=*/options,
-      /*dtype_data=*/reinterpret_cast<float*>(float_workspace.data_ptr()),
+      /*dtype_data=*/
+      reinterpret_cast<float*>(float_workspace.mutable_data_ptr()),
       /*dtype_size=*/float_workspace.numel(),
-      /*int_data=*/reinterpret_cast<int*>(int_workspace.data_ptr()),
+      /*int_data=*/reinterpret_cast<int*>(int_workspace.mutable_data_ptr()),
       /*int_size=*/int_workspace.numel());
 
   THO_DISPATCH_V2(

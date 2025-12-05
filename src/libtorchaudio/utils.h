@@ -4,7 +4,7 @@
 
 // TODO: replace the include libtorchaudio/stable/ops.h with
 // torch/stable/ops.h when torch::stable provides all required
-// features (torch::stable::item<T> or similar):
+// features (torch::stable::item<T> et al):
 #include <libtorchaudio/stable/ops.h>
 
 namespace torchaudio {
@@ -25,7 +25,7 @@ using TensorAccessor = torch::headeronly::HeaderOnlyTensorAccessor<T, N>;
 // TODO: eliminate accessor<T, N>(t) in favor of t.accessor<T, N>
 // after Tensor::accessor is supported in stable ABI
 template <typename T, size_t N>
-inline TensorAccessor<T, N> accessor(Tensor t) {
+inline TensorAccessor<T, N> accessor(torch::stable::Tensor t) {
   return TensorAccessor<T, N>(
       reinterpret_cast<T*>(t.data_ptr()), t.sizes().data(), t.strides().data());
 }
@@ -42,7 +42,7 @@ using PackedTensorAccessor32 =
 // TODO: eliminate accessor<T, N>(t) in favor of t.accessor<T, N>
 // after Tensor::accessor is supported in stable ABI
 template <typename T, size_t N>
-inline PackedTensorAccessor32<T, N> packed_accessor32(Tensor t) {
+inline PackedTensorAccessor32<T, N> packed_accessor32(torch::stable::Tensor t) {
   return PackedTensorAccessor32<T, N>(
       static_cast<typename PackedTensorAccessor32<T, N>::PtrType>(t.data_ptr()),
       t.sizes().data(),
@@ -58,7 +58,8 @@ using PackedTensorAccessorSizeT =
         size_t>;
 
 template <typename T, size_t N>
-inline PackedTensorAccessorSizeT<T, N> packed_accessor_size_t(Tensor t) {
+inline PackedTensorAccessorSizeT<T, N> packed_accessor_size_t(
+    torch::stable::Tensor t) {
   return PackedTensorAccessorSizeT<T, N>(
       static_cast<typename PackedTensorAccessorSizeT<T, N>::PtrType>(
           t.data_ptr()),
