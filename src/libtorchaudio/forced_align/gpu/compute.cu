@@ -294,7 +294,8 @@ std::tuple<Tensor, Tensor> compute(
   auto B = logProbs.size(0);
   auto T = logProbs.size(1); // num frames
 
-  Tensor paths = torchaudio::stable::new_zeros(targets, {B, T}, /*dtype=*/std::nullopt, /*layout=*/std::nullopt, /*device=*/torchaudio::stable::cpu_device());
+  Tensor paths = torch::stable::empty({B, T}, targets.scalar_type());
+  torch::stable::zero_(paths);
 
   THO_DISPATCH_V2(logProbs.scalar_type(), "forced_align_impl", AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
