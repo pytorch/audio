@@ -1,7 +1,7 @@
 #include <libtorchaudio/rnnt/gpu/gpu_transducer.h>
+#include <libtorchaudio/cuda_utils.h>
+#include <libtorchaudio/stable/ops.h>
 
-#include <c10/cuda/CUDAException.h>
-#include <c10/cuda/CUDAStream.h>
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
@@ -76,9 +76,8 @@ std::tuple<Tensor, Tensor> compute(
       "blank must be within [0, logits.shape[-1])");
 
   auto max_ivalue = [](const Tensor& t) {
-    int32_t value;
-    C10_CUDA_CHECK(cudaMemcpy(&value, torch::stable::amax(t, {}).data_ptr(), sizeof(int32_t), cudaMemcpyDeviceToHost));
-    return value;
+    auto mx = torchaudio::stable::cpu(torch::stable::amax(t, {}));
+    return reinterpret_cast<int32_t*>(mx.data_ptr())[0];
   };
 
   STD_TORCH_CHECK(
@@ -100,7 +99,7 @@ std::tuple<Tensor, Tensor> compute(
   options.blank_ = blank;
   options.clamp_ = clamp;
   options.fusedLogSmax_ = fused_log_softmax;
-  options.stream_ = at::cuda::getCurrentCUDAStream();
+  options.stream_ = libtorchaudio::cuda::getCurrentCUDAStream(logits.get_device_index());
   cudaSetDevice(logits.get_device());
   options.device_ = GPU;
 
