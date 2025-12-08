@@ -15,8 +15,8 @@ from torchaudio.functional.functional import (
     _check_convolve_mode,
     _fix_waveform_shape,
     _get_sinc_resample_kernel,
-    _rnnt_loss,
     _stretch_waveform,
+    rnnt_loss,
 )
 
 __all__ = []
@@ -1847,7 +1847,7 @@ class RNNTLoss(torch.nn.Module):
             Tensor: Loss with the reduction option applied. If ``reduction`` is  ``"none"``, then size (batch),
             otherwise scalar.
         """
-        return _rnnt_loss(
+        return rnnt_loss(
             logits,
             targets,
             logit_lengths,
