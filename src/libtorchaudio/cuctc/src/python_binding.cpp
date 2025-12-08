@@ -23,12 +23,25 @@
 // OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+// It is safe to temporarily disable TORCH_TARGET_VERSION for pybind11
+// as it is a header-only library.
+#ifdef TORCH_TARGET_VERSION
+#define SAVE_TORCH_TARGET_VERSION TORCH_TARGET_VERSION
+#undef TORCH_TARGET_VERSION
+#endif
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#ifdef SAVE_TORCH_TARGET_VERSION
+#define TORCH_TARGET_VERSION SAVE_TORCH_TARGET_VERSION
+#undef SAVE_TORCH_TARGET_VERSION
+#endif
+
 #include <tuple>
 #include <utility>
 #include <vector>
 #include "include/ctc_prefix_decoder.h"
+
 namespace py = pybind11;
 
 std::tuple<size_t, std::vector<std::vector<std::pair<float, std::vector<int>>>>>
