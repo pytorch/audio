@@ -1,6 +1,6 @@
 #include <libtorchaudio/rnnt/gpu/gpu_transducer.h>
 #include <libtorchaudio/cuda_utils.h>
-#include <libtorchaudio/stable/ops.h>
+#include <libtorchaudio/utils.h>
 
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
@@ -74,17 +74,11 @@ std::tuple<Tensor, Tensor> compute(
   STD_TORCH_CHECK(
       blank >= 0 && blank < logits.size(-1),
       "blank must be within [0, logits.shape[-1])");
-
-  auto max_ivalue = [](const Tensor& t) {
-    auto mx = torchaudio::stable::cpu(torch::stable::amax(t, {}));
-    return reinterpret_cast<int32_t*>(mx.data_ptr())[0];
-  };
-
   STD_TORCH_CHECK(
-      logits.size(1) == max_ivalue(logit_lengths),
+                  logits.size(1) == torchaudio::util::max<int64_t>(logit_lengths),
       "input length mismatch");
   STD_TORCH_CHECK(
-      logits.size(2) == max_ivalue(target_lengths) + 1,
+      logits.size(2) == torchaudio::util::max<int64_t>(target_lengths) + 1,
       "output length mismatch");
   STD_TORCH_CHECK(
       targets.size(1) + 1 == logits.size(2),
