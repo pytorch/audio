@@ -1,7 +1,3 @@
-import inspect
-
-from torchaudio._internal.module_utils import dropping_class_support, dropping_support
-
 _CTC_DECODERS = [
     "CTCHypothesis",
     "CTCDecoder",
@@ -37,21 +33,7 @@ def __getattr__(name: str):
                 "To use CUCTC decoder, please set BUILD_CUDA_CTC_DECODER=1 when building from source."
             ) from err
 
-        # TODO: when all unsupported classes are removed, replace the
-        # following if-else block with
-        #  item = getattr(_cuda_ctc_decoder, name)
-        orig_item = getattr(_cuda_ctc_decoder, name)
-        if inspect.isclass(orig_item) or (
-            # workaround a failure to detect type instances
-            # after sphinx autodoc mocking, required for
-            # building docs
-            getattr(orig_item, "__sphinx_mock__", False)
-            and inspect.isclass(orig_item.__class__)
-        ):
-            item = dropping_class_support(orig_item)
-        else:
-            item = dropping_support(orig_item)
-
+        item = getattr(_cuda_ctc_decoder, name)
         globals()[name] = item
         return item
     raise AttributeError(f"module {__name__} has no attribute {name}")
