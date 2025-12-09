@@ -152,7 +152,7 @@ else()
 endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${warning_flags} ${TORCH_CXX_FLAGS}")
 
-# Ensure that torchaudio is torch ABI stable.
+# Ensure that torchaudio is torch ABI stable with torch 2.10 onwards
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTORCH_TARGET_VERSION=0x020a000000000000")
 
 find_program(CCACHE_PROGRAM ccache)
