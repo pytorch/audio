@@ -136,7 +136,7 @@ void forced_align_impl(
   const int S = 2 * L + 1;
 
   auto cpu_device = torch::stable::Device("cpu");
-  auto targetsCpu = torch::stable::to(targets, std::nullopt, std::nullopt, cpu_device);
+  auto targetsCpu = torch::stable::to(targets, cpu_device);
   // backPtrBuffer stores the index offset fthe best path at current position
   // We copy the values to CPU after running every kBackPtrBufferSize of
   // frames.
@@ -231,7 +231,7 @@ void forced_align_impl(
     }
   }
   libtorchaudio::cuda::synchronize(cpuDataTranferStream, device_index);
-  auto alphasCpu = torch::stable::to(alphas, std::nullopt, std::nullopt, cpu_device);
+  auto alphasCpu = torch::stable::to(alphas, cpu_device);
   auto alphasCpu_a = torchaudio::accessor<scalar_t, 2>(alphasCpu);
   int curIdxOffset = ((T - 1) % 2);
   int ltrIdx =
@@ -308,7 +308,7 @@ std::tuple<Tensor, Tensor> compute(
           (forced_align_impl<scalar_t, ScalarType::Int>(logProbs, targets, blank, paths));
           }
       }), AT_EXPAND(AT_FLOATING_TYPES), ScalarType::Half);
-  Tensor pathsCuda = torch::stable::to(paths, std::nullopt, std::nullopt, logProbs.device());
+  Tensor pathsCuda = torch::stable::to(paths, logProbs.device());
   return std::make_tuple(pathsCuda, logProbs);
 }
 
