@@ -1,6 +1,8 @@
 #include <libtorchaudio/utils.h>
 
-// It is safe to temporarily disable TORCH_TARGET_VERSION for pybind11
+// Stuff in third_party/ is considered non-ABI-stable
+// (https://github.com/pytorch/pytorch/issues/169893), but
+// it is safe to temporarily disable TORCH_TARGET_VERSION for pybind11
 // as it is a header-only library.
 #ifdef TORCH_TARGET_VERSION
 #define SAVE_TORCH_TARGET_VERSION TORCH_TARGET_VERSION
