@@ -1,5 +1,6 @@
 #pragma once
 
+#include <torch/csrc/stable/device.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
 #include <torch/headeronly/core/TensorAccessor.h>
