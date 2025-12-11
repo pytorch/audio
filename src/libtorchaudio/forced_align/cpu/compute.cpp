@@ -1,6 +1,7 @@
-#include <libtorchaudio/stable/ops.h>
 #include <libtorchaudio/utils.h>
+
 #include <torch/csrc/stable/library.h>
+#include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
 #include <torch/headeronly/core/Dispatch_v2.h>
 #include <torch/headeronly/core/ScalarType.h>
@@ -186,26 +187,12 @@ std::tuple<Tensor, Tensor> compute(
   STD_TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
-  THO_DISPATCH_V2(
-      inputLengths.scalar_type(),
-      "forced_align_impl",
-      AT_WRAP([&] {
-        STD_TORCH_CHECK(
-            logProbs.size(1) == torchaudio::util::max<scalar_t>(inputLengths),
-            "input length mismatch");
-      }),
-      ScalarType::Int,
-      ScalarType::Long);
-  THO_DISPATCH_V2(
-      targetLengths.scalar_type(),
-      "forced_align_impl",
-      AT_WRAP([&] {
-        STD_TORCH_CHECK(
-            targets.size(1) == torchaudio::util::max<scalar_t>(targetLengths),
-            "target length mismatch");
-      }),
-      ScalarType::Int,
-      ScalarType::Long);
+  STD_TORCH_CHECK(
+      logProbs.size(1) == torchaudio::util::max<int64_t>(inputLengths),
+      "input length mismatch");
+  STD_TORCH_CHECK(
+      targets.size(1) == torchaudio::util::max<int64_t>(targetLengths),
+      "target length mismatch");
   const auto B = logProbs.size(0);
   const auto T = logProbs.size(1);
   Tensor paths = torch::stable::empty({B, T}, targets.scalar_type());
