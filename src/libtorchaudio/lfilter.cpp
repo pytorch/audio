@@ -24,12 +24,10 @@ void host_lfilter_core_loop(
   int64_t n_samples_input = input_signal_windows.size(2);
   int64_t n_samples_output = padded_output_waveform.size(2);
   int64_t n_order = a_coeff_flipped.size(1);
-  scalar_t* output_data =
-      reinterpret_cast<scalar_t*>(padded_output_waveform.data_ptr());
-  const scalar_t* input_data =
-      reinterpret_cast<scalar_t*>(input_signal_windows.data_ptr());
+  scalar_t* output_data = padded_output_waveform.mutable_data_ptr<scalar_t>();
+  const scalar_t* input_data = input_signal_windows.const_data_ptr<scalar_t>();
   const scalar_t* a_coeff_flipped_data =
-      reinterpret_cast<scalar_t*>(a_coeff_flipped.data_ptr());
+      a_coeff_flipped.const_data_ptr<scalar_t>();
 
   torch::stable::parallel_for(
       0, n_channel * n_batch, 1, [&](int64_t begin, int64_t end) {
