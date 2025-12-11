@@ -251,7 +251,11 @@ disabledInCI = _skipIf(
 )
 skipIfSingleCuda = _skipIf(
     not (torch.cuda.is_available() and torch.cuda.device_count() > 1),
-    reason="CUDA is not available or not a multi-GPU platform",
+    reason=(
+        "CUDA is not available."
+        if not torch.cuda.is_available()
+        else f"Not a multi-GPU platform (device count is {torch.cuda.device_count()})."
+    ),
     key="NO_MULTIGPU_CUDA",
 )
 
