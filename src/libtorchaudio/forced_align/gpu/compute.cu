@@ -122,6 +122,7 @@ void forced_align_impl(
     const int64_t blank,
     Tensor& paths) {
   auto device_index = logProbs.get_device_index();
+  const torch::stable::accelerator::DeviceGuard device_guard(device_index);
   auto defaultStream = libtorchaudio::cuda::getCurrentCUDAStream(device_index);
   auto cpuDataTranferStream = libtorchaudio::cuda::getStreamFromPool(false, device_index);
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
