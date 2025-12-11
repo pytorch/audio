@@ -95,21 +95,20 @@ Tensor lfilter_core_generic_loop(
     Tensor padded_output_waveform) {
   int64_t n_samples_input = input_signal_windows.size(2);
   int64_t n_order = a_coeff_flipped.size(1);
-  auto coeff = torchaudio::stable::unsqueeze(a_coeff_flipped, 2);
+  auto coeff = torch::stable::unsqueeze(a_coeff_flipped, 2);
   for (int64_t i_sample = 0; i_sample < n_samples_input; i_sample++) {
     auto windowed_output_signal = torch::stable::transpose(
-        torch::stable::narrow(
-            padded_output_waveform, 2, i_sample, i_sample + n_order),
+        torch::stable::narrow(padded_output_waveform, 2, i_sample, n_order),
         0,
         1);
-    auto o0 = torchaudio::stable::subtract(
-        torchaudio::stable::select(input_signal_windows, 2, i_sample),
+    auto o0 = torch::stable::subtract(
+        torch::stable::select(input_signal_windows, 2, i_sample),
         torch::stable::transpose(
-            torchaudio::stable::squeeze(
-                torchaudio::stable::matmul(windowed_output_signal, coeff), 2),
+            torch::stable::squeeze(
+                torch::stable::matmul(windowed_output_signal, coeff), 2),
             0,
             1));
-    auto s = torchaudio::stable::select(
+    auto s = torch::stable::select(
         padded_output_waveform, 2, i_sample + n_order - 1);
     torch::stable::copy_(s, o0);
   }

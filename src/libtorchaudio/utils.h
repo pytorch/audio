@@ -1,18 +1,21 @@
 #pragma once
 
+#include <torch/csrc/stable/device.h>
+#include <torch/csrc/stable/ops.h>
+#include <torch/csrc/stable/tensor.h>
 #include <torch/headeronly/core/TensorAccessor.h>
-
-// TODO: replace the include libtorchaudio/stable/ops.h with
-// torch/stable/ops.h when torch::stable provides all required
-// features (torch::stable::item<T> et al):
-#include <libtorchaudio/stable/ops.h>
 
 namespace torchaudio {
 
 namespace util {
 template <typename T>
 T max(const torch::stable::Tensor& t) {
-  return torchaudio::stable::item<T>(torch::stable::amax(t, {}));
+  torch::stable::Tensor cpu = torch::stable::to(
+      torch::stable::amax(t, {}),
+      torch::headeronly::CppTypeToScalarType<T>::value,
+      std::nullopt,
+      torch::stable::Device("cpu"));
+  return (cpu.const_data_ptr<T>())[0];
 }
 } // namespace util
 
