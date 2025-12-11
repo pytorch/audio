@@ -27,6 +27,7 @@ fi
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_unidecode=true
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_inflect=true
     export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MOD_pytorch_lightning=true
+    export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MULTIGPU_CUDA=true
     cd test
     pytest torchaudio_unittest -k "not torchscript and not fairseq and not demucs ${PYTEST_K_EXTRA}" 
 )
