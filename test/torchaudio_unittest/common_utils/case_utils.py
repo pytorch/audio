@@ -249,6 +249,11 @@ disabledInCI = _skipIf(
     reason="Tests are failing on CI consistently. Disabled while investigating.",
     key="TEMPORARY_DISABLED",
 )
+skipIfSingleCuda = _skipIf(
+    not (torch.cuda.is_available() and torch.cuda.device_count() > 1),
+    reason="CUDA is not available or not a multi-GPU platform",
+    key="NO_MULTIGPU_CUDA",
+)
 
 
 def skipIfNoHWAccel(name):
