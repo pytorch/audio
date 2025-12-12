@@ -15,6 +15,6 @@ cd test
 if [ -z "${CUDA_VERSION:-}" ] ; then
     pytest --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not fairseq and not demucs and not librosa"
 else
-    pytest --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not cpu and (cuda or gpu) and and not fairseq and not demucs and not librosa"
+    pytest --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not cpu and (cuda or gpu) and not fairseq and not demucs and not librosa"
 fi
 coverage html
