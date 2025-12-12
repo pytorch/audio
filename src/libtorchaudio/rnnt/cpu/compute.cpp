@@ -1,4 +1,6 @@
 #include <libtorchaudio/rnnt/cpu/cpu_transducer.h>
+#include <libtorchaudio/utils.h>
+
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
@@ -73,15 +75,11 @@ std::tuple<Tensor, Tensor> compute(
   STD_TORCH_CHECK(
       blank >= 0 && blank < logits.size(-1),
       "blank must be within [0, logits.shape[-1])");
-
-  auto max_ivalue = [](const Tensor& t) {
-    return reinterpret_cast<int32_t*>(torch::stable::amax(t, {}).data_ptr())[0];
-  };
-
   STD_TORCH_CHECK(
-      logits.size(1) == max_ivalue(logit_lengths), "input length mismatch");
+      logits.size(1) == torchaudio::util::max<int64_t>(logit_lengths),
+      "input length mismatch");
   STD_TORCH_CHECK(
-      logits.size(2) == max_ivalue(target_lengths) + 1,
+      logits.size(2) == torchaudio::util::max<int64_t>(target_lengths) + 1,
       "output length mismatch");
   STD_TORCH_CHECK(
       targets.size(1) + 1 == logits.size(2), "target length mismatch");
@@ -110,14 +108,12 @@ std::tuple<Tensor, Tensor> compute(
       {DtypeWorkspace<float>::ComputeSizeFromOptions(options)},
       ScalarType::Float);
 
-  // TODO: use t.mutable_data_ptr<..>() instead of reinterpret_cast
-  // when stable ABI Tensor supports mutable_data_ptr templates.
   Workspace<float> workspace(
       /*options=*/options,
       /*dtype_data=*/
-      reinterpret_cast<float*>(float_workspace.mutable_data_ptr()),
+      float_workspace.mutable_data_ptr<float>(),
       /*dtype_size=*/float_workspace.numel(),
-      /*int_data=*/reinterpret_cast<int*>(int_workspace.mutable_data_ptr()),
+      /*int_data=*/int_workspace.mutable_data_ptr<int>(),
       /*int_size=*/int_workspace.numel());
 
   THO_DISPATCH_V2(
@@ -126,12 +122,12 @@ std::tuple<Tensor, Tensor> compute(
       AT_WRAP([&] {
         (Compute</*DTYPE=*/scalar_t, /*CAST_DTYPE=*/float>(
             /*workspace=*/workspace,
-            /*logits=*/reinterpret_cast<scalar_t*>(logits.data_ptr()),
-            /*targets=*/reinterpret_cast<int*>(targets.data_ptr()),
-            /*srcLengths=*/reinterpret_cast<int*>(logit_lengths.data_ptr()),
-            /*tgtLengths=*/reinterpret_cast<int*>(target_lengths.data_ptr()),
-            /*costs=*/reinterpret_cast<scalar_t*>(costs.data_ptr()),
-            /*gradients=*/reinterpret_cast<scalar_t*>(gradients.data_ptr())));
+            /*logits=*/logits.const_data_ptr<scalar_t>(),
+            /*targets=*/targets.const_data_ptr<int>(),
+            /*srcLengths=*/logit_lengths.const_data_ptr<int>(),
+            /*tgtLengths=*/target_lengths.const_data_ptr<int>(),
+            /*costs=*/costs.mutable_data_ptr<scalar_t>(),
+            /*gradients=*/gradients.mutable_data_ptr<scalar_t>()));
       }),
       ScalarType::Float,
       ScalarType::Half);
