@@ -92,5 +92,7 @@ jobs:
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_DECODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_SOX_ENCODER=true
         export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_FFMPEG=true
+        export TORCHAUDIO_TEST_ALLOW_SKIP_IF_NO_MULTIGPU_CUDA=true
+
         pytest test/torchaudio_unittest -k "not torchscript and not fairseq and not demucs" -x
         echo "::endgroup::"
