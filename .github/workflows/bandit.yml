@@ -13,7 +13,7 @@
 #     runs-on: ubuntu-latest
 
 #     steps:
-#       - uses: actions/checkout@v2
+#       - uses: actions/checkout@v6
 
 #       # Task will fail if any high-severity issues are found
 #       # Ignoring submodules
