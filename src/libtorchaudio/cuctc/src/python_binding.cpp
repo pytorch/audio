@@ -126,13 +126,6 @@ std::tuple<size_t, Tensor, Tensor, Tensor> ctc_prefix_decoder_batch_wrapper(
 
 PYBIND11_MODULE(pybind11_prefixctc, m) {}
 
-STABLE_TORCH_LIBRARY_FRAGMENT(pybind11_prefixctc, m) {
-  m.def(
-      "ctc_beam_search_decoder_batch_gpu_v2(int interal_data_ptr, Tensor memory, Tensor log_prob, Tensor encoder_out_lens, int beam, int blid, int spid, float thresold) -> (int, Tensor, Tensor, Tensor)");
-  m.def("prefixCTC_alloc(int stream) -> int");
-  m.def("prefixCTC_free(int interal_data_ptr) -> ()");
-}
-
 STABLE_TORCH_LIBRARY_IMPL(pybind11_prefixctc, CompositeExplicitAutograd, m) {
   m.impl("prefixCTC_alloc", TORCH_BOX(&cu_ctc::prefixCTC_alloc));
   m.impl("prefixCTC_free", TORCH_BOX(&cu_ctc::prefixCTC_free));
@@ -142,4 +135,12 @@ STABLE_TORCH_LIBRARY_IMPL(pybind11_prefixctc, CUDA, m) {
   m.impl(
       "ctc_beam_search_decoder_batch_gpu_v2",
       TORCH_BOX(&ctc_prefix_decoder_batch_wrapper));
+}
+
+
+STABLE_TORCH_LIBRARY_FRAGMENT(pybind11_prefixctc, m) {
+  m.def(
+      "ctc_beam_search_decoder_batch_gpu_v2(int interal_data_ptr, Tensor memory, Tensor log_prob, Tensor encoder_out_lens, int beam, int blid, int spid, float thresold) -> (int, Tensor, Tensor, Tensor)");
+  m.def("prefixCTC_alloc(int stream) -> int");
+  m.def("prefixCTC_free(int interal_data_ptr) -> ()");
 }

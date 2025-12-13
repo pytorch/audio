@@ -7,16 +7,17 @@ from pathlib import Path
 import torch
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
-from torch.utils.cpp_extension import CUDA_HOME
+from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDA_HOME, CUDAExtension
 
 __all__ = [
     "get_ext_modules",
+    "get_build_ext",
     "CMakeBuild",
 ]
 
 _THIS_DIR = Path(__file__).parent.resolve()
 _ROOT_DIR = _THIS_DIR.parent.parent.resolve()
-_TORCHAUDIO_DIR = _ROOT_DIR / "torchaudio"
+_CSRC_DIR = _ROOT_DIR / "src" / "libtorchaudio"
 
 
 def _get_build(var, default=False):
@@ -43,7 +44,92 @@ _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP"
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
+def get_build_ext():
+    return BuildExtension.with_options(no_python_abi_suffix=True)
+
+
 def get_ext_modules():
+    extra_compile_args = {
+        "cxx": [
+            "-fdiagnostics-color=always",
+            "-DTORCH_TARGET_VERSION=0x020a000000000000",
+        ],
+    }
+
+    extension = CppExtension
+
+    if _USE_CUDA:
+        extension = CUDAExtension
+        extra_compile_args["cxx"].append("-DUSE_CUDA")
+        extra_compile_args["nvcc"] = ["-O2", "-DUSE_CUDA"]
+
+    sources = [
+        "utils.cpp",
+        "lfilter.cpp",
+        "overdrive.cpp",
+    ]
+
+    if _USE_CUDA:
+        sources.append("iir_cuda.cu")
+
+    if _BUILD_RNNT:
+        sources.extend(
+            [
+                "rnnt/cpu/compute.cpp",
+                "rnnt/compute.cpp",
+            ]
+        )
+        if _USE_CUDA:
+            sources.append("rnnt/gpu/compute.cu")
+
+    if _BUILD_ALIGN:
+        extra_compile_args["cxx"].append("-DINCLUDE_ALIGN")
+        sources.extend(
+            [
+                "forced_align/cpu/compute.cpp",
+                "forced_align/compute.cpp",
+            ]
+        )
+        if _USE_CUDA:
+            sources.append("forced_align/gpu/compute.cu")
+
+    modules = [
+        extension(
+            name="torchaudio.lib._torchaudio",
+            sources=[
+                _CSRC_DIR / "_torchaudio.cpp",
+                _CSRC_DIR / "utils.cpp",
+            ],
+            py_limited_api=True,
+            extra_compile_args=extra_compile_args,
+            include_dirs=[_CSRC_DIR.parent],
+        ),
+        extension(
+            name="torchaudio.lib.libtorchaudio",
+            sources=[_CSRC_DIR / s for s in sources],
+            py_limited_api=True,
+            extra_compile_args=extra_compile_args,
+            include_dirs=[_CSRC_DIR.parent],
+        ),
+    ]
+    if _BUILD_CUDA_CTC_DECODER and 0:  # TODO: port libctc_prefix_decoder torch stable library
+        modules.extend(
+            [
+                extension(
+                    name="torchaudio.lib.libctc_prefix_decoder",
+                    sources=[
+                        _CSRC_DIR / "cuctc" / "src" / s
+                        for s in ["ctc_prefix_decoder.cpp", "ctc_prefix_decoder_kernel_v2.cu"]
+                    ],
+                    py_limited_api=True,
+                    extra_compile_args=extra_compile_args,
+                    include_dirs=[_CSRC_DIR / "cuctc"],
+                ),
+            ]
+        )
+
+    return modules
+
     modules = [
         Extension(name="torchaudio.lib.libtorchaudio", sources=[]),
         Extension(name="torchaudio.lib._torchaudio", sources=[]),
