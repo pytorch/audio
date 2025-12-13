@@ -4,7 +4,7 @@ import sys
 
 import torch
 
-from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
+from torchaudio._internal.module_utils import fail_with_message, no_op
 
 from .utils import _check_cuda_version, _init_dll_path, _load_lib
 
