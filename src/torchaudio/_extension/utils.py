@@ -116,9 +116,7 @@ def _init_dll_path():
 
 
 def _check_cuda_version():
-    import torchaudio.lib._torchaudio
-
-    version = torchaudio.lib._torchaudio.cuda_version()
+    version = torch.ops._torchaudio.cuda_version()
     if version is not None and torch.version.cuda is not None:
         version_str = str(version)
         ta_version = f"{version_str[:-3]}.{version_str[-2]}"
