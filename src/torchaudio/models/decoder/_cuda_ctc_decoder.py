@@ -8,7 +8,9 @@ import torch
 import torchaudio
 
 torchaudio._extension._load_lib("libctc_prefix_decoder")
-import torchaudio.lib.pybind11_prefixctc as cuctc
+import torchaudio.lib.pybind11_prefixctc
+
+cuctc = torch.ops.pybind11_prefixctc
 
 
 __all__ = ["CUCTCHypothesis", "CUCTCDecoder", "cuda_ctc_decoder"]
@@ -102,51 +104,36 @@ class CUCTCDecoder:
             List[List[CUCTCHypothesis]]:
                 List of sorted best hypotheses for each audio sequence in the batch.
         """
-        if not encoder_out_lens.dtype == torch.int32:
-            raise AssertionError("encoder_out_lens must be torch.int32")
-        if not log_prob.dtype == torch.float32:
-            raise AssertionError("log_prob must be torch.float32")
-        if not (log_prob.is_cuda and encoder_out_lens.is_cuda):
-            raise AssertionError("inputs must be cuda tensors")
-        if not (log_prob.is_contiguous() and encoder_out_lens.is_contiguous()):
-            raise AssertionError("input tensors must be contiguous")
-        required_size, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(
+        required_size, list_data, len_data, score = cuctc.ctc_beam_search_decoder_batch_gpu_v2(
             self.internal_data,
-            self.memory.data_ptr(),
-            self.memory.size(0),
-            log_prob.data_ptr(),
-            encoder_out_lens.data_ptr(),
-            log_prob.size(),
-            log_prob.stride(),
+            self.memory,
+            log_prob,
+            encoder_out_lens,
             self.beam_size,
             self.blank_id,
             self.space_id,
             self.blank_skip_threshold,
         )
         if required_size > 0:
-            self.memory = torch.empty(required_size, dtype=torch.int8, device=log_prob.device).contiguous()
-            _, score_hyps = cuctc.ctc_beam_search_decoder_batch_gpu_v2(
+            self.memory = torch.empty(required_size, dtype=torch.int8, device=log_prob.device)
+            required_size, list_data, len_data, score = cuctc.ctc_beam_search_decoder_batch_gpu_v2(
                 self.internal_data,
-                self.memory.data_ptr(),
-                self.memory.size(0),
-                log_prob.data_ptr(),
-                encoder_out_lens.data_ptr(),
-                log_prob.size(),
-                log_prob.stride(),
+                self.memory,
+                log_prob,
+                encoder_out_lens,
                 self.beam_size,
                 self.blank_id,
                 self.space_id,
                 self.blank_skip_threshold,
             )
-        batch_size = len(score_hyps)
         hypos = []
-        for i in range(batch_size):
+        for i in range(log_prob.shape[0]):
             hypos.append(
                 [
                     CUCTCHypothesis(
-                        tokens=score_hyps[i][j][1],
-                        words=[self.vocab_list[word_id] for word_id in score_hyps[i][j][1]],
-                        score=score_hyps[i][j][0],
+                        tokens=list_data[i][j][: len_data[i][j]],
+                        words=[self.vocab_list[word_id] for word_id in list_data[i][j][: len_data[i][j]]],
+                        score=score[i][j],
                     )
                     for j in range(self.nbest)
                 ]
