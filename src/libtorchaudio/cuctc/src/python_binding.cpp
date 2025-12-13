@@ -44,7 +44,7 @@
 #include <vector>
 #include "include/ctc_prefix_decoder.h"
 
-namespace py = pybind11;
+// namespace py = pybind11;
 
 std::tuple<size_t, std::vector<std::vector<std::pair<float, std::vector<int>>>>>
 ctc_prefix_decoder_batch_wrapper(
@@ -102,7 +102,7 @@ ctc_prefix_decoder_batch_wrapper(
   }
   return std::make_tuple(require_size, std::move(score_hyps));
 }
-
+/*
 PYBIND11_MODULE(pybind11_prefixctc, m) {
   m.doc() = "none";
   m.def(
@@ -111,4 +111,19 @@ PYBIND11_MODULE(pybind11_prefixctc, m) {
       "ctc prefix decoder  v2 computing on GPU");
   m.def("prefixCTC_alloc", &cu_ctc::prefixCTC_alloc, "allocate internal data");
   m.def("prefixCTC_free", &cu_ctc::prefixCTC_free, "free internal data");
+}
+*/
+
+STABLE_TORCH_LIBRARY_FRAGMENT(_torchaudio, m) {
+  m.def("ctc_beam_search_decoder_batch_gpu_v2() -> (int, ((float, int)[])[])");
+  m.def("prefixCTC_alloc() -> int");
+  m.def("prefixCTC_free(int) -> ()");
+}
+
+STABLE_TORCH_LIBRARY_IMPL(_torchaudio, CompositeExplicitAutograd, m) {
+  m.impl(
+      "ctc_beam_search_decoder_batch_gpu_v2",
+      TORCH_BOX(&ctc_prefix_decoder_batch_wrapper));
+  m.impl("prefixCTC_alloc", TORCH_BOX(&prefixCTC_alloc));
+  m.impl("prefixCTC_free", TORCH_BOX(&prefixCTC_free));
 }
