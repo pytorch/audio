@@ -39,8 +39,51 @@ _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP"
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
+class MyBuildExtension(BuildExtension):
+    def get_ext_fullname(self, ext_name: str) -> str:
+        result = super().get_ext_fullname(ext_name)
+        print(f"XXXXXXXXXXXX get_ext_fullname({ext_name}) -> {result}")
+        return result
+
+    def get_ext_fullpath(self, ext_name: str) -> str:
+        result = super().get_ext_fullpath(ext_name)
+        print(f"XXXXXXXXXXXX get_ext_fullpath({ext_name}) -> {result}")
+        return result
+
+    def get_ext_filename(self, fullname: str) -> str:
+        import setuptools.command.build_ext as m
+
+        _build_ext = m._build_ext
+        so_ext = os.getenv("SETUPTOOLS_EXT_SUFFIX")
+        if so_ext:
+            filename = os.path.join(*fullname.split(".")) + so_ext
+        else:
+            filename = _build_ext.get_ext_filename(self, fullname)
+            ext_suffix = m.get_config_var("EXT_SUFFIX")
+            if not isinstance(ext_suffix, str):
+                raise OSError(
+                    "Configuration variable EXT_SUFFIX not found for this platform "
+                    "and environment variable SETUPTOOLS_EXT_SUFFIX is missing"
+                )
+            so_ext = ext_suffix
+
+        if fullname in self.ext_map:
+            ext = self.ext_map[fullname]
+            abi3_suffix = m.get_abi3_suffix()
+            if ext.py_limited_api and abi3_suffix:  # Use abi3
+                filename = filename[: -len(so_ext)] + abi3_suffix
+            if isinstance(ext, m.Library):
+                fn, ext = os.path.splitext(filename)
+                filename = self.shlib_compiler.library_filename(fn, m.libtype)
+            elif m.use_stubs and ext._links_to_dynamic:
+                d, fn = os.path.split(filename)
+                filename = os.path.join(d, "dl-" + fn)
+        print(f"YYYYYYYYYYYYYYYYYYYYYYY {filename=}")
+        return filename
+
+
 def get_build_ext():
-    return BuildExtension.with_options(no_python_abi_suffix=True, use_ninja=True)
+    return MyBuildExtension.with_options(no_python_abi_suffix=True, use_ninja=True)
 
 
 def get_ext_modules():
