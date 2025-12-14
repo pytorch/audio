@@ -1,7 +1,7 @@
 #include <libtorchaudio/utils.h>
 #include <torch/csrc/stable/library.h>
 
-STABLE_TORCH_LIBRARY_FRAGMENT(_torchaudio, m) {
+STABLE_TORCH_LIBRARY(_torchaudio, m) {
   m.def("is_align_available() -> bool");
   m.def("cuda_version() -> int?");
 }
