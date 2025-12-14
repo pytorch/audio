@@ -1,5 +1,19 @@
 #pragma once
 
+// Workaround to linker error on Windows platform:
+// LINK : error LNK2001: unresolved external symbol PyInit_...
+#define TORCHAUDIO_EXT_MODULE(name)                               \
+  static struct PyModuleDef name##_module = {                     \
+      /*.m_base =*/PyModuleDef_HEAD_INIT, /*.m_name =*/"" #name}; \
+  PyMODINIT_FUNC PyInit_##name(void) {                            \
+    return PyModuleDef_Init(&name##_module);                      \
+  }
+#ifndef Py_LIMITED_API
+#error "This extension module expects Py_LIMITED_API defined."
+#endif
+#include <Python.h>
+// end of Workaround
+
 #include <torch/csrc/stable/device.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>

@@ -51,10 +51,12 @@ def get_build_ext():
 def get_ext_modules():
     extra_compile_args = {
         "cxx": [
-            "-fdiagnostics-color=always",
             "-DTORCH_TARGET_VERSION=0x020a000000000000",
         ],
     }
+
+    if platform.system() != "Windows":
+        extra_compile_args["cxx"].append("-fdiagnostics-color=always")
 
     extension = CppExtension
 
@@ -64,6 +66,7 @@ def get_ext_modules():
         extra_compile_args["nvcc"] = ["-O2", "-DUSE_CUDA"]
 
     sources = [
+        "libtorchaudio.cpp",
         "utils.cpp",
         "lfilter.cpp",
         "overdrive.cpp",
