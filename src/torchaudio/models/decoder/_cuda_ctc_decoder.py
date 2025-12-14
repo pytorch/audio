@@ -8,9 +8,7 @@ import torch
 import torchaudio
 
 torchaudio._extension._load_lib("libctc_prefix_decoder")
-import torchaudio.lib.pybind11_prefixctc
-
-cuctc = torch.ops.pybind11_prefixctc
+cuctc = torch.ops.torchaudio_prefixctc
 
 
 __all__ = ["CUCTCHypothesis", "CUCTCDecoder", "cuda_ctc_decoder"]
