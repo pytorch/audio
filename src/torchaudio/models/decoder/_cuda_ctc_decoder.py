@@ -7,7 +7,7 @@ from typing import List, NamedTuple, Union
 import torch
 import torchaudio
 
-torchaudio._extension._load_lib("libctc_prefix_decoder")
+torchaudio._extension._load_lib("torchaudio_prefixctc")
 cuctc = torch.ops.torchaudio_prefixctc
 
 

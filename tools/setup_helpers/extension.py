@@ -114,7 +114,7 @@ def get_ext_modules():
         modules.extend(
             [
                 extension(
-                    name="torchaudio.lib.libctc_prefix_decoder",
+                    name="torchaudio.lib.torchaudio_prefixctc",
                     sources=[
                         _CSRC_DIR / "cuctc" / "src" / s
                         for s in ["ctc_prefix_decoder.cpp", "ctc_prefix_decoder_kernel_v2.cu", "python_binding.cpp"]
