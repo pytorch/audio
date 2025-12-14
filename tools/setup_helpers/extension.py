@@ -40,7 +40,7 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
 def get_build_ext():
-    return BuildExtension.with_options(no_python_abi_suffix=True)
+    return BuildExtension.with_options(no_python_abi_suffix=True, use_ninja=True)
 
 
 def get_ext_modules():

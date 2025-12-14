@@ -128,8 +128,7 @@ def is_cuda_ctc_decoder_available():
             from torchaudio.models.decoder import CUCTCDecoder  # noqa: F401
 
             _IS_CUDA_CTC_DECODER_AVAILABLE = True
-        except Exception as msg:
-            print(f"{msg=}")
+        except Exception:
             _IS_CUDA_CTC_DECODER_AVAILABLE = False
     return _IS_CUDA_CTC_DECODER_AVAILABLE
 
