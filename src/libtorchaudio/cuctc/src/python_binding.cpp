@@ -24,6 +24,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <torch/csrc/stable/library.h>
+#include <torch/csrc/stable/ops.h>
+#include <torch/csrc/stable/tensor.h>
+#include <torch/headeronly/core/ScalarType.h>
+
 // Stuff in third_party/ is considered non-ABI-stable
 // (https://github.com/pytorch/pytorch/issues/169893), but
 // it is safe to temporarily disable TORCH_TARGET_VERSION for pybind11
@@ -44,23 +49,43 @@
 #include <vector>
 #include "include/ctc_prefix_decoder.h"
 
-namespace py = pybind11;
+using torch::headeronly::ScalarType;
+using torch::stable::Tensor;
 
-std::tuple<size_t, std::vector<std::vector<std::pair<float, std::vector<int>>>>>
-ctc_prefix_decoder_batch_wrapper(
+std::tuple<size_t, Tensor, Tensor, Tensor> ctc_prefix_decoder_batch_wrapper(
     std::uintptr_t n_inter_data,
-    std::uintptr_t buff_ptr,
-    size_t buff_size,
-    std::uintptr_t pp,
-    std::uintptr_t seq_len_ptr,
-    const std::vector<int>& pp_sizes,
-    const std::vector<int>& pp_strides,
+    Tensor buff,
+    Tensor log_prob,
+    Tensor encoder_out_lens,
     int beam,
     int blid,
     int spid,
     float thresold) {
-  using SCORE_TYPE =
-      std::vector<std::vector<std::pair<float, std::vector<int>>>>;
+  STD_TORCH_CHECK(
+      encoder_out_lens.scalar_type() == ScalarType::Int,
+      "encoder_out_lens must be torch.int32");
+  STD_TORCH_CHECK(
+      log_prob.scalar_type() == ScalarType::Float,
+      "log_prob must be torch.float32");
+  STD_TORCH_CHECK(log_prob.is_cuda(), "log_prob must be cuda tensor");
+  STD_TORCH_CHECK(
+      encoder_out_lens.is_cuda(), "encoder_out_lens must be cuda tensor");
+  STD_TORCH_CHECK(
+      log_prob.get_device_index() == encoder_out_lens.get_device_index(),
+      "log_prob and encoder_out_lens must be on the same device");
+  STD_TORCH_CHECK(log_prob.is_contiguous(), "log_prob must be contiguous");
+  STD_TORCH_CHECK(
+      encoder_out_lens.is_contiguous(), "encoder_out_lens must be contiguous");
+  if (buff.numel() > 0) {
+    STD_TORCH_CHECK(buff.is_cuda(), "buff must be cuda tensor");
+    STD_TORCH_CHECK(
+        log_prob.get_device_index() == buff.get_device_index(),
+        "log_prob and buff must be on the same device");
+  }
+  auto pp_sizes_ = log_prob.sizes();
+  auto pp_strides_ = log_prob.strides();
+  std::vector<int> pp_sizes(std::begin(pp_sizes_), std::end(pp_sizes_));
+  std::vector<int> pp_strides(std::begin(pp_strides_), std::end(pp_strides_));
   cu_ctc::InternalData* inter_data = (cu_ctc::InternalData*)(n_inter_data);
   auto [require_size, max_select_seq_len] =
       cu_ctc::calculate_require_buff_and_init_internal_data(
@@ -69,46 +94,52 @@ ctc_prefix_decoder_batch_wrapper(
           pp_sizes[1],
           pp_sizes[2],
           beam,
-          buff_ptr,
-          buff_size,
-          (float*)pp,
-          (int*)seq_len_ptr,
+          reinterpret_cast<std::uintptr_t>(buff.data_ptr()),
+          buff.size(0),
+          log_prob.mutable_data_ptr<float>(),
+          encoder_out_lens.mutable_data_ptr<int>(),
           pp_sizes,
           pp_strides,
           blid,
           thresold);
   if (require_size > 0) {
-    return std::make_tuple(require_size, SCORE_TYPE{});
+    return std::make_tuple(require_size, Tensor{}, Tensor{}, Tensor{});
   }
   int batch_size = pp_sizes[0];
-  std::vector<int> list_data(batch_size * beam * max_select_seq_len);
-  std::vector<int> len_data(batch_size * beam);
-  std::vector<float> score(batch_size * beam);
+  Tensor list_data = torch::stable::empty(
+      {batch_size, beam, max_select_seq_len}, ScalarType::Int);
+  Tensor len_data = torch::stable::empty({batch_size, beam}, ScalarType::Int);
+  Tensor score = torch::stable::empty({batch_size, beam}, ScalarType::Float);
   cu_ctc::ctc_beam_search_decoder_batch_gpu(
-      inter_data, blid, spid, list_data.data(), len_data.data(), score.data());
-  SCORE_TYPE score_hyps{};
-  score_hyps.reserve(batch_size);
-  for (int b = 0; b < batch_size; b++) {
-    score_hyps.push_back(std::vector<std::pair<float, std::vector<int>>>{});
-    score_hyps.back().reserve(beam);
-    for (int beam_id = 0; beam_id < beam; beam_id++) {
-      int len = len_data[b * beam + beam_id];
-      int offset = b * beam * max_select_seq_len + beam_id * max_select_seq_len;
-      std::vector<int> clist(
-          list_data.data() + offset, list_data.data() + offset + len);
-      score_hyps.back().push_back(
-          std::pair{score[b * beam + beam_id], std::move(clist)});
-    }
-  }
-  return std::make_tuple(require_size, std::move(score_hyps));
+      inter_data,
+      blid,
+      spid,
+      list_data.mutable_data_ptr<int>(),
+      len_data.mutable_data_ptr<int>(),
+      score.mutable_data_ptr<float>());
+  return std::make_tuple(
+      require_size,
+      std::move(list_data),
+      std::move(len_data),
+      std::move(score));
 }
 
-PYBIND11_MODULE(pybind11_prefixctc, m) {
-  m.doc() = "none";
+PYBIND11_MODULE(pybind11_prefixctc, m) {}
+
+STABLE_TORCH_LIBRARY_FRAGMENT(pybind11_prefixctc, m) {
   m.def(
+      "ctc_beam_search_decoder_batch_gpu_v2(int interal_data_ptr, Tensor memory, Tensor log_prob, Tensor encoder_out_lens, int beam, int blid, int spid, float thresold) -> (int, Tensor, Tensor, Tensor)");
+  m.def("prefixCTC_alloc(int stream) -> int");
+  m.def("prefixCTC_free(int interal_data_ptr) -> ()");
+}
+
+STABLE_TORCH_LIBRARY_IMPL(pybind11_prefixctc, CompositeExplicitAutograd, m) {
+  m.impl("prefixCTC_alloc", TORCH_BOX(&cu_ctc::prefixCTC_alloc));
+  m.impl("prefixCTC_free", TORCH_BOX(&cu_ctc::prefixCTC_free));
+}
+
+STABLE_TORCH_LIBRARY_IMPL(pybind11_prefixctc, CUDA, m) {
+  m.impl(
       "ctc_beam_search_decoder_batch_gpu_v2",
-      &ctc_prefix_decoder_batch_wrapper,
-      "ctc prefix decoder  v2 computing on GPU");
-  m.def("prefixCTC_alloc", &cu_ctc::prefixCTC_alloc, "allocate internal data");
-  m.def("prefixCTC_free", &cu_ctc::prefixCTC_free, "free internal data");
+      TORCH_BOX(&ctc_prefix_decoder_batch_wrapper));
 }
