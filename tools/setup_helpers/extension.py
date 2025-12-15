@@ -39,7 +39,7 @@ _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP"
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
-class MyBuildExtension(BuildExtension):
+class BuildExtensionBugFix(BuildExtension):
     def get_ext_fullname(self, ext_name: str) -> str:
         result = super().get_ext_fullname(ext_name)
         print(f"XXXXXXXXXXXX get_ext_fullname({ext_name}) -> {result}")
@@ -50,7 +50,7 @@ class MyBuildExtension(BuildExtension):
         print(f"XXXXXXXXXXXX get_ext_fullpath({ext_name}) -> {result}")
         return result
 
-    def get_ext_filename(self, fullname: str) -> str:
+    def _get_ext_filename(self, fullname: str) -> str:
         import inspect
 
         import setuptools.command.build_ext as m
@@ -89,9 +89,34 @@ class MyBuildExtension(BuildExtension):
         print(f"YYYYYYYYYYYYYYYYYYYYYYY {filename=}")
         return filename
 
+    def get_ext_filename(self, ext_name):
+        # Origin: torch/utils/cpp_extension.py
+        # Fixes a bug: don't try to remove ABI part that does not
+        # exist in a file name.
+        from setuptools.command.build_ext import build_ext
+
+        # Get the original shared library name. For Python 3, this name will be
+        # suffixed with "<SOABI>.so", where <SOABI> will be something like
+        # cpython-37m-x86_64-linux-gnu.
+        ext_filename = build_ext.get_ext_filename(self, ext_name)
+        print(f"ZZZZZZZZZZZZZZZZZZZZ 1: {ext_name} {ext_filename=}")
+        # If `no_python_abi_suffix` is `True`, we omit the Python 3 ABI
+        # component. This makes building shared libraries with setuptools that
+        # aren't Python modules nicer.
+        if self.no_python_abi_suffix:
+            # The parts will be e.g. ["my_extension", "cpython-37m-x86_64-linux-gnu", "so"].
+            ext_filename_parts = ext_filename.split(".")
+            # Remove ABI component only if it actually exists in file name.
+            if len(ext_filename_parts) > 2:
+                # Omit the second to last element.
+                without_abi = ext_filename_parts[:-2] + ext_filename_parts[-1:]
+                ext_filename = ".".join(without_abi)
+        print(f"ZZZZZZZZZZZZZZZZZZZZ 2: {ext_filename=}")
+        return ext_filename
+
 
 def get_build_ext():
-    return MyBuildExtension.with_options(no_python_abi_suffix=True, use_ninja=True)
+    return BuildExtensionBugFix.with_options(no_python_abi_suffix=True, use_ninja=True)
 
 
 def get_ext_modules():
