@@ -69,7 +69,17 @@ def forced_align(
     assert input_lengths is not None
     assert target_lengths is not None
 
+    def _show(t):
+        return f"{t.shape=} {t.dtype=} {t.device=}"
+
+    print(f"{_show(log_probs)=}")
+    print(f"{_show(targets)=}")
+    print(f"{_show(input_lengths)=}")
+    print(f"{_show(target_lengths)=}")
+    print(f"{blank=}", flush=True)
     paths, scores = torch.ops.torchaudio.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+    print(f"{_show(paths)=}")
+    print(f"{_show(scores)=}")
     return paths, scores[:, torch.arange(scores.shape[1]), paths[0]]
 
 

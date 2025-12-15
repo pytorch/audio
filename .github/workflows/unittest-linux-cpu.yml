@@ -35,6 +35,7 @@ jobs:
         export FFMPEG_VERSION="${{ matrix.ffmpeg-version }}"
         export PIP_PROGRESS_BAR=off
         export CONDA_QUIET=1
+        export NO_COLOR=1
 
         # Set UPLOAD_CHANNEL
         if [[(${GITHUB_EVENT_NAME} = 'pull_request' && (${GITHUB_BASE_REF} = 'release'*)) || (${GITHUB_REF} = 'refs/heads/release'*) ]]; then
