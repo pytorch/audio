@@ -1,4 +1,6 @@
 import torch
+
+torch.autograd.set_detect_anomaly(True)
 from torchaudio_unittest import common_utils
 
 from .autograd_impl import Autograd, AutogradFloat32
