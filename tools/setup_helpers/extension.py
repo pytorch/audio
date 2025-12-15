@@ -51,7 +51,15 @@ class MyBuildExtension(BuildExtension):
         return result
 
     def get_ext_filename(self, fullname: str) -> str:
+        import inspect
+
         import setuptools.command.build_ext as m
+
+        orig = inspect.getsource(super().get_ext_filename)
+        print("AAAAAAAAAAAAAAAAAAAAA")
+        print(f"{orig}")
+        print("AAAAAAAAAAAAAAAAAAAAA")
+        print(f"OOOOOOOOOOOOOOOOOO {super().get_ext_filename(fullname)=}")
 
         _build_ext = m._build_ext
         so_ext = os.getenv("SETUPTOOLS_EXT_SUFFIX")

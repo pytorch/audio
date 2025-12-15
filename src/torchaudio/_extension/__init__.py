@@ -21,18 +21,17 @@ __all__ = [
 ]
 
 
-if os.name == "nt":  # and (3, 8) <= sys.version_info < (3, 9):
+if os.name == "nt" and (3, 8) <= sys.version_info < (3, 9):
     _init_dll_path()
 
 # When the extension module is built, we initialize it.
 # In case of an error, we do not catch the failure as it suggests there is something
 # wrong with the installation.
 _IS_TORCHAUDIO_EXT_AVAILABLE = _load_lib("_torchaudio")
-assert _IS_TORCHAUDIO_EXT_AVAILABLE
 _IS_ALIGN_AVAILABLE = False
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
     if not _load_lib("libtorchaudio"):
-        assert 0  # unreachable
+        raise ImportError("Failed to load libtorchaudio")
 
     _check_cuda_version()
     _IS_ALIGN_AVAILABLE = torch.ops._torchaudio.is_align_available()

@@ -16,13 +16,6 @@ _LG = logging.getLogger(__name__)
 _LIB_DIR = Path(__file__).parent.parent / "lib"
 
 
-def _get_lib_path(lib: str):
-    suffix = ".pyd" if os.name == "nt" else ".so"
-    paths = _LIB_DIR.glob(f"{lib}*{suffix}")
-    path = _LIB_DIR / f"{lib}.{suffix}"
-    return path
-
-
 def _load_lib(lib: str) -> bool:
     """Load extension module
 
@@ -56,7 +49,6 @@ def _load_lib(lib: str) -> bool:
     """
     suffix = ".pyd" if os.name == "nt" else ".so"
     paths = list(_LIB_DIR.glob(f"{lib}*{suffix}"))
-    print(f"_load_lib: {lib=} {paths=}")
     if not paths:
         return False
     if len(paths) > 1:
