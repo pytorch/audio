@@ -7,6 +7,7 @@ Anything that depends on external state should happen in __init__.py
 import logging
 import os
 import types
+import warnings
 from pathlib import Path
 
 import torch
@@ -16,7 +17,8 @@ _LIB_DIR = Path(__file__).parent.parent / "lib"
 
 
 def _get_lib_path(lib: str):
-    suffix = "pyd" if os.name == "nt" else "so"
+    suffix = ".pyd" if os.name == "nt" else ".so"
+    paths = _LIB_DIR.glob(f"{lib}*{suffix}")
     path = _LIB_DIR / f"{lib}.{suffix}"
     return path
 
@@ -52,10 +54,14 @@ def _load_lib(lib: str) -> bool:
             This behavior was chosen because the expected failure case is not recoverable.
             If a dependency is missing, then users have to install it.
     """
-    path = _get_lib_path(lib)
-    if not path.exists():
+    suffix = ".pyd" if os.name == "nt" else ".so"
+    paths = list(_LIB_DIR.glob(f"{lib}*{suffix}"))
+    print(f"_load_lib: {lib=} {paths=}")
+    if not paths:
         return False
-    torch.ops.load_library(path)
+    if len(paths) > 1:
+        warnings.warn(f"Expected a single file path to {lib}, got {paths=}")
+    torch.ops.load_library(paths[0])
     return True
 
 
