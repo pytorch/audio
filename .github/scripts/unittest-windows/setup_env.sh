@@ -36,4 +36,4 @@ fi
 conda activate "${env_dir}"
 
 # 3. Install minimal build tools
-conda install -y -c conda-forge cmake ninja "ffmpeg<9"
+conda install -y -c conda-forge ninja "ffmpeg<9"
