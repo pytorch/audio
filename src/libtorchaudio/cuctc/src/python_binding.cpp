@@ -24,8 +24,6 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <libtorchaudio/utils.h>
-
 #include <torch/csrc/stable/library.h>
 #include <torch/csrc/stable/ops.h>
 #include <torch/csrc/stable/tensor.h>
@@ -128,6 +126,3 @@ STABLE_TORCH_LIBRARY(torchaudio_prefixctc, m) {
   m.def("prefixCTC_alloc(int stream) -> int");
   m.def("prefixCTC_free(int interal_data_ptr) -> ()");
 }
-
-// Defines PyInit_torchaudio_prefixctc when building under Windows:
-// TORCHAUDIO_EXT_MODULE(torchaudio_prefixctc)

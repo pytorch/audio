@@ -39,36 +39,16 @@ _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP"
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
-class BuildExtensionBugFix(BuildExtension):
-    def get_ext_filename(self, ext_name):
-        # A workaround to https://github.com/pytorch/pytorch/issues/170542
-        from setuptools.command.build_ext import build_ext
-
-        # Get the original shared library name. For Python 3, this name will be
-        # suffixed with "<SOABI>.so", where <SOABI> will be something like
-        # cpython-37m-x86_64-linux-gnu.
-        ext_filename = build_ext.get_ext_filename(self, ext_name)
-        # If `no_python_abi_suffix` is `True`, we omit the Python 3 ABI
-        # component. This makes building shared libraries with setuptools that
-        # aren't Python modules nicer.
-        if self.no_python_abi_suffix:
-            # The parts will be e.g. ["my_extension", "cpython-37m-x86_64-linux-gnu", "so"].
-            ext_filename_parts = ext_filename.split(".")
-            # Remove ABI component only if it actually exists in file name.
-            if len(ext_filename_parts) > 2:
-                # Omit the second to last element.
-                without_abi = ext_filename_parts[:-2] + ext_filename_parts[-1:]
-                ext_filename = ".".join(without_abi)
-        return ext_filename
-
+class BuildExtensionAsLibrary(BuildExtension):
     def get_export_symbols(self, ext):
-        # Skip export the module "PyInit_" function.
-        print(f"ZZZZZZZZZZZZZZZ {ext.name=} {ext.export_symbols=}")
+        # Skip export the module "PyInit_" function that the distutils
+        # Extension.get_export_symbols would add. Only relevant for
+        # Windows builds.
         return ext.export_symbols
 
 
 def get_build_ext():
-    return BuildExtensionBugFix.with_options(
+    return BuildExtensionAsLibrary.with_options(
         # See https://github.com/pytorch/pytorch/issues/170542
         no_python_abi_suffix=False,
         use_ninja=True,
@@ -93,7 +73,6 @@ def get_ext_modules():
         extra_compile_args["nvcc"] = ["-O2", "-DUSE_CUDA"]
 
     sources = [
-        "libtorchaudio.cpp",
         "utils.cpp",
         "lfilter.cpp",
         "overdrive.cpp",
