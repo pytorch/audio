@@ -13,8 +13,8 @@ env | grep TORCHAUDIO || true
 
 cd test
 if [ -z "${CUDA_VERSION:-}" ] ; then
-    pytest -sv --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not fairseq and not demucs and not librosa"
+    pytest --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not fairseq and not demucs and not librosa"
 else
-    pytest -sv --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not cpu and (cuda or gpu) and not fairseq and not demucs and not librosa"
+    pytest --continue-on-collection-errors --cov=torchaudio --junitxml=${RUNNER_TEST_RESULTS_DIR}/junit.xml -v --durations 20 torchaudio_unittest -k "not cpu and (cuda or gpu) and not fairseq and not demucs and not librosa"
 fi
 coverage html

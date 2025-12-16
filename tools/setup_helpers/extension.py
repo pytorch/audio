@@ -40,16 +40,6 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 
 class BuildExtensionBugFix(BuildExtension):
-    def get_ext_fullname(self, ext_name: str) -> str:
-        result = super().get_ext_fullname(ext_name)
-        print(f"XXXXXXXXXXXX get_ext_fullname({ext_name}) -> {result}")
-        return result
-
-    def get_ext_fullpath(self, ext_name: str) -> str:
-        result = super().get_ext_fullpath(ext_name)
-        print(f"XXXXXXXXXXXX get_ext_fullpath({ext_name}) -> {result}")
-        return result
-
     def get_ext_filename(self, ext_name):
         # Origin: torch/utils/cpp_extension.py
         # Fixes a bug: don't try to remove ABI part that does not
@@ -77,7 +67,7 @@ class BuildExtensionBugFix(BuildExtension):
 
 
 def get_build_ext():
-    return BuildExtensionBugFix.with_options(no_python_abi_suffix=True, use_ninja=True)
+    return BuildExtensionBugFix.with_options(no_python_abi_suffix=False, use_ninja=True)
 
 
 def get_ext_modules():
