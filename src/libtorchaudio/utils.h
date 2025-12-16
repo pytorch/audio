@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef _WIN32
+#ifdef _WIN32_TMP_DISABLE
 // Workaround to linker error on Windows platform:
 // LINK : error LNK2001: unresolved external symbol PyInit_...
 #define TORCHAUDIO_EXT_MODULE(name)                               \

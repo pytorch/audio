@@ -41,16 +41,13 @@ _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
 class BuildExtensionBugFix(BuildExtension):
     def get_ext_filename(self, ext_name):
-        # Origin: torch/utils/cpp_extension.py
-        # Fixes a bug: don't try to remove ABI part that does not
-        # exist in a file name.
+        # A workaround to https://github.com/pytorch/pytorch/issues/170542
         from setuptools.command.build_ext import build_ext
 
         # Get the original shared library name. For Python 3, this name will be
         # suffixed with "<SOABI>.so", where <SOABI> will be something like
         # cpython-37m-x86_64-linux-gnu.
         ext_filename = build_ext.get_ext_filename(self, ext_name)
-        print(f"ZZZZZZZZZZZZZZZZZZZZ 1: {ext_name} {ext_filename=}")
         # If `no_python_abi_suffix` is `True`, we omit the Python 3 ABI
         # component. This makes building shared libraries with setuptools that
         # aren't Python modules nicer.
@@ -62,12 +59,20 @@ class BuildExtensionBugFix(BuildExtension):
                 # Omit the second to last element.
                 without_abi = ext_filename_parts[:-2] + ext_filename_parts[-1:]
                 ext_filename = ".".join(without_abi)
-        print(f"ZZZZZZZZZZZZZZZZZZZZ 2: {ext_filename=}")
         return ext_filename
+
+    def get_export_symbols(self, ext):
+        # Skip export the module "PyInit_" function.
+        print(f"ZZZZZZZZZZZZZZZ {ext.name=} {ext.export_symbols=}")
+        return ext.export_symbols
 
 
 def get_build_ext():
-    return BuildExtensionBugFix.with_options(no_python_abi_suffix=False, use_ninja=True)
+    return BuildExtensionBugFix.with_options(
+        # See https://github.com/pytorch/pytorch/issues/170542
+        no_python_abi_suffix=False,
+        use_ninja=True,
+    )
 
 
 def get_ext_modules():

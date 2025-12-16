@@ -130,4 +130,4 @@ STABLE_TORCH_LIBRARY(torchaudio_prefixctc, m) {
 }
 
 // Defines PyInit_torchaudio_prefixctc when building under Windows:
-TORCHAUDIO_EXT_MODULE(torchaudio_prefixctc)
+// TORCHAUDIO_EXT_MODULE(torchaudio_prefixctc)
