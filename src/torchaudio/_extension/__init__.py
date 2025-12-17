@@ -2,7 +2,9 @@ import logging
 import os
 import sys
 
-from torchaudio._internal.module_utils import fail_with_message, is_module_available, no_op
+import torch
+
+from torchaudio._internal.module_utils import fail_with_message, no_op
 
 from .utils import _check_cuda_version, _init_dll_path, _load_lib
 
@@ -22,20 +24,17 @@ __all__ = [
 if os.name == "nt" and (3, 8) <= sys.version_info < (3, 9):
     _init_dll_path()
 
-
 # When the extension module is built, we initialize it.
 # In case of an error, we do not catch the failure as it suggests there is something
 # wrong with the installation.
-_IS_TORCHAUDIO_EXT_AVAILABLE = is_module_available("torchaudio.lib._torchaudio")
+_IS_TORCHAUDIO_EXT_AVAILABLE = _load_lib("_torchaudio")
 _IS_ALIGN_AVAILABLE = False
 if _IS_TORCHAUDIO_EXT_AVAILABLE:
-    _load_lib("libtorchaudio")
-
-    import torchaudio.lib._torchaudio  # noqa
+    if not _load_lib("libtorchaudio"):
+        raise ImportError("Failed to load libtorchaudio")
 
     _check_cuda_version()
-    _IS_ALIGN_AVAILABLE = torchaudio.lib._torchaudio.is_align_available()
-
+    _IS_ALIGN_AVAILABLE = torch.ops._torchaudio.is_align_available()
 
 fail_if_no_align = (
     no_op

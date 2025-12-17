@@ -44,7 +44,7 @@ pip install --progress-bar=off --pre torch --index-url="${PYTORCH_WHEEL_INDEX}"
 
 
 # 2. Install torchaudio
-conda install --quiet -y ninja cmake
+conda install --quiet -y ninja
 
 printf "* Installing torchaudio\n"
 export BUILD_CPP_TEST=1

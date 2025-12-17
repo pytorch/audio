@@ -4,7 +4,6 @@ Building from source
 TorchAudio integrates PyTorch for numerical computation. It requires the following tools to build from source.
 
 - `PyTorch <https://pytorch.org>`_
-- `CMake <https://cmake.org/>`_
 - `Ninja <https://ninja-build.org/>`_
 - C++ complier with C++ 17 support
    - `GCC <https://gcc.gnu.org/>`_ (Linux)
