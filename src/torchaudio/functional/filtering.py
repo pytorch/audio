@@ -946,7 +946,7 @@ class DifferentiableFIR(torch.autograd.Function):
         b_coeff_flipped = b_coeffs.flip(1).contiguous()
         padded_waveform = F.pad(waveform, (n_order - 1, 0))
         output = F.conv1d(padded_waveform, b_coeff_flipped.unsqueeze(1), groups=n_channel)
-        if not torch.jit.is_scripting():
+        if not torch.jit.is_scripting() and not torch.jit.is_tracing():
             ctx.save_for_backward(waveform, b_coeffs, output)
         return output
 
@@ -974,7 +974,7 @@ class DifferentiableFIR(torch.autograd.Function):
 
     @staticmethod
     def ts_apply(waveform, b_coeffs):
-        if torch.jit.is_scripting():
+        if torch.jit.is_scripting() or torch.jit.is_tracing():
             return DifferentiableFIR.forward(torch.empty(0), waveform, b_coeffs)
         else:
             return DifferentiableFIR.apply(waveform, b_coeffs)
@@ -993,7 +993,7 @@ class DifferentiableIIR(torch.autograd.Function):
         )
         _lfilter_core_loop(waveform, a_coeff_flipped, padded_output_waveform)
         output = padded_output_waveform[:, :, n_order - 1 :]
-        if not torch.jit.is_scripting():
+        if not torch.jit.is_scripting() and not torch.jit.is_tracing():
             ctx.save_for_backward(waveform, a_coeffs_normalized, output)
         return output
 
@@ -1018,7 +1018,7 @@ class DifferentiableIIR(torch.autograd.Function):
 
     @staticmethod
     def ts_apply(waveform, a_coeffs_normalized):
-        if torch.jit.is_scripting():
+        if torch.jit.is_scripting() or torch.jit.is_tracing():
             return DifferentiableIIR.forward(torch.empty(0), waveform, a_coeffs_normalized)
         else:
             return DifferentiableIIR.apply(waveform, a_coeffs_normalized)
