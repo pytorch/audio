@@ -103,7 +103,7 @@ When using conda, the directories are ``${CONDA_PREFIX}/bin``, ``${CONDA_PREFIX}
 
 .. code-block::
 
-   conda install cmake ninja
+   conda install ninja
 
 6. Build TorchAudio
 -------------------

@@ -121,7 +121,7 @@ Verify the installation by checking the version and CUDA device accessibility.
 
 .. code-block::
 
-   pip install cmake ninja
+   pip install ninja
 
 2. Install dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~

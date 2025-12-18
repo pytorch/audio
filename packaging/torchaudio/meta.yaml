@@ -14,7 +14,6 @@ requirements:
   host:
     - python
     - setuptools
-    - cmake
     - ninja
     - pytorch-mutex 1.0 {{ build_variant }}  # [not osx ]
     {{ environ.get('CONDA_PYTORCH_BUILD_CONSTRAINT', 'pytorch') }}

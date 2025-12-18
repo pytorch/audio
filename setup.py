@@ -132,7 +132,7 @@ def _main():
         package_dir={"": "src"},
         ext_modules=setup_helpers.get_ext_modules(),
         cmdclass={
-            "build_ext": setup_helpers.CMakeBuild,
+            "build_ext": setup_helpers.get_build_ext(),
             "clean": clean,
         },
         install_requires=[pytorch_package_dep],

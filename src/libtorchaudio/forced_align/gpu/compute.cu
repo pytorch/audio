@@ -115,7 +115,7 @@ __global__ void falign_cuda_step_kernel(
   }
 }
 
-template <typename scalar_t, ScalarType target_scalar_type>
+template <typename scalar_t, typename target_t>
 void forced_align_impl(
     const Tensor& logProbs,
     const Tensor& targets,
@@ -126,8 +126,6 @@ void forced_align_impl(
   auto defaultStream = libtorchaudio::cuda::getCurrentCUDAStream(device_index);
   auto cpuDataTranferStream = libtorchaudio::cuda::getStreamFromPool(false, device_index);
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
-  using target_t = typename std::
-      conditional<target_scalar_type == ScalarType::Int, int, int64_t>::type;
   auto paths_a = torchaudio::accessor<target_t, 2>(paths);
   const int batchIndex =
       0; // TODO: support batch version and use the real batch index
@@ -304,10 +302,13 @@ std::tuple<Tensor, Tensor> compute(
 
   THO_DISPATCH_V2(logProbs.scalar_type(), "forced_align_impl", AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
-          (forced_align_impl<scalar_t, ScalarType::Long>(logProbs, targets, blank, paths));
+          (forced_align_impl<scalar_t, int64_t>(logProbs, targets, blank, paths));
+        } else if (targets.scalar_type() == ScalarType::Int) {
+          (forced_align_impl<scalar_t, int32_t>(logProbs, targets, blank, paths));
         } else {
-          (forced_align_impl<scalar_t, ScalarType::Int>(logProbs, targets, blank, paths));
-          }
+          STD_TORCH_CHECK(
+              false, "unexpected targets dtype:", targets.scalar_type());
+        }
       }), AT_EXPAND(AT_FLOATING_TYPES), ScalarType::Half);
   Tensor pathsCuda = torch::stable::to(paths, logProbs.device());
   return std::make_tuple(pathsCuda, logProbs);
