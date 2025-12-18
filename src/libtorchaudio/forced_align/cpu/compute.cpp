@@ -15,15 +15,13 @@ using torch::stable::Tensor;
 
 // Inspired from
 // https://github.com/flashlight/sequence/blob/main/flashlight/lib/sequence/criterion/cpu/ConnectionistTemporalClassificationCriterion.cpp
-template <typename scalar_t, ScalarType target_scalar_type>
+template <typename scalar_t, typename target_t>
 void forced_align_impl(
     const Tensor& logProbs,
     const Tensor& targets,
     const int64_t blank,
     Tensor& paths) {
   const scalar_t kNegInfinity = -std::numeric_limits<scalar_t>::infinity();
-  using target_t = typename std::
-      conditional<target_scalar_type == ScalarType::Int, int, int64_t>::type;
   const auto batchIndex =
       0; // TODO: support batch version and use the real batch index
   const auto T = logProbs.size(1);
@@ -140,13 +138,6 @@ void forced_align_impl(
   delete[] backPtr_a;
 }
 
-template <typename scalar_t>
-const auto forced_align_long_impl =
-    forced_align_impl<scalar_t, ScalarType::Long>;
-
-template <typename scalar_t>
-const auto forced_align_int_impl = forced_align_impl<scalar_t, ScalarType::Int>;
-
 std::tuple<Tensor, Tensor> compute(
     Tensor logProbs,
     Tensor targets,
@@ -180,10 +171,10 @@ std::tuple<Tensor, Tensor> compute(
       targetLengths.dim() == 1, "target_lengths must be 1-D (batch_size,)");
   STD_TORCH_CHECK(
       logProbs.size(0) == 1,
-      "The batch dimension for log_probs must be 1 at the current version.")
+      "The batch dimension for log_probs must be 1 at the current version.");
   STD_TORCH_CHECK(
       targets.size(0) == 1,
-      "The batch dimension for targets must be 1 at the current version.")
+      "The batch dimension for targets must be 1 at the current version.");
   STD_TORCH_CHECK(
       blank >= 0 && blank < logProbs.size(-1),
       "blank must be within [0, num classes)");
@@ -202,9 +193,14 @@ std::tuple<Tensor, Tensor> compute(
       "forced_align_impl",
       AT_WRAP([&] {
         if (targets.scalar_type() == ScalarType::Long) {
-          forced_align_long_impl<scalar_t>(logProbs, targets, blank, paths);
+          (forced_align_impl<scalar_t, int64_t>(
+              logProbs, targets, blank, paths));
+        } else if (targets.scalar_type() == ScalarType::Int) {
+          (forced_align_impl<scalar_t, int32_t>(
+              logProbs, targets, blank, paths));
         } else {
-          forced_align_int_impl<scalar_t>(logProbs, targets, blank, paths);
+          STD_TORCH_CHECK(
+              false, "unexpected targets dtype:", targets.scalar_type());
         }
       }),
       AT_EXPAND(AT_FLOATING_TYPES),

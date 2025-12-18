@@ -29,21 +29,6 @@
 #include <torch/csrc/stable/tensor.h>
 #include <torch/headeronly/core/ScalarType.h>
 
-// Stuff in third_party/ is considered non-ABI-stable
-// (https://github.com/pytorch/pytorch/issues/169893), but
-// it is safe to temporarily disable TORCH_TARGET_VERSION for pybind11
-// as it is a header-only library.
-#ifdef TORCH_TARGET_VERSION
-#define SAVE_TORCH_TARGET_VERSION TORCH_TARGET_VERSION
-#undef TORCH_TARGET_VERSION
-#endif
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-#ifdef SAVE_TORCH_TARGET_VERSION
-#define TORCH_TARGET_VERSION SAVE_TORCH_TARGET_VERSION
-#undef SAVE_TORCH_TARGET_VERSION
-#endif
-
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -124,22 +109,20 @@ std::tuple<size_t, Tensor, Tensor, Tensor> ctc_prefix_decoder_batch_wrapper(
       std::move(score));
 }
 
-PYBIND11_MODULE(pybind11_prefixctc, m) {}
-
-STABLE_TORCH_LIBRARY_FRAGMENT(pybind11_prefixctc, m) {
-  m.def(
-      "ctc_beam_search_decoder_batch_gpu_v2(int interal_data_ptr, Tensor memory, Tensor log_prob, Tensor encoder_out_lens, int beam, int blid, int spid, float thresold) -> (int, Tensor, Tensor, Tensor)");
-  m.def("prefixCTC_alloc(int stream) -> int");
-  m.def("prefixCTC_free(int interal_data_ptr) -> ()");
-}
-
-STABLE_TORCH_LIBRARY_IMPL(pybind11_prefixctc, CompositeExplicitAutograd, m) {
+STABLE_TORCH_LIBRARY_IMPL(torchaudio_prefixctc, CompositeExplicitAutograd, m) {
   m.impl("prefixCTC_alloc", TORCH_BOX(&cu_ctc::prefixCTC_alloc));
   m.impl("prefixCTC_free", TORCH_BOX(&cu_ctc::prefixCTC_free));
 }
 
-STABLE_TORCH_LIBRARY_IMPL(pybind11_prefixctc, CUDA, m) {
+STABLE_TORCH_LIBRARY_IMPL(torchaudio_prefixctc, CUDA, m) {
   m.impl(
       "ctc_beam_search_decoder_batch_gpu_v2",
       TORCH_BOX(&ctc_prefix_decoder_batch_wrapper));
+}
+
+STABLE_TORCH_LIBRARY(torchaudio_prefixctc, m) {
+  m.def(
+      "ctc_beam_search_decoder_batch_gpu_v2(int interal_data_ptr, Tensor memory, Tensor log_prob, Tensor encoder_out_lens, int beam, int blid, int spid, float thresold) -> (int, Tensor, Tensor, Tensor)");
+  m.def("prefixCTC_alloc(int stream) -> int");
+  m.def("prefixCTC_free(int interal_data_ptr) -> ()");
 }
