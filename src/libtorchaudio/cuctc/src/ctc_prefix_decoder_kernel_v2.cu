@@ -224,8 +224,6 @@ __global__ void matrix_merge_kernel_v2(
   const int batch_id = blockIdx.y;
   if (!log_prob_struct.need_process_on_ith_step(batch_id, step))
     return;
-  const int select_seq =
-      log_prob_struct.ith_selected_seq_in_this_batch(batch_id, step);
   __shared__ int tmpclen[128]; // beam<128
   int tidin, tidout;
 
@@ -395,7 +393,9 @@ __launch_bounds__(BLOCK_SIZE) void topk_reduce_and_copy_list_per_batch_kernel(
     int* clist2,
     int blid,
     float* score) {
+#ifdef USE_PARALLEL_WRITE
   constexpr int MAX_SUPPORT_BEAM = 128;
+#endif
   int batch_id = blockIdx.x;
   int rw_offset_this_block = batch_id * items_per_batch;
   if (batch_id >= bs)
