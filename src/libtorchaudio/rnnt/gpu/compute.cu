@@ -21,7 +21,8 @@ std::tuple<Tensor, Tensor> compute(
     Tensor target_lengths,
     int64_t blank,
     double clamp,
-    bool fused_log_softmax = true) {
+    bool fused_log_softmax) 
+{	
   STD_TORCH_CHECK(logits.is_cuda(), "logits must be on CUDA");
 
   STD_TORCH_CHECK(
@@ -129,9 +130,24 @@ std::tuple<Tensor, Tensor> compute(
 
   return std::make_tuple(costs, gradients);
 }
-
+std::tuple<Tensor, Tensor> compute_default(
+    Tensor logits,
+    Tensor targets,
+    Tensor logit_lengths,
+    Tensor target_lengths,
+    int64_t blank,
+    double clamp) {
+  return compute(
+      logits,
+      targets,
+      logit_lengths,
+      target_lengths,
+      blank,
+      clamp,
+      /*fused_log_softmax=*/true);
+}
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
-  m.impl("rnnt_loss_forward", TORCH_BOX(&compute));
+  m.impl("rnnt_loss_forward", TORCH_BOX(&compute_default));
 }
 
 } // namespace gpu
