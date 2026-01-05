@@ -136,7 +136,8 @@ std::tuple<Tensor, Tensor> compute_default(
     Tensor logit_lengths,
     Tensor target_lengths,
     int64_t blank,
-    double clamp) {
+    double clamp,
+    bool fused_log_softmax) {
   return compute(
       logits,
       targets,
@@ -144,7 +145,7 @@ std::tuple<Tensor, Tensor> compute_default(
       target_lengths,
       blank,
       clamp,
-      /*fused_log_softmax=*/true);
+      fused_log_softmax);
 }
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
   m.impl("rnnt_loss_forward", TORCH_BOX(&compute_default));
