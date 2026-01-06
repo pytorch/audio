@@ -21,7 +21,7 @@ std::tuple<Tensor, Tensor> compute(
     Tensor target_lengths,
     int64_t blank,
     double clamp,
-    bool fused_log_softmax) {	
+    bool fused_log_softmax) {
   STD_TORCH_CHECK(logits.is_cuda(), "logits must be on CUDA");
 
   STD_TORCH_CHECK(
