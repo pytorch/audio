@@ -130,25 +130,9 @@ std::tuple<Tensor, Tensor> compute(
 
   return std::make_tuple(costs, gradients);
 }
-std::tuple<Tensor, Tensor> compute_default(
-    Tensor logits,
-    Tensor targets,
-    Tensor logit_lengths,
-    Tensor target_lengths,
-    int64_t blank,
-    double clamp,
-    bool fused_log_softmax) {
-  return compute(
-      logits,
-      targets,
-      logit_lengths,
-      target_lengths,
-      blank,
-      clamp,
-      fused_log_softmax);
-}
+
 STABLE_TORCH_LIBRARY_IMPL(torchaudio, CUDA, m) {
-  m.impl("rnnt_loss_forward", TORCH_BOX(&compute_default));
+  m.impl("rnnt_loss_forward", TORCH_BOX(&compute));
 }
 
 } // namespace gpu
