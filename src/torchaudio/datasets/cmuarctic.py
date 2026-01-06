@@ -1,4 +1,3 @@
-import csv
 import os
 from pathlib import Path
 from typing import Tuple, Union
@@ -128,9 +127,8 @@ class CMUARCTIC(Dataset):
                 )
         self._text = os.path.join(self._path, self._folder_text, self._file_text)
 
-        with open(self._text, "r") as text:
-            walker = csv.reader(text)
-            self._walker = list(walker)
+        with open(self._text, "r", newline=None) as text:
+            self._walker = [[line.rstrip("\n")] for line in text.readlines()]
 
     def __getitem__(self, n: int) -> Tuple[Tensor, int, str, str]:
         """Load the n-th sample from the dataset.
