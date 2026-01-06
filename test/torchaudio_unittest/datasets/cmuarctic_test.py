@@ -11,7 +11,7 @@ def get_mock_dataset(root_dir):
     """
     mocked_data = []
     sample_rate = 16000
-    transcript = "This is a test transcript."
+    transcript = "This is a test transcript, with comma."
 
     base_dir = os.path.join(root_dir, "ARCTIC", "cmu_us_aew_arctic")
     txt_dir = os.path.join(base_dir, "etc")
