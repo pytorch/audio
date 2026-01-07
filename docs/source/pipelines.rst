@@ -184,7 +184,7 @@ Tacotron2 Text-To-Speech
 
 .. image:: https://download.pytorch.org/torchaudio/doc-assets/pipelines-tacotron2bundle.png
 
-``TextProcessor`` can be rule-based tokenization in the case of characters, or it can be a neural-netowrk-based G2P model that generates sequence of phonemes from input text.
+``TextProcessor`` can be rule-based tokenization in the case of characters, or it can be a neural-network-based G2P model that generates sequence of phonemes from input text.
 
 Similarly ``Vocoder`` can be an algorithm without learning parameters, like `Griffin-Lim`, or a neural-network-based model like `Waveglow`.
 
