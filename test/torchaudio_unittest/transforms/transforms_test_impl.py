@@ -111,6 +111,40 @@ class TransformsTestBase(TestBaseMixin):
 
     @parameterized.expand(
         [
+            param(sample_rate=16384, hop_length=256, n_bins=84, bins_per_octave=12),
+            param(sample_rate=4096, hop_length=128, n_bins=40, bins_per_octave=8),
+            param(sample_rate=1024, hop_length=64, n_bins=12, bins_per_octave=4),
+            param(sample_rate=512, hop_length=32, n_bins=12, bins_per_octave=12),
+        ],
+    )
+    def test_CQT_VQT_match(self, sample_rate, hop_length, n_bins, bins_per_octave):
+        """Make sure that the CQT is the VQT with gamma set to 0."""
+        f_min = 32.703
+        waveform = get_whitenoise(sample_rate=sample_rate, dtype=self.dtype).to(self.device)
+        
+        cqt = T.CQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            f_min=f_min,
+            n_bins=n_bins,
+            bins_per_octave=bins_per_octave,
+            dtype=self.dtype,
+        ).to(self.device)(waveform)
+        
+        vqt = T.VQT(
+            sample_rate=sample_rate,
+            hop_length=hop_length,
+            f_min=f_min,
+            n_bins=n_bins,
+            gamma=0.,
+            bins_per_octave=bins_per_octave,
+            dtype=self.dtype,
+        ).to(self.device)(waveform)
+                
+        self.assertEqual(cqt, vqt)
+
+    @parameterized.expand(
+        [
             param(0.5, 1, True, False),
             param(0.5, 1, None, False),
             param(1, 4, True, True),

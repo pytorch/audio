@@ -4,11 +4,13 @@ from ._transforms import (
     AmplitudeToDB,
     ComputeDeltas,
     Convolve,
+    CQT,
     Deemphasis,
     Fade,
     FFTConvolve,
     FrequencyMasking,
     GriffinLim,
+    InverseCQT,
     InverseMelScale,
     InverseSpectrogram,
     LFCC,
@@ -32,6 +34,7 @@ from ._transforms import (
     TimeStretch,
     Vad,
     Vol,
+    VQT,
 )
 
 __all__ = [
@@ -39,11 +42,13 @@ __all__ = [
     "AmplitudeToDB",
     "ComputeDeltas",
     "Convolve",
+    "CQT",
     "Deemphasis",
     "Fade",
     "FFTConvolve",
     "FrequencyMasking",
     "GriffinLim",
+    "InverseCQT",
     "InverseMelScale",
     "InverseSpectrogram",
     "LFCC",
@@ -71,4 +76,5 @@ __all__ = [
     "TimeStretch",
     "Vad",
     "Vol",
+    "VQT",
 ]
