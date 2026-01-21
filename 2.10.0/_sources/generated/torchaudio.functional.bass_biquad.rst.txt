@@ -1,0 +1,6 @@
+﻿torchaudio.functional.bass\_biquad
+==================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: bass_biquad

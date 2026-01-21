@@ -1,0 +1,6 @@
+﻿torchaudio.functional.contrast
+==============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: contrast

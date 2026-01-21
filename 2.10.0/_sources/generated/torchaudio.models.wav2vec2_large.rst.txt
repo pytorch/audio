@@ -1,0 +1,6 @@
+torchaudio.models.wav2vec2\_large
+=================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: wav2vec2_large

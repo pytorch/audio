@@ -1,0 +1,6 @@
+torchaudio.models.hubert\_pretrain\_model
+=========================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: hubert_pretrain_model

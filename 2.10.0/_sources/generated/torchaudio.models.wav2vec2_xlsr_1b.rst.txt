@@ -1,0 +1,6 @@
+torchaudio.models.wav2vec2\_xlsr\_1b
+====================================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: wav2vec2_xlsr_1b

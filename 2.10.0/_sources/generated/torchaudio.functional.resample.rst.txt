@@ -1,0 +1,6 @@
+﻿torchaudio.functional.resample
+==============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: resample

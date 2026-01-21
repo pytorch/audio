@@ -1,0 +1,6 @@
+﻿torchaudio.functional.griffinlim
+================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: griffinlim

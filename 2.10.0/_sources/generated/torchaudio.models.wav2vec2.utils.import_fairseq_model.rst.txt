@@ -1,0 +1,6 @@
+torchaudio.models.wav2vec2.utils.import\_fairseq\_model
+=======================================================
+
+.. currentmodule:: torchaudio.models.wav2vec2.utils
+
+.. autofunction:: import_fairseq_model

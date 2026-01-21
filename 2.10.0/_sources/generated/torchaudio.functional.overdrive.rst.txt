@@ -1,0 +1,6 @@
+﻿torchaudio.functional.overdrive
+===============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: overdrive

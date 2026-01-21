@@ -1,0 +1,6 @@
+﻿torchaudio.functional.spectrogram
+=================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: spectrogram

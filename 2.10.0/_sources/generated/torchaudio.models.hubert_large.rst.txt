@@ -1,0 +1,6 @@
+torchaudio.models.hubert\_large
+===============================
+
+.. currentmodule:: torchaudio.models
+
+.. autofunction:: hubert_large
