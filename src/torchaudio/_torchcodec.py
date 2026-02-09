@@ -112,13 +112,25 @@ def load_with_torchcodec(
         warnings.warn("The 'format' parameter is not supported by TorchCodec AudioDecoder.", UserWarning, stacklevel=2)
 
     # Create AudioDecoder
+    # Some audio files (e.g. Opus from MLS dataset) contain metadata
+    # with non-UTF-8 bytes, which can cause UnicodeDecodeError during
+    # initialization or when accessing stream metadata.
     try:
         decoder = AudioDecoder(uri)
+    except UnicodeDecodeError as e:
+        raise RuntimeError(
+            f"Failed to create AudioDecoder for {uri}: "
+            f"file metadata contains non-decodable bytes: {e}"
+        ) from e
     except Exception as e:
         raise RuntimeError(f"Failed to create AudioDecoder for {uri}: {e}") from e
 
-    # Get sample rate from metadata
-    sample_rate = decoder.metadata.sample_rate
+    # Get sample rate from metadata.
+    # Guard against UnicodeDecodeError from non-UTF-8 metadata tags.
+    try:
+        sample_rate = decoder.metadata.sample_rate
+    except UnicodeDecodeError:
+        sample_rate = None
     if sample_rate is None:
         raise RuntimeError("Unable to determine sample rate from audio metadata")
 
