@@ -120,14 +120,14 @@ def load_with_torchcodec(
     # Get sample rate from metadata
     sample_rate = decoder.metadata.sample_rate
     if sample_rate is None:
-        raise RuntimeError("Unable to determine sample rate from audio metadata")
+        raise RuntimeError(f"Unable to determine sample rate from audio metadata for {uri}")
 
     # Decode the entire file first, then subsample manually
     # This is the simplest approach since torchcodec uses time-based indexing
     try:
         audio_samples = decoder.get_all_samples()
     except Exception as e:
-        raise RuntimeError(f"Failed to decode audio samples: {e}") from e
+        raise RuntimeError(f"Failed to decode audio samples from {uri}: {e}") from e
 
     data = audio_samples.data
 

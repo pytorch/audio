@@ -83,16 +83,21 @@ def load(
         - Not all audio formats supported by torchaudio backends may be supported
         by TorchCodec.
     """
-    return load_with_torchcodec(
-        uri,
-        frame_offset=frame_offset,
-        num_frames=num_frames,
-        normalize=normalize,
-        channels_first=channels_first,
-        format=format,
-        buffer_size=buffer_size,
-        backend=backend,
-    )
+    try:
+        return load_with_torchcodec(
+            uri,
+            frame_offset=frame_offset,
+            num_frames=num_frames,
+            normalize=normalize,
+            channels_first=channels_first,
+            format=format,
+            buffer_size=buffer_size,
+            backend=backend,
+        )
+    except Exception as e:
+        if str(uri) not in str(e):
+            raise type(e)(f"Failed to load audio from {uri}: {e}") from e
+        raise
 
 
 def save(
