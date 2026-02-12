@@ -59,7 +59,7 @@ To check the version installed you can use the following commands;
 
 Since Tegra GPUs are not supported by ``nvidia-smi`` command, it is recommended to isntall ``jtop``.
 
-Only super-use can install ``jtop``. So make sure to add ``-U``, so that running ``jtop`` won't require super-user priviledge.
+Only super-use can install ``jtop``. So make sure to add ``-U``, so that running ``jtop`` won't require super-user privilege.
 
 3. Install ``pip`` in user env
 ------------------------------
