@@ -57,7 +57,7 @@ import matplotlib.pyplot as plt
 import torchaudio.functional as F
 
 ######################################################################
-# First we prepare the speech data and the transcript we area going
+# First we prepare the speech data and the transcript we are going
 # to use.
 #
 
@@ -71,15 +71,15 @@ TRANSCRIPT = "i had that curiosity beside me at this moment".split()
 # ~~~~~~~~~~~~~~~~~~~~
 #
 # :py:func:`~torchaudio.functional.forced_align` takes emission and
-# token sequences and outputs timestaps of the tokens and their scores.
+# token sequences and outputs timestamps of the tokens and their scores.
 #
-# Emission reperesents the frame-wise probability distribution over
+# Emission represents the frame-wise probability distribution over
 # tokens, and it can be obtained by passing waveform to an acoustic
 # model.
 #
 # Tokens are numerical expression of transcripts. There are many ways to
 # tokenize transcripts, but here, we simply map alphabets into integer,
-# which is how labels were constructed when the acoustice model we are
+# which is how labels were constructed when the acoustic model we are
 # going to use was trained.
 #
 # We will use a pre-trained Wav2Vec2 model,
@@ -161,7 +161,7 @@ for i, (ali, score) in enumerate(zip(aligned_tokens, alignment_scores)):
 #
 # .. note::
 #
-#    The alignment is expressed in the frame cordinate of the emission,
+#    The alignment is expressed in the frame coordinate of the emission,
 #    which is different from the original waveform.
 #
 # It contains blank tokens and repeated tokens. The following is the
@@ -184,7 +184,7 @@ for i, (ali, score) in enumerate(zip(aligned_tokens, alignment_scores)):
 #
 # .. note::
 #
-#    When same token occured after blank tokens, it is not treated as
+#    When same token occurred after blank tokens, it is not treated as
 #    a repeat, but as a new occurrence.
 #
 #    .. code-block::
@@ -200,7 +200,7 @@ for i, (ali, score) in enumerate(zip(aligned_tokens, alignment_scores)):
 # Token-level alignments
 # ~~~~~~~~~~~~~~~~~~~~~~
 #
-# Next step is to resolve the repetation, so that each alignment does
+# Next step is to resolve the repetition, so that each alignment does
 # not depend on previous alignments.
 # :py:func:`torchaudio.functional.merge_tokens` computes the
 # :py:class:`~torchaudio.functional.TokenSpan` object, which represents
@@ -352,7 +352,7 @@ plot_alignments(waveform, word_spans, emission, TRANSCRIPT)
 #
 # When splitting the token-level alignments into words, you will
 # notice that some blank tokens are treated differently, and this makes
-# the interpretation of the result somehwat ambigious.
+# the interpretation of the result somewhat ambiguous.
 #
 # This is easy to see when we plot the scores. The following figure
 # shows word regions and non-word regions, with the frame-level scores
@@ -387,7 +387,7 @@ plot_scores(word_spans, alignment_scores)
 #
 # One reason for this is because the model was trained without a
 # label for the word boundary. The blank tokens are treated not just
-# as repeatation but also as silence between words.
+# as repetition but also as silence between words.
 #
 # But then, a question arises. Should frames immediately after or
 # near the end of a word be silent or repeat?
@@ -400,12 +400,12 @@ plot_scores(word_spans, alignment_scores)
 #
 # Unfortunately, CTC does not provide a comprehensive solution to this.
 # Models trained with CTC are known to exhibit "peaky" response,
-# that is, they tend to spike for an aoccurance of a label, but the
+# that is, they tend to spike for an occurrence of a label, but the
 # spike does not last for the duration of the label.
 # (Note: Pre-trained Wav2Vec2 models tend to spike at the beginning of
-# label occurances, but this not always the case.)
+# label occurrences, but this not always the case.)
 #
-# :cite:`zeyer2021does` has in-depth alanysis on the peaky behavior of
+# :cite:`zeyer2021does` has in-depth analysis on the peaky behavior of
 # CTC.
 # We encourage those who are interested understanding more to refer
 # to the paper.
