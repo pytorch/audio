@@ -238,17 +238,34 @@ class Tester(common_utils.TorchaudioTestCase):
             sample_rate, upsample_rate, resampling_method="sinc_interp_hann"
         )
         up_sampled = upsample_resample(waveform)
-
-        # we expect the upsampled signal to have twice as many samples
         self.assertTrue(up_sampled.size(-1) == waveform.size(-1) * 2)
 
         downsample_resample = torchaudio.transforms.Resample(
             sample_rate, downsample_rate, resampling_method="sinc_interp_hann"
         )
         down_sampled = downsample_resample(waveform)
-
-        # we expect the downsampled signal to have half as many samples
         self.assertTrue(down_sampled.size(-1) == waveform.size(-1) // 2)
+
+
+    def test_spectrogram_window_not_in_state_dict(self):
+        transform = transforms.Spectrogram()
+        state_dict = transform.state_dict()
+
+        self.assertNotIn("window", state_dict)
+
+
+    def test_inverse_spectrogram_window_not_in_state_dict(self):
+        transform = transforms.InverseSpectrogram(n_fft=400)
+        state_dict = transform.state_dict()
+
+        self.assertNotIn("window", state_dict)
+
+
+    def test_resample_kernel_not_in_state_dict(self):
+        transform = transforms.Resample(orig_freq=16000, new_freq=8000)
+        state_dict = transform.state_dict()
+
+        self.assertNotIn("kernel", state_dict)
 
     def test_compute_deltas(self):
         channel = 13
