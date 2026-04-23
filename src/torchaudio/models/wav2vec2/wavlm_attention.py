@@ -31,7 +31,7 @@ from torch import nn, Tensor
 
 class WavLMSelfAttention(nn.Module):
     """Multi-headed self-attention for WavLM model :cite:`chen2022wavlm`.
-    Wraps around ``torch.nn.MultiheadAttention``, creating relaive position embeddings and passing them to multi-headed
+    Wraps around ``torch.nn.MultiheadAttention``, creating relative position embeddings and passing them to multi-headed
     attention as a mask.
     Source: https://github.com/microsoft/unilm/blob/2d8302f09c99bca2b82e6e868d81d4281cceebc8/wavlm/modules.py#L303-L763
 
