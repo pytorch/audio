@@ -308,9 +308,12 @@ def griffinlim(
     specgram = specgram.pow(1 / power)
 
     # initialize the phase
-    if torch.is_complex(specgram):
+    if torch.is_complex(specgram) and rand_init:
+        raise ValueError("Cannot choose between given phase init and random phase init. Either give complex spectrogram input or rand_init True with non-complex spectrogram.")
+    elif torch.is_complex(specgram) and not rand_init:
         # Use current phase as init
         angles = torch.angle(specgram)
+        angles = torch.polar(abs=torch.ones_like(angles), angle=angles) # angles should be complex dtype
         specgram = torch.abs(specgram)
     else:
         # Either random phase init or zero phase init
