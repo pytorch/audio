@@ -13,6 +13,9 @@ defaults:
   run:
     shell: bash -l -eo pipefail {0}
 
+permissions:
+  contents: read
+
 jobs:
   pre-commit-checks:
     runs-on: ubuntu-latest
