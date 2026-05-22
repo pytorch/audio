@@ -409,7 +409,7 @@ def vtln_warp_freq(
 def vtln_warp_mel_freq(
     vtln_low_cutoff: float,
     vtln_high_cutoff: float,
-    low_freq,
+    low_freq: float,
     high_freq: float,
     vtln_warp_factor: float,
     mel_freq: Tensor,
