@@ -36,7 +36,7 @@ Transforms are implemented using :class:`torch.nn.Module`. Common ways to build 
            self.spec = Spectrogram(n_fft=n_fft, power=2)
 
            self.spec_aug = torch.nn.Sequential(
-               TimeStretch(stretch_factor, fixed_rate=True),
+               TimeStretch(n_freq=n_fft // 2 + 1, fixed_rate=stretch_factor),
                FrequencyMasking(freq_mask_param=80),
                TimeMasking(time_mask_param=80),
            )
