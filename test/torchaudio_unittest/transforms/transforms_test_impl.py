@@ -1,5 +1,6 @@
 import math
 import random
+import warnings
 from unittest.mock import patch
 
 import numpy as np
@@ -37,16 +38,16 @@ class TransformsTestBase(TestBaseMixin):
         n_mels = 64
         sample_rate = 8000
 
-        n_stft = n_fft // 2 + 1
+        n_freqs = n_fft // 2 + 1
 
         # Generate reference spectrogram and input mel-scaled spectrogram
         expected = get_spectrogram(
             get_whitenoise(sample_rate=sample_rate, duration=1, n_channels=2), n_fft=n_fft, power=power
         ).to(self.device, self.dtype)
-        input = T.MelScale(n_mels=n_mels, sample_rate=sample_rate, n_stft=n_stft).to(self.device, self.dtype)(expected)
+        input = T.MelScale(n_mels=n_mels, sample_rate=sample_rate, n_freqs=n_freqs).to(self.device, self.dtype)(expected)
 
         # Run transform
-        transform = T.InverseMelScale(n_stft, n_mels=n_mels, sample_rate=sample_rate).to(self.device, self.dtype)
+        transform = T.InverseMelScale(n_freqs, n_mels=n_mels, sample_rate=sample_rate).to(self.device, self.dtype)
         result = transform(input)
 
         # Compare
@@ -58,6 +59,63 @@ class TransformsTestBase(TestBaseMixin):
         assert _get_ratio(relative_diff < 1e-1) > 0.2
         assert _get_ratio(relative_diff < 1e-3) > 5e-3
         assert _get_ratio(relative_diff < 1e-5) > 1e-5
+
+    def test_melscale_n_stft_deprecation(self):
+        """`n_stft` is deprecated on MelScale; using it must emit a DeprecationWarning
+        and the value should still take effect (alias for ``n_freqs``).
+        See https://github.com/pytorch/audio/issues/3658
+        """
+        n_freqs_value = 201
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            transform = T.MelScale(n_stft=n_freqs_value)
+        # Deprecation warning is raised
+        assert any(
+            issubclass(w.category, (DeprecationWarning, UserWarning))
+            and "n_stft" in str(w.message)
+            and "n_freqs" in str(w.message)
+            for w in caught
+        ), f"Expected deprecation warning about n_stft, got: {[str(w.message) for w in caught]}"
+        # Alias works: the internal n_freqs reflects the deprecated value
+        assert transform.n_freqs == n_freqs_value
+
+    def test_melscale_n_freqs_default(self):
+        """`MelScale` constructed without ``n_stft``/``n_freqs`` uses the default value
+        and does not emit any deprecation warning.
+        """
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            transform = T.MelScale()
+        assert all("n_stft" not in str(w.message) for w in caught)
+        # Default value should be 201 (per the docstring)
+        assert transform.n_freqs == 201
+
+    def test_inverse_melscale_n_stft_deprecation(self):
+        """`n_stft` is deprecated on InverseMelScale; using it as a keyword must emit
+        a DeprecationWarning and the value should still take effect.
+        See https://github.com/pytorch/audio/issues/3658
+        """
+        n_freqs_value = 201
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            transform = T.InverseMelScale(n_stft=n_freqs_value)
+        assert any(
+            issubclass(w.category, (DeprecationWarning, UserWarning))
+            and "n_stft" in str(w.message)
+            and "n_freqs" in str(w.message)
+            for w in caught
+        ), f"Expected deprecation warning about n_stft, got: {[str(w.message) for w in caught]}"
+        assert transform.n_freqs == n_freqs_value
+
+    def test_inverse_melscale_n_freqs_default(self):
+        """`InverseMelScale` constructed without ``n_stft``/``n_freqs`` uses the default
+        value and does not emit any deprecation warning.
+        """
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            transform = T.InverseMelScale()
+        assert all("n_stft" not in str(w.message) for w in caught)
+        assert transform.n_freqs == 201
 
     @nested_params(
         ["sinc_interp_hann", "sinc_interp_kaiser"],

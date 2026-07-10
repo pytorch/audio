@@ -358,7 +358,9 @@ class MelScale(torch.nn.Module):
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
         f_max (float or None, optional): Maximum frequency. (Default: ``sample_rate // 2``)
-        n_stft (int, optional): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`. (Default: ``201``)
+        n_freqs (int, optional): Number of filter banks from the STFT or the number of bins in
+            the linear-frequency spectrogram. (Default: ``201``)
+        n_stft (int, optional): **Deprecated**; use ``n_freqs`` instead. (Default: ``None``)
         norm (str or None, optional): If ``"slaney"``, divide the triangular mel weights by the width of the mel band
             (area normalization). (Default: ``None``)
         mel_scale (str, optional): Scale to use: ``htk`` or ``slaney``. (Default: ``htk``)
@@ -367,7 +369,7 @@ class MelScale(torch.nn.Module):
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> spectrogram_transform = transforms.Spectrogram(n_fft=1024)
         >>> spectrogram = spectrogram_transform(waveform)
-        >>> melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_stft=1024 // 2 + 1)
+        >>> melscale_transform = transforms.MelScale(sample_rate=sample_rate, n_freqs=1024 // 2 + 1)
         >>> melscale_spectrogram = melscale_transform(spectrogram)
 
     See also:
@@ -375,7 +377,7 @@ class MelScale(torch.nn.Module):
         generate the filter banks.
     """
 
-    __constants__ = ["n_mels", "sample_rate", "f_min", "f_max", "n_stft"]
+    __constants__ = ["n_mels", "sample_rate", "f_min", "f_max", "n_freqs"]
 
     def __init__(
         self,
@@ -383,24 +385,33 @@ class MelScale(torch.nn.Module):
         sample_rate: int = 16000,
         f_min: float = 0.0,
         f_max: Optional[float] = None,
-        n_stft: int = 201,
+        n_freqs: int = 201,
+        n_stft: Optional[int] = None,
         norm: Optional[str] = None,
         mel_scale: str = "htk",
     ) -> None:
         super(MelScale, self).__init__()
+        if n_stft is not None:
+            warnings.warn(
+                "`n_stft` is deprecated and will be removed in a future release. "
+                "Please use `n_freqs` instead.",
+                UserWarning,
+                stacklevel=2,
+            )
+            n_freqs = n_stft
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max if f_max is not None else float(sample_rate // 2)
         self.f_min = f_min
-        self.n_stft = n_stft
+        self.n_freqs = n_freqs
         self.norm = norm
         self.mel_scale = mel_scale
 
         if f_min > self.f_max:
-            raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
+            raise ValueError(f"Require f_min: {f_min} <= f_max: {self.f_max}")
 
         fb = F.melscale_fbanks(
-            self.n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale
+            self.n_freqs, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale
         )
         self.register_buffer("fb", fb)
 
@@ -428,7 +439,9 @@ class InverseMelScale(torch.nn.Module):
     the estimated spectrogram and the filter banks using `torch.linalg.lstsq`.
 
     Args:
-        n_stft (int): Number of bins in STFT. See ``n_fft`` in :class:`Spectrogram`.
+        n_freqs (int): Number of filter banks from the STFT or the number of bins in
+            the linear-frequency spectrogram. (Default: ``201``)
+        n_stft (int, optional): **Deprecated**; use ``n_freqs`` instead. (Default: ``None``)
         n_mels (int, optional): Number of mel filterbanks. (Default: ``128``)
         sample_rate (int, optional): Sample rate of audio signal. (Default: ``16000``)
         f_min (float, optional): Minimum frequency. (Default: ``0.``)
@@ -445,11 +458,11 @@ class InverseMelScale(torch.nn.Module):
         >>> waveform, sample_rate = torchaudio.load("test.wav", normalize=True)
         >>> mel_spectrogram_transform = transforms.MelSpectrogram(sample_rate, n_fft=1024)
         >>> mel_spectrogram = mel_spectrogram_transform(waveform)
-        >>> inverse_melscale_transform = transforms.InverseMelScale(n_stft=1024 // 2 + 1)
+        >>> inverse_melscale_transform = transforms.InverseMelScale(n_freqs=1024 // 2 + 1)
         >>> spectrogram = inverse_melscale_transform(mel_spectrogram)
     """
     __constants__ = [
-        "n_stft",
+        "n_freqs",
         "n_mels",
         "sample_rate",
         "f_min",
@@ -458,7 +471,8 @@ class InverseMelScale(torch.nn.Module):
 
     def __init__(
         self,
-        n_stft: int,
+        n_freqs: int = 201,
+        n_stft: Optional[int] = None,
         n_mels: int = 128,
         sample_rate: int = 16000,
         f_min: float = 0.0,
@@ -468,7 +482,15 @@ class InverseMelScale(torch.nn.Module):
         driver: str = "gels",
     ) -> None:
         super(InverseMelScale, self).__init__()
-        self.n_stft = n_stft
+        if n_stft is not None:
+            warnings.warn(
+                "`n_stft` is deprecated and will be removed in a future release. "
+                "Please use `n_freqs` instead.",
+                UserWarning,
+                stacklevel=2,
+            )
+            n_freqs = n_stft
+        self.n_freqs = n_freqs
         self.n_mels = n_mels
         self.sample_rate = sample_rate
         self.f_max = f_max or float(sample_rate // 2)
@@ -478,13 +500,13 @@ class InverseMelScale(torch.nn.Module):
         self.driver = driver
 
         if f_min > self.f_max:
-            raise ValueError("Require f_min: {} <= f_max: {}".format(f_min, self.f_max))
+            raise ValueError(f"Require f_min: {f_min} <= f_max: {self.f_max}")
 
         if driver not in ["gels", "gelsy", "gelsd", "gelss"]:
             raise ValueError(f'driver must be one of ["gels", "gelsy", "gelsd", "gelss"]. Found {driver}.')
 
         fb = F.melscale_fbanks(
-            self.n_stft, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale
+            self.n_freqs, self.f_min, self.f_max, self.n_mels, self.sample_rate, self.norm, self.mel_scale
         )
         self.register_buffer("fb", fb)
 
@@ -615,7 +637,13 @@ class MelSpectrogram(torch.nn.Module):
             onesided=True,
         )
         self.mel_scale = MelScale(
-            self.n_mels, self.sample_rate, self.f_min, self.f_max, self.n_fft // 2 + 1, norm, mel_scale
+            n_mels=self.n_mels,
+            sample_rate=self.sample_rate,
+            f_min=self.f_min,
+            f_max=self.f_max,
+            n_freqs=self.n_fft // 2 + 1,
+            norm=norm,
+            mel_scale=mel_scale,
         )
 
     def forward(self, waveform: Tensor) -> Tensor:
