@@ -1,9 +1,11 @@
-from typing import Optional, Tuple
+from typing import Literal, Optional, Tuple
 
 import torch
 
 
 __all__ = ["Conformer"]
+
+_NormType = Literal["batch_norm", "group_norm", "layer_norm"]
 
 
 def _lengths_to_padding_mask(lengths: torch.Tensor) -> torch.Tensor:
@@ -13,6 +15,15 @@ def _lengths_to_padding_mask(lengths: torch.Tensor) -> torch.Tensor:
         batch_size, max_length
     ) >= lengths.unsqueeze(1)
     return padding_mask
+
+
+class _TransposedLayerNorm(torch.nn.LayerNorm):
+    r"""Layer norm over the channel dimension of ``(B, C, T)`` tensors."""
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        x = input.transpose(-2, -1)
+        x = torch.nn.functional.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
+        return x.transpose(-2, -1)
 
 
 class _ConvolutionModule(torch.nn.Module):
@@ -25,6 +36,15 @@ class _ConvolutionModule(torch.nn.Module):
         dropout (float, optional): dropout probability. (Default: 0.0)
         bias (bool, optional): indicates whether to add bias term to each convolution layer. (Default: ``False``)
         use_group_norm (bool, optional): use GroupNorm rather than BatchNorm. (Default: ``False``)
+        norm_type (str or None, optional): normalization applied after the depthwise
+            convolution; one of ``"batch_norm"``, ``"group_norm"``, or ``"layer_norm"``.
+            ``"layer_norm"`` normalizes each time step independently, so its statistics are
+            unaffected by padding. ``"batch_norm"`` and ``"group_norm"`` pool statistics over
+            the time dimension, which includes padded time steps even when a ``key_padding_mask``
+            is passed to :meth:`forward`. For fully padding-invariant behavior, pass a
+            ``key_padding_mask`` together with ``norm_type="layer_norm"``. If ``None``, the
+            normalization is selected by ``use_group_norm``. Mutually exclusive with
+            ``use_group_norm=True``. (Default: ``None``)
     """
 
     def __init__(
@@ -35,11 +55,32 @@ class _ConvolutionModule(torch.nn.Module):
         dropout: float = 0.0,
         bias: bool = False,
         use_group_norm: bool = False,
+        norm_type: Optional[_NormType] = None,
     ) -> None:
         super().__init__()
         if (depthwise_kernel_size - 1) % 2 != 0:
             raise ValueError("depthwise_kernel_size must be odd to achieve 'SAME' padding.")
+        if norm_type is not None and use_group_norm:
+            raise ValueError("Only one of use_group_norm and norm_type can be specified.")
+        if norm_type is None:
+            norm_type = "group_norm" if use_group_norm else "batch_norm"
+
+        norm: torch.nn.Module
+        if norm_type == "batch_norm":
+            norm = torch.nn.BatchNorm1d(num_channels)
+        elif norm_type == "group_norm":
+            norm = torch.nn.GroupNorm(num_groups=1, num_channels=num_channels)
+        elif norm_type == "layer_norm":
+            norm = _TransposedLayerNorm(num_channels)
+        else:
+            raise ValueError(
+                f"norm_type must be one of 'batch_norm', 'group_norm', or 'layer_norm', but got {norm_type!r}."
+            )
+
         self.layer_norm = torch.nn.LayerNorm(input_dim)
+        # Even though forward() may iterate over the modules one by one (to inject masking),
+        # they must stay in this Sequential so that state_dict keys (e.g. ``sequential.2.weight``)
+        # remain compatible with checkpoints of previously trained models.
         self.sequential = torch.nn.Sequential(
             torch.nn.Conv1d(
                 input_dim,
@@ -59,9 +100,7 @@ class _ConvolutionModule(torch.nn.Module):
                 groups=num_channels,
                 bias=bias,
             ),
-            torch.nn.GroupNorm(num_groups=1, num_channels=num_channels)
-            if use_group_norm
-            else torch.nn.BatchNorm1d(num_channels),
+            norm,
             torch.nn.SiLU(),
             torch.nn.Conv1d(
                 num_channels,
@@ -74,17 +113,27 @@ class _ConvolutionModule(torch.nn.Module):
             torch.nn.Dropout(dropout),
         )
 
-    def forward(self, input: torch.Tensor) -> torch.Tensor:
+    def forward(self, input: torch.Tensor, key_padding_mask: Optional[torch.Tensor] = None) -> torch.Tensor:
         r"""
         Args:
             input (torch.Tensor): with shape `(B, T, D)`.
+            key_padding_mask (torch.Tensor or None): boolean mask with shape `(B, T)` in which ``True``
+                marks a padded time step to zero out before the depthwise convolution. (Default: ``None``)
 
         Returns:
             torch.Tensor: output, with shape `(B, T, D)`.
         """
         x = self.layer_norm(input)
         x = x.transpose(1, 2)
-        x = self.sequential(x)
+        if key_padding_mask is None:
+            x = self.sequential(x)
+        else:
+            padding_mask = key_padding_mask.unsqueeze(1)  # (B, 1, T)
+            for i, module in enumerate(self.sequential):
+                if i == 2:
+                    # Zero padded frames so the depthwise conv can't bleed them into valid ones.
+                    x = x.masked_fill(padding_mask, 0.0)
+                x = module(x)
         return x.transpose(1, 2)
 
 
@@ -132,6 +181,21 @@ class ConformerLayer(torch.nn.Module):
             in the convolution module. (Default: ``False``)
         convolution_first (bool, optional): apply the convolution module ahead of
             the attention module. (Default: ``False``)
+        conv_mask_padding (bool, optional): if ``True``, zero out padded positions in the
+            convolution module before the depthwise convolution, using the ``key_padding_mask``
+            passed to :meth:`forward`. This stops padding from leaking into valid frames
+            through the convolution. Note that the module's normalization can still let
+            padding affect valid frames; see ``conv_norm_type``. Disabled by default for backward
+            compatibility with models trained without masking. (Default: ``False``)
+        conv_norm_type (str or None, optional): normalization applied after the depthwise
+            convolution in the convolution module; one of ``"batch_norm"``,
+            ``"group_norm"``, or ``"layer_norm"``. ``"layer_norm"`` normalizes each time step
+            independently, so its statistics are unaffected by padding. ``"batch_norm"`` and
+            ``"group_norm"`` pool statistics over the time dimension, which includes padded time
+            steps even when ``conv_mask_padding=True``. For fully padding-invariant behavior, use
+            ``conv_mask_padding=True`` together with ``conv_norm_type="layer_norm"``. If ``None``,
+            the normalization is selected by ``use_group_norm``. Mutually exclusive with
+            ``use_group_norm=True``. (Default: ``None``)
     """
 
     def __init__(
@@ -143,6 +207,8 @@ class ConformerLayer(torch.nn.Module):
         dropout: float = 0.0,
         use_group_norm: bool = False,
         convolution_first: bool = False,
+        conv_mask_padding: bool = False,
+        conv_norm_type: Optional[_NormType] = None,
     ) -> None:
         super().__init__()
 
@@ -159,16 +225,18 @@ class ConformerLayer(torch.nn.Module):
             dropout=dropout,
             bias=True,
             use_group_norm=use_group_norm,
+            norm_type=conv_norm_type,
         )
 
         self.ffn2 = _FeedForwardModule(input_dim, ffn_dim, dropout=dropout)
         self.final_layer_norm = torch.nn.LayerNorm(input_dim)
         self.convolution_first = convolution_first
+        self.conv_mask_padding = conv_mask_padding
 
-    def _apply_convolution(self, input: torch.Tensor) -> torch.Tensor:
+    def _apply_convolution(self, input: torch.Tensor, key_padding_mask: Optional[torch.Tensor]) -> torch.Tensor:
         residual = input
         input = input.transpose(0, 1)
-        input = self.conv_module(input)
+        input = self.conv_module(input, key_padding_mask if self.conv_mask_padding else None)
         input = input.transpose(0, 1)
         input = residual + input
         return input
@@ -187,7 +255,7 @@ class ConformerLayer(torch.nn.Module):
         x = x * 0.5 + residual
 
         if self.convolution_first:
-            x = self._apply_convolution(x)
+            x = self._apply_convolution(x, key_padding_mask)
 
         residual = x
         x = self.self_attn_layer_norm(x)
@@ -202,7 +270,7 @@ class ConformerLayer(torch.nn.Module):
         x = x + residual
 
         if not self.convolution_first:
-            x = self._apply_convolution(x)
+            x = self._apply_convolution(x, key_padding_mask)
 
         residual = x
         x = self.ffn2(x)
@@ -228,6 +296,21 @@ class Conformer(torch.nn.Module):
             in the convolution module. (Default: ``False``)
         convolution_first (bool, optional): apply the convolution module ahead of
             the attention module. (Default: ``False``)
+        conv_mask_padding (bool, optional): if ``True``, zero out padded positions in each
+            layer's convolution module before the depthwise convolution, using the padding
+            mask derived from ``lengths``. This stops padding from leaking into valid frames
+            through the convolution. Note that the module's normalization can still let
+            padding affect valid frames; see ``conv_norm_type``. Disabled by default for backward
+            compatibility with models trained without masking. (Default: ``False``)
+        conv_norm_type (str or None, optional): normalization applied after the depthwise
+            convolution in each layer's convolution module; one of ``"batch_norm"``,
+            ``"group_norm"``, or ``"layer_norm"``. ``"layer_norm"`` normalizes each time step
+            independently, so its statistics are unaffected by padding. ``"batch_norm"`` and
+            ``"group_norm"`` pool statistics over the time dimension, which includes padded time
+            steps even when ``conv_mask_padding=True``. For fully padding-invariant behavior, use
+            ``conv_mask_padding=True`` together with ``conv_norm_type="layer_norm"``. If ``None``,
+            the normalization is selected by ``use_group_norm``. Mutually exclusive with
+            ``use_group_norm=True``. (Default: ``None``)
 
     Examples:
         >>> conformer = Conformer(
@@ -252,6 +335,8 @@ class Conformer(torch.nn.Module):
         dropout: float = 0.0,
         use_group_norm: bool = False,
         convolution_first: bool = False,
+        conv_mask_padding: bool = False,
+        conv_norm_type: Optional[_NormType] = None,
     ):
         super().__init__()
 
@@ -265,6 +350,8 @@ class Conformer(torch.nn.Module):
                     dropout=dropout,
                     use_group_norm=use_group_norm,
                     convolution_first=convolution_first,
+                    conv_mask_padding=conv_mask_padding,
+                    conv_norm_type=conv_norm_type,
                 )
                 for _ in range(num_layers)
             ]
