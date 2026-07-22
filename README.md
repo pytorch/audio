@@ -27,11 +27,11 @@ processing library. The benefits of PyTorch can be seen in torchaudio through
 having all the computations be through PyTorch operations which makes it easy
 to use and feel like a natural extension.
 
-- [Dataloaders for common audio datasets](http://pytorch.org/audio/main/datasets.html)
+- [Dataloaders for common audio datasets](https://pytorch.org/audio/main/datasets.html)
 - Audio and speech processing functions
   - [forced_align](https://pytorch.org/audio/main/generated/torchaudio.functional.forced_align.html)
 - Common audio transforms
-  - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](http://pytorch.org/audio/main/transforms.html)
+  - [Spectrogram, AmplitudeToDB, MelScale, MelSpectrogram, MFCC, MuLawEncoding, MuLawDecoding, Resample](https://pytorch.org/audio/main/transforms.html)
 - Compliance interfaces: Run code using PyTorch that align with other libraries
   - [Kaldi: spectrogram, fbank, mfcc](https://pytorch.org/audio/main/compliance.kaldi.html)
 
@@ -44,7 +44,7 @@ Please refer to https://pytorch.org/audio/main/installation.html for installatio
 API Reference
 -------------
 
-API Reference is located here: http://pytorch.org/audio/main/
+API Reference is located here: https://pytorch.org/audio/main/
 
 Contributing Guidelines
 -----------------------
