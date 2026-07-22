@@ -29,12 +29,12 @@ void forced_align_impl(
   const auto S = 2 * L + 1;
 
   auto alphas_a = new scalar_t[2 * S]; // scalar_t is just logProbs.dtype()
-  for (int i = 0; i < 2 * S; i++) {
+  for (int64_t i = 0; i < 2 * S; i++) {
     alphas_a[i] = kNegInfinity;
   }
 
   auto backPtr_a = new int8_t[T * S];
-  for (int i = 0; i < T * S; i++) {
+  for (int64_t i = 0; i < T * S; i++) {
     backPtr_a[i] = -1;
   }
   auto logProbs_a = torchaudio::accessor<scalar_t, 3>(logProbs);
