@@ -1,32 +1,40 @@
 Installing pre-built binaries
 =============================
 
-``torchaudio`` has binary distributions for PyPI (``pip``) and Anaconda (``conda``).
+``torchaudio`` has binary distributions on PyPI:
 
-Please refer to https://pytorch.org/get-started/locally/ for the details.
+.. code-block::
 
-.. note::
+   pip install torchaudio
 
-   Each ``torchaudio`` package is compiled against specific version of ``torch``.
-   Please refer to the following table and install the correct pair of ``torch`` and ``torchaudio``.
+To install a specific variant (CUDA, ROCm, nightly, ...), please refer to
+https://pytorch.org/get-started/locally/.
 
-.. note::
+.. important::
 
-   Starting ``0.10``, torchaudio has CPU-only and CUDA-enabled binary distributions,
-   each of which requires a corresponding PyTorch distribution.
+   **TorchAudio 2.11 works with PyTorch 2.11 and with every future PyTorch
+   release (2.12, 2.13, ...).**
 
 Dependencies
 ------------
 
 * `PyTorch <https://pytorch.org>`_
 
-  Please refer to the compatibility matrix bellow for supported PyTorch versions.
+  2.11 or newer for TorchAudio 2.11. For older TorchAudio releases, please
+  refer to the :ref:`compatibility matrix <compatibility_matrix>` below.
 
 .. _optional_dependencies:
 
 Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
+* `torchcodec <https://github.com/pytorch/torchcodec>`__
+
+  Required by :func:`torchaudio.load` and :func:`torchaudio.save`, which are
+  thin wrappers around TorchCodec's ``AudioDecoder`` and ``AudioEncoder``.
+  We recommend using those TorchCodec classes directly. Installation
+  instructions are at
+  https://github.com/pytorch/torchcodec#installing-torchcodec.
 
 * `sentencepiece <https://pypi.org/project/sentencepiece/>`__
 
@@ -37,16 +45,15 @@ Optional Dependencies
 
   Required for performing text-to-speech with :ref:`Tacotron2`.
 
-
+.. _compatibility_matrix:
 
 Compatibility Matrix
 --------------------
 
-The official binary distributions of TorchAudio contain extension modules
-which are written in C++ and linked against specific versions of PyTorch.
-
-TorchAudio and PyTorch from different releases cannot be used together.
-Please refer to the following table for the matching versions.
+TorchAudio 2.11 is built against PyTorch's stable ABI and therefore supports
+PyTorch 2.11 and all later versions. Earlier TorchAudio releases contain
+extension modules linked against a single PyTorch version, and cannot be mixed
+with a different PyTorch release.
 
 .. list-table::
    :header-rows: 1
@@ -54,6 +61,27 @@ Please refer to the following table for the matching versions.
    * - ``PyTorch``
      - ``TorchAudio``
      - ``Python``
+   * - ``2.11`` **and above**
+     - ``2.11.0``
+     - ``>=3.10``, ``<=3.14``
+   * - ``2.10``
+     - ``2.10.0``
+     - ``>=3.10``, ``<=3.14``
+   * - ``2.9.1``
+     - ``2.9.1``
+     - ``>=3.10``, ``<=3.14``
+   * - ``2.9``
+     - ``2.9.0``
+     - ``>=3.10``, ``<=3.14``
+   * - ``2.8``
+     - ``2.8.0``
+     - ``>=3.9``, ``<=3.13``
+   * - ``2.7.1``
+     - ``2.7.1``
+     - ``>=3.9``, ``<=3.13``
+   * - ``2.7``
+     - ``2.7.0``
+     - ``>=3.9``, ``<=3.13``
    * - ``2.6``
      - ``2.6.0``
      - ``>=3.9``, ``<=3.13``
