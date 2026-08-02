@@ -1,0 +1,6 @@
+﻿torchaudio.load\_with\_torchcodec
+=================================
+
+.. currentmodule:: torchaudio
+
+.. autofunction:: load_with_torchcodec

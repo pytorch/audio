@@ -1,0 +1,6 @@
+﻿torchaudio.functional.deemph\_biquad
+====================================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: deemph_biquad

@@ -1,0 +1,6 @@
+﻿torchaudio.functional.convolve
+==============================
+
+.. currentmodule:: torchaudio.functional
+
+.. autofunction:: convolve
