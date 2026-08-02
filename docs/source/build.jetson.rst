@@ -123,14 +123,7 @@ Verify the installation by checking the version and CUDA device accessibility.
 
    pip install ninja
 
-2. Install dependencies
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block::
-
-   sudo apt install libavformat-dev libavcodec-dev libavutil-dev libavdevice-dev libavfilter-dev
-
-3. Build TorchAudio
+2. Build TorchAudio
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
@@ -139,7 +132,7 @@ Verify the installation by checking the version and CUDA device accessibility.
    cd audio
    USE_CUDA=1 pip install -v -e . --no-use-pep517
 
-4. Check the installation
+3. Check the installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block::
@@ -150,8 +143,4 @@ Verify the installation by checking the version and CUDA device accessibility.
 
 .. code-block::
 
-   2.0.0a0+2ead941
-   --prefix=/usr --extra-version=0ubuntu0.1 --toolchain=hardened --libdir=/usr/lib/aarch64-linux-gnu --incdir=/usr/include/aarch64-linux-gnu --arch=arm64 --enable-gpl --disable-stripping --enable-avresample --disable-filter=resample --enable-avisynth --enable-gnutls --enable-ladspa --enable-libaom --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libcodec2 --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libjack --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librsvg --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-lv2 --enable-omx --enable-openal --enable-opencl --enable-opengl --enable-sdl2 --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-libx264 --enable-shared
-
-.. image:: https://download.pytorch.org/torchaudio/doc-assets/jetson-verify-build.png
-   :width: 360px
+   2.11.0a0+2ead941

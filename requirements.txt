@@ -2,6 +2,6 @@
 torch
 
 # Optional runtime dependencies
-SoundFile
+torchcodec
 
 # For build and test-time dependencies please refer to CONTRIBUTING.md
