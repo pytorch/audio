@@ -47,3 +47,18 @@ class CUCTCDecoderTest(TempDirMixin, TorchaudioTestCase):
         decoder = self._get_decoder()
         results = decoder(log_probs, encoder_out_lens)
         self.assertEqual(len(results), log_probs.shape[0])
+
+    def test_decode_deterministic_beam_size_five(self):
+        tokens = ["-", "|", "f", "o", "b", "a", "r"]
+        logits = torch.full((1, 3, NUM_TOKENS), -10.0, device="cuda")
+        logits[0, 0, 2] = 10.0
+        logits[0, 1, 0] = 10.0
+        logits[0, 2, 3] = 10.0
+        log_probs = torch.nn.functional.log_softmax(logits, -1)
+        encoder_out_lens = torch.tensor([3], dtype=torch.int32).cuda()
+
+        decoder = self._get_decoder(tokens=tokens, blank_skip_threshold=1.0)
+        results = decoder(log_probs, encoder_out_lens)
+
+        self.assertEqual(results[0][0].tokens, [2, 3])
+        self.assertEqual(results[0][0].words, ["f", "o"])
