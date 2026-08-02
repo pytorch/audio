@@ -34,7 +34,7 @@ They are stateless.
 using implementations from ``functional`` and ``torch.nn.Module``.
 They can be serialized using TorchScript.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-31
+.. GENERATED FROM PYTHON SOURCE LINES 19-30
 
 .. code-block:: default
 
@@ -47,7 +47,6 @@ They can be serialized using TorchScript.
     print(torch.__version__)
     print(torchaudio.__version__)
 
-    import librosa
     import matplotlib.pyplot as plt
 
 
@@ -58,13 +57,13 @@ They can be serialized using TorchScript.
 
  .. code-block:: none
 
-    2.8.0+cu126
-    2.8.0
+    2.14.0.dev20260802+cu130
+    2.11.0a0+2470b9c
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-43
+.. GENERATED FROM PYTHON SOURCE LINES 31-42
 
 Overview of audio features
 --------------------------
@@ -78,31 +77,23 @@ For the complete list of available features, please refer to the
 documentation.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-57
+.. GENERATED FROM PYTHON SOURCE LINES 45-47
 
 Preparation
 -----------
 
-.. note::
-
-   When running this tutorial in Google Colab, install the required packages
-
-   .. code::
-
-      !pip install librosa
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 57-97
+.. GENERATED FROM PYTHON SOURCE LINES 47-89
 
 .. code-block:: default
 
+
     from IPython.display import Audio
     from matplotlib.patches import Rectangle
-    from torchaudio.utils import download_asset
+    from torchaudio.utils import _download_asset
 
     torch.random.manual_seed(0)
 
-    SAMPLE_SPEECH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+    SAMPLE_SPEECH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
     def plot_waveform(waveform, sr, title="Waveform", ax=None):
@@ -125,7 +116,8 @@ Preparation
         if title is not None:
             ax.set_title(title)
         ax.set_ylabel(ylabel)
-        ax.imshow(librosa.power_to_db(specgram), origin="lower", aspect="auto", interpolation="nearest")
+        power_to_db = T.AmplitudeToDB("power", 80.0)
+        ax.imshow(power_to_db(specgram), origin="lower", aspect="auto", interpolation="nearest")
 
 
     def plot_fbank(fbank, title=None):
@@ -140,17 +132,10 @@ Preparation
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/examples/tutorials/audio_feature_extractions_tutorial.py:63: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      SAMPLE_SPEECH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 98-104
+.. GENERATED FROM PYTHON SOURCE LINES 90-96
 
 Spectrogram
 -----------
@@ -159,7 +144,7 @@ To get the frequency make-up of an audio signal as it varies with time,
 you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-114
+.. GENERATED FROM PYTHON SOURCE LINES 96-106
 
 .. code-block:: default
 
@@ -177,19 +162,10 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
-      warnings.warn(
-    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 116-122
+.. GENERATED FROM PYTHON SOURCE LINES 108-114
 
 .. code-block:: default
 
@@ -211,7 +187,7 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-127
+.. GENERATED FROM PYTHON SOURCE LINES 116-119
 
 .. code-block:: default
 
@@ -236,7 +212,7 @@ you can use :py:func:`torchaudio.transforms.Spectrogram`.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-147
+.. GENERATED FROM PYTHON SOURCE LINES 120-139
 
 The effect of ``n_fft`` parameter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -258,7 +234,7 @@ even thought they are higher resolution.
 The following illustrates this;
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-157
+.. GENERATED FROM PYTHON SOURCE LINES 141-149
 
 .. note::
 
@@ -269,7 +245,7 @@ The following illustrates this;
    so that they have the same number of elemets in the time axis.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-168
+.. GENERATED FROM PYTHON SOURCE LINES 150-160
 
 .. code-block:: default
 
@@ -290,7 +266,7 @@ The following illustrates this;
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-177
+.. GENERATED FROM PYTHON SOURCE LINES 162-169
 
 .. code-block:: default
 
@@ -313,7 +289,7 @@ The following illustrates this;
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-187
+.. GENERATED FROM PYTHON SOURCE LINES 170-179
 
 When comparing signals, it is desirable to use the same sampling rate,
 however if you must use the different sampling rate, care must be
@@ -325,12 +301,12 @@ the frequency axis represents is subject to the sampling rate.
 As we have seen above, changing the value of ``n_fft`` does not change
 the coverage of frequency range for the same input signal.
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-192
+.. GENERATED FROM PYTHON SOURCE LINES 182-184
 
 Let's downsample the audio and apply spectrogram with the same ``n_fft``
 value.
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-199
+.. GENERATED FROM PYTHON SOURCE LINES 185-191
 
 .. code-block:: default
 
@@ -347,7 +323,7 @@ value.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-209
+.. GENERATED FROM PYTHON SOURCE LINES 193-201
 
 .. code-block:: default
 
@@ -366,7 +342,7 @@ value.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-220
+.. GENERATED FROM PYTHON SOURCE LINES 203-212
 
 .. code-block:: default
 
@@ -391,7 +367,7 @@ value.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-230
+.. GENERATED FROM PYTHON SOURCE LINES 213-222
 
 In the above visualization, the second plot ("Downsampled") might
 give the impression that the spectrogram is streched.
@@ -403,7 +379,7 @@ rate.
 This becomes more clear if we resample the downsampled signal again
 so that it has the same sample rate as the original.
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-240
+.. GENERATED FROM PYTHON SOURCE LINES 225-232
 
 GriffinLim
 ----------
@@ -413,7 +389,7 @@ To recover a waveform from a spectrogram, you can use
 
 The same set of parameters used for spectrogram must be used.
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-250
+.. GENERATED FROM PYTHON SOURCE LINES 232-242
 
 .. code-block:: default
 
@@ -434,7 +410,7 @@ The same set of parameters used for spectrogram must be used.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 252-258
+.. GENERATED FROM PYTHON SOURCE LINES 244-250
 
 .. code-block:: default
 
@@ -467,7 +443,7 @@ The same set of parameters used for spectrogram must be used.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 259-268
+.. GENERATED FROM PYTHON SOURCE LINES 251-260
 
 Mel Filter Bank
 ---------------
@@ -479,7 +455,7 @@ Since this function does not require input audio/features, there is no
 equivalent transform in :py:func:`torchaudio.transforms`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 268-282
+.. GENERATED FROM PYTHON SOURCE LINES 260-274
 
 .. code-block:: default
 
@@ -504,12 +480,13 @@ equivalent transform in :py:func:`torchaudio.transforms`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-287
+.. GENERATED FROM PYTHON SOURCE LINES 276-280
 
 .. code-block:: default
 
 
     plot_fbank(mel_filters, "Mel Filter Bank - torchaudio")
+
 
 
 
@@ -523,66 +500,7 @@ equivalent transform in :py:func:`torchaudio.transforms`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 288-294
-
-Comparison against librosa
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For reference, here is the equivalent way to get the mel filter bank
-with ``librosa``.
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 294-305
-
-.. code-block:: default
-
-
-    mel_filters_librosa = librosa.filters.mel(
-        sr=sample_rate,
-        n_fft=n_fft,
-        n_mels=n_mels,
-        fmin=0.0,
-        fmax=sample_rate / 2.0,
-        norm="slaney",
-        htk=True,
-    ).T
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 307-313
-
-.. code-block:: default
-
-
-    plot_fbank(mel_filters_librosa, "Mel Filter Bank - librosa")
-
-    mse = torch.square(mel_filters - mel_filters_librosa).mean().item()
-    print("Mean Square Difference: ", mse)
-
-
-
-
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
-   :alt: Mel Filter Bank - librosa
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Mean Square Difference:  3.934872696751886e-17
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 314-322
+.. GENERATED FROM PYTHON SOURCE LINES 281-289
 
 MelSpectrogram
 --------------
@@ -593,7 +511,7 @@ and performing mel-scale conversion. In ``torchaudio``,
 this functionality.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 322-343
+.. GENERATED FROM PYTHON SOURCE LINES 289-310
 
 .. code-block:: default
 
@@ -625,7 +543,7 @@ this functionality.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 345-348
+.. GENERATED FROM PYTHON SOURCE LINES 312-316
 
 .. code-block:: default
 
@@ -635,85 +553,23 @@ this functionality.
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
+
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
    :alt: MelSpectrogram - torchaudio
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_006.png
    :class: sphx-glr-single-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 349-355
-
-Comparison against librosa
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For reference, here is the equivalent means of generating mel-scale
-spectrograms with ``librosa``.
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 355-370
-
-.. code-block:: default
-
-
-    melspec_librosa = librosa.feature.melspectrogram(
-        y=SPEECH_WAVEFORM.numpy()[0],
-        sr=sample_rate,
-        n_fft=n_fft,
-        hop_length=hop_length,
-        win_length=win_length,
-        center=True,
-        pad_mode="reflect",
-        power=2.0,
-        n_mels=n_mels,
-        norm="slaney",
-        htk=True,
-    )
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 372-378
-
-.. code-block:: default
-
-
-    plot_spectrogram(melspec_librosa, title="MelSpectrogram - librosa", ylabel="mel freq")
-
-    mse = torch.square(melspec - melspec_librosa).mean().item()
-    print("Mean Square Difference: ", mse)
-
-
-
-
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
-   :alt: MelSpectrogram - librosa
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Mean Square Difference:  1.287746465017392e-09
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 379-382
+.. GENERATED FROM PYTHON SOURCE LINES 317-320
 
 MFCC
 ----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 382-402
+.. GENERATED FROM PYTHON SOURCE LINES 320-340
 
 .. code-block:: default
 
@@ -744,7 +600,7 @@ MFCC
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 404-407
+.. GENERATED FROM PYTHON SOURCE LINES 342-345
 
 .. code-block:: default
 
@@ -754,86 +610,22 @@ MFCC
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
    :alt: MFCC
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_007.png
    :class: sphx-glr-single-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 408-411
-
-Comparison against librosa
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 411-430
-
-.. code-block:: default
-
-
-    melspec = librosa.feature.melspectrogram(
-        y=SPEECH_WAVEFORM.numpy()[0],
-        sr=sample_rate,
-        n_fft=n_fft,
-        win_length=win_length,
-        hop_length=hop_length,
-        n_mels=n_mels,
-        htk=True,
-        norm=None,
-    )
-
-    mfcc_librosa = librosa.feature.mfcc(
-        S=librosa.core.spectrum.power_to_db(melspec),
-        n_mfcc=n_mfcc,
-        dct_type=2,
-        norm="ortho",
-    )
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 432-438
-
-.. code-block:: default
-
-
-    plot_spectrogram(mfcc_librosa, title="MFCC (librosa)")
-
-    mse = torch.square(mfcc - mfcc_librosa).mean().item()
-    print("Mean Square Difference: ", mse)
-
-
-
-
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_010.png
-   :alt: MFCC (librosa)
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_010.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Mean Square Difference:  0.810401201248169
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 439-442
+.. GENERATED FROM PYTHON SOURCE LINES 346-349
 
 LFCC
 ----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 442-461
+.. GENERATED FROM PYTHON SOURCE LINES 349-368
 
 .. code-block:: default
 
@@ -859,22 +651,22 @@ LFCC
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_011.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
    :alt: LFCC
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_011.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_008.png
    :class: sphx-glr-single-img
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 462-465
+.. GENERATED FROM PYTHON SOURCE LINES 369-372
 
 Pitch
 -----
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 465-468
+.. GENERATED FROM PYTHON SOURCE LINES 372-375
 
 .. code-block:: default
 
@@ -888,7 +680,7 @@ Pitch
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 470-489
+.. GENERATED FROM PYTHON SOURCE LINES 377-396
 
 .. code-block:: default
 
@@ -914,9 +706,9 @@ Pitch
 
 
 
-.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_012.png
+.. image-sg:: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
    :alt: Pitch Feature
-   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_012.png
+   :srcset: /tutorials/images/sphx_glr_audio_feature_extractions_tutorial_009.png
    :class: sphx-glr-single-img
 
 
@@ -926,7 +718,7 @@ Pitch
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  10.311 seconds)
+   **Total running time of the script:** ( 0 minutes  4.547 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_extractions_tutorial.py:

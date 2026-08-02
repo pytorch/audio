@@ -44,5 +44,3 @@ Factory Functions
    ~torchaudio.models.hubert_pretrain_xlarge
 
 .. PROTOTYPE FACTORY FUNCTIONS
-
-.. UTILITY FUNCTIONS

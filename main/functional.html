@@ -10,7 +10,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>torchaudio.functional &mdash; Torchaudio 2.8.0 documentation</title>
+  <title>torchaudio.functional &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -41,7 +41,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="torchaudio.functional.amplitude_to_DB" href="generated/torchaudio.functional.amplitude_to_DB.html" />
-    <link rel="prev" title="play_audio" href="generated/torchaudio.io.play_audio.html" />
+    <link rel="prev" title="torchaudio.save_with_torchcodec" href="generated/torchaudio.save_with_torchcodec.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -222,7 +222,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
+      <a href="../versions.html"><span style="font-size:110%">Nightly Build (2.11.0a0+2470b9c) &#x25BC</span></a>
     </div>
     
 
@@ -261,43 +261,6 @@
 <li class="toctree-l1"><a class="reference internal" href="build.linux.html">Building on Linux and macOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.windows.html">Building on Windows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="build.jetson.html">Building on Jetson</a></li>
-<li class="toctree-l1"><a class="reference internal" href="build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
 <ul>
@@ -310,37 +273,13 @@
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="torchaudio.html">torchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="io.html">torchaudio.io</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">torchaudio.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.decoder.html">torchaudio.models.decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
-<li class="toctree-l1"><a class="reference internal" href="kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">torchaudio.utils</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="torio.html">torio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torio.io.html">torio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="torio.utils.html">torio.utils</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.datasets.html">torchaudio.prototype.datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.functional.html">torchaudio.prototype.functional</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.models.html">torchaudio.prototype.models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="prototype.transforms.html">torchaudio.prototype.transforms</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="libtorio.html">libtorio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">torchaudio.pipelines</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -470,34 +409,31 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.mu_law_decoding.html#torchaudio.functional.mu_law_decoding" title="torchaudio.functional.mu_law_decoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mu_law_decoding</span></code></a></p></td>
 <td><p>Decode mu-law encoded signal.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.apply_codec.html#torchaudio.functional.apply_codec" title="torchaudio.functional.apply_codec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_codec</span></code></a></p></td>
-<td><p>DEPRECATED</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.resample.html#torchaudio.functional.resample" title="torchaudio.functional.resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.resample.html#torchaudio.functional.resample" title="torchaudio.functional.resample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample</span></code></a></p></td>
 <td><p>Resamples the waveform at the new frequency using bandlimited interpolation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.loudness.html#torchaudio.functional.loudness" title="torchaudio.functional.loudness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loudness</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.loudness.html#torchaudio.functional.loudness" title="torchaudio.functional.loudness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">loudness</span></code></a></p></td>
 <td><p>Measure audio loudness according to the ITU-R BS.1770-4 recommendation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.convolve.html#torchaudio.functional.convolve" title="torchaudio.functional.convolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convolve</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.convolve.html#torchaudio.functional.convolve" title="torchaudio.functional.convolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convolve</span></code></a></p></td>
 <td><p>Convolves inputs along their last dimension using the direct method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.fftconvolve.html#torchaudio.functional.fftconvolve" title="torchaudio.functional.fftconvolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fftconvolve</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.fftconvolve.html#torchaudio.functional.fftconvolve" title="torchaudio.functional.fftconvolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fftconvolve</span></code></a></p></td>
 <td><p>Convolves inputs along their last dimension using FFT.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.add_noise.html#torchaudio.functional.add_noise" title="torchaudio.functional.add_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_noise</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.add_noise.html#torchaudio.functional.add_noise" title="torchaudio.functional.add_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_noise</span></code></a></p></td>
 <td><p>Scales and adds noise to waveform per signal-to-noise ratio.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.preemphasis.html#torchaudio.functional.preemphasis" title="torchaudio.functional.preemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preemphasis</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.preemphasis.html#torchaudio.functional.preemphasis" title="torchaudio.functional.preemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preemphasis</span></code></a></p></td>
 <td><p>Pre-emphasizes a waveform along its last dimension, i.e. for each signal <span class="math notranslate nohighlight">\(x\)</span> in <code class="docutils literal notranslate"><span class="pre">waveform</span></code>, computes output <span class="math notranslate nohighlight">\(y\)</span> as.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.deemphasis.html#torchaudio.functional.deemphasis" title="torchaudio.functional.deemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deemphasis</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.deemphasis.html#torchaudio.functional.deemphasis" title="torchaudio.functional.deemphasis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">deemphasis</span></code></a></p></td>
 <td><p>De-emphasizes a waveform along its last dimension.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.speed.html#torchaudio.functional.speed" title="torchaudio.functional.speed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">speed</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.speed.html#torchaudio.functional.speed" title="torchaudio.functional.speed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">speed</span></code></a></p></td>
 <td><p>Adjusts waveform speed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.frechet_distance.html#torchaudio.functional.frechet_distance" title="torchaudio.functional.frechet_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frechet_distance</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.frechet_distance.html#torchaudio.functional.frechet_distance" title="torchaudio.functional.frechet_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">frechet_distance</span></code></a></p></td>
 <td><p>Computes the Fréchet distance between two multivariate normal distributions <span id="id1">[<a class="reference internal" href="references.html#id72" title="DC Dowson and BV666017 Landau. The fréchet distance between multivariate normal distributions. Journal of multivariate analysis, 12(3):450–455, 1982.">Dowson and Landau, 1982</a>]</span>.</p></td>
 </tr>
 </tbody>
@@ -512,7 +448,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.forced_align.html#torchaudio.functional.forced_align" title="torchaudio.functional.forced_align"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forced_align</span></code></a></p></td>
-<td><p>DEPRECATED</p></td>
+<td><p>Align a CTC label sequence to an emission.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/torchaudio.functional.merge_tokens.html#torchaudio.functional.merge_tokens" title="torchaudio.functional.merge_tokens"><code class="xref py py-obj docutils literal notranslate"><span class="pre">merge_tokens</span></code></a></p></td>
 <td><p>Removes repeated tokens and blank tokens from the given CTC token sequence.</p></td>
@@ -676,7 +612,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/torchaudio.functional.rnnt_loss.html#torchaudio.functional.rnnt_loss" title="torchaudio.functional.rnnt_loss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rnnt_loss</span></code></a></p></td>
-<td><p>DEPRECATED</p></td>
+<td><p>Compute the RNN Transducer loss from <em>Sequence Transduction with Recurrent Neural Networks</em> <span id="id7">[<a class="reference internal" href="references.html#id18" title="Alex Graves. Sequence transduction with recurrent neural networks. 2012. arXiv:1211.3711.">Graves, 2012</a>]</span>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -708,7 +644,7 @@
         <a href="generated/torchaudio.functional.amplitude_to_DB.html" class="btn btn-neutral float-right" title="torchaudio.functional.amplitude_to_DB" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="generated/torchaudio.io.play_audio.html" class="btn btn-neutral" title="play_audio" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="generated/torchaudio.save_with_torchcodec.html" class="btn btn-neutral" title="torchaudio.save_with_torchcodec" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -721,7 +657,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2025, Torchaudio Contributors.
+        &copy; Copyright 2026, Torchaudio Contributors.
 
     </p>
   </div>

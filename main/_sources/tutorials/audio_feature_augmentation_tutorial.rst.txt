@@ -23,18 +23,15 @@ Audio Feature Augmentation
 
 **Author**: `Moto Hira <moto@meta.com>`__
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-21
+.. GENERATED FROM PYTHON SOURCE LINES 9-18
 
 .. code-block:: default
 
 
-    # When running this tutorial in Google Colab, install the required packages
-    # with the following.
-    # !pip install torchaudio librosa
-
     import torch
     import torchaudio
     import torchaudio.transforms as T
+    import numpy as np
 
     print(torch.__version__)
     print(torchaudio.__version__)
@@ -47,27 +44,27 @@ Audio Feature Augmentation
 
  .. code-block:: none
 
-    2.8.0+cu126
-    2.8.0
+    2.14.0.dev20260802+cu130
+    2.11.0a0+2470b9c
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-25
+.. GENERATED FROM PYTHON SOURCE LINES 19-22
 
 Preparation
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-31
+.. GENERATED FROM PYTHON SOURCE LINES 22-28
 
 .. code-block:: default
 
 
-    import librosa
     import matplotlib.pyplot as plt
     from IPython.display import Audio
-    from torchaudio.utils import download_asset
+    from torchaudio.utils import _download_asset
+    import torchaudio
 
 
 
@@ -76,34 +73,26 @@ Preparation
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-35
+.. GENERATED FROM PYTHON SOURCE LINES 29-32
 
 In this tutorial, we will use a speech data from
 `VOiCES dataset <https://iqtlabs.github.io/voices/>`__,
 which is licensed under Creative Commos BY 4.0.
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-73
+.. GENERATED FROM PYTHON SOURCE LINES 32-62
 
 .. code-block:: default
 
 
-    SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+    SAMPLE_WAV_SPEECH_PATH = _download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
-    def _get_sample(path, resample=None):
-        effects = [["remix", "1"]]
-        if resample:
-            effects.extend(
-                [
-                    ["lowpass", f"{resample // 2}"],
-                    ["rate", f"{resample}"],
-                ]
-            )
-        return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
+    def _get_sample(path):
+        return torchaudio.load(path)
 
 
-    def get_speech_sample(*, resample=None):
-        return _get_sample(SAMPLE_WAV_SPEECH_PATH, resample=resample)
+    def get_speech_sample():
+        return _get_sample(SAMPLE_WAV_SPEECH_PATH)
 
 
     def get_spectrogram(
@@ -128,17 +117,10 @@ which is licensed under Creative Commos BY 4.0.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/examples/tutorials/audio_feature_augmentation_tutorial.py:36: UserWarning: torchaudio.utils.download.download_asset has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      SAMPLE_WAV_SPEECH_PATH = download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 74-84
+.. GENERATED FROM PYTHON SOURCE LINES 63-73
 
 SpecAugment
 -----------
@@ -151,13 +133,13 @@ is a popular spectrogram augmentation technique.
 :py:func:`torchaudio.transforms.FrequencyMasking`.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-89
+.. GENERATED FROM PYTHON SOURCE LINES 75-78
 
 TimeStretch
 -----------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-98
+.. GENERATED FROM PYTHON SOURCE LINES 78-87
 
 .. code-block:: default
 
@@ -174,29 +156,28 @@ TimeStretch
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/examples/tutorials/audio_feature_augmentation_tutorial.py:48: UserWarning: torchaudio.sox_effects.sox_effects.apply_effects_file has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 99-101
+.. GENERATED FROM PYTHON SOURCE LINES 88-90
 
 Visualization
 ~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-116
+.. GENERATED FROM PYTHON SOURCE LINES 90-111
 
 .. code-block:: default
+
+
+    def power_to_db(S):
+        S = np.asarray(S)
+        return 10.0 * np.log10(np.maximum(1e-10, S))
+
 
     def plot():
         def plot_spec(ax, spec, title):
             ax.set_title(title)
-            ax.imshow(librosa.amplitude_to_db(spec), origin="lower", aspect="auto")
+            ax.imshow(power_to_db(spec**2), origin="lower", aspect="auto")
 
         fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
         plot_spec(axes[0], torch.abs(spec_12[0]), title="Stretched x1.2")
@@ -220,12 +201,12 @@ Visualization
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-119
+.. GENERATED FROM PYTHON SOURCE LINES 112-114
 
 Audio Samples
 ~~~~~~~~~~~~~
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-129
+.. GENERATED FROM PYTHON SOURCE LINES 114-124
 
 .. code-block:: default
 
@@ -257,7 +238,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-134
+.. GENERATED FROM PYTHON SOURCE LINES 126-129
 
 .. code-block:: default
 
@@ -282,7 +263,7 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-139
+.. GENERATED FROM PYTHON SOURCE LINES 131-134
 
 .. code-block:: default
 
@@ -307,13 +288,13 @@ Audio Samples
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-143
+.. GENERATED FROM PYTHON SOURCE LINES 135-138
 
 Time and Frequency Masking
 --------------------------
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-153
+.. GENERATED FROM PYTHON SOURCE LINES 138-148
 
 .. code-block:: default
 
@@ -331,17 +312,10 @@ Time and Frequency Masking
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/examples/tutorials/audio_feature_augmentation_tutorial.py:48: UserWarning: torchaudio.sox_effects.sox_effects.apply_effects_file has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      return torchaudio.sox_effects.apply_effects_file(path, effects=effects)
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 155-170
+.. GENERATED FROM PYTHON SOURCE LINES 150-165
 
 .. code-block:: default
 
@@ -350,7 +324,7 @@ Time and Frequency Masking
     def plot():
         def plot_spec(ax, spec, title):
             ax.set_title(title)
-            ax.imshow(librosa.power_to_db(spec), origin="lower", aspect="auto")
+            ax.imshow(power_to_db(spec), origin="lower", aspect="auto")
 
         fig, axes = plt.subplots(3, 1, sharex=True, sharey=True)
         plot_spec(axes[0], spec[0], title="Original")
@@ -375,7 +349,7 @@ Time and Frequency Masking
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.803 seconds)
+   **Total running time of the script:** ( 0 minutes  0.547 seconds)
 
 
 .. _sphx_glr_download_tutorials_audio_feature_augmentation_tutorial.py:

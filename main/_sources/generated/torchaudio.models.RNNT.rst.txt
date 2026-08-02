@@ -72,17 +72,12 @@ Factory Functions
 
 .. PROTOTYPE FACTORY FUNCTIONS
 
-Prototype Factory Functions
-===========================
+Utility Functions
+=================
 
-.. currentmodule:: torchaudio.prototype.models
+.. currentmodule:: torchaudio.models
 
 .. autosummary::
    :toctree: ../generated
    :nosignatures:
 
-
-   ~torchaudio.prototype.models.conformer_rnnt_model
-   ~torchaudio.prototype.models.conformer_rnnt_base
-
-.. UTILITY FUNCTIONS

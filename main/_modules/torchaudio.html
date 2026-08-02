@@ -6,11 +6,10 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Musan &mdash; Torchaudio 2.8.0 documentation</title>
+  <title>torchaudio &mdash; Torchaudio nightly documentation</title>
   
 
   
@@ -40,8 +39,6 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="torchaudio.prototype.functional" href="../prototype.functional.html" />
-    <link rel="prev" title="torchaudio.prototype.datasets" href="../prototype.datasets.html" />
   <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -222,7 +219,7 @@
           <div class="pytorch-left-menu-search">
             
     <div class="version">
-      <a href="../../versions.html"><span style="font-size:110%">2.8.0 &#x25BC</span></a>
+      <a href="../../versions.html"><span style="font-size:110%">Nightly Build (2.11.0a0+2470b9c) &#x25BC</span></a>
     </div>
     
 
@@ -261,43 +258,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../build.linux.html">Building on Linux and macOS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../build.windows.html">Building on Windows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../build.jetson.html">Building on Jetson</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../build.ffmpeg.html">Enabling GPU video decoder/encoder</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">API Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_io_tutorial.html">Audio I/O</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/streamreader_basic_tutorial.html">StreamReader Basic Usages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/streamreader_advanced_tutorial.html">StreamReader Advanced Usages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/streamwriter_basic_tutorial.html">StreamWriter Basic Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/streamwriter_advanced.html">StreamWriter Advanced Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/nvdec_tutorial.html">Accelerated video decoding with NVDEC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/nvenc_tutorial.html">Accelerated video encoding with NVENC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/effector_tutorial.html">AudioEffector Usages</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_resampling_tutorial.html">Audio Resampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_data_augmentation_tutorial.html">Audio Data Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_feature_extractions_tutorial.html">Audio Feature Extractions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_feature_augmentation_tutorial.html">Audio Feature Augmentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/ctc_forced_alignment_api_tutorial.html">CTC forced alignment API tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/oscillator_tutorial.html">Oscillator and ADSR envelope</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/additive_synthesis_tutorial.html">Additive Synthesis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/filter_design_tutorial.html">Filter design tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/subtractive_synthesis_tutorial.html">Subtractive synthesis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/audio_datasets_tutorial.html">Audio Datasets</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Pipeline Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/speech_recognition_pipeline_tutorial.html">Speech Recognition with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/asr_inference_with_ctc_decoder_tutorial.html">ASR Inference with CTC Decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/asr_inference_with_cuda_ctc_decoder_tutorial.html">ASR Inference with CUDA CTC Decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/online_asr_tutorial.html">Online ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/device_asr.html">Device ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/device_avsr.html">Device AV-ASR with Emformer RNN-T</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/forced_alignment_tutorial.html">Forced Alignment with Wav2Vec2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/forced_alignment_for_multilingual_data_tutorial.html">Forced alignment for multilingual data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/tacotron2_pipeline_tutorial.html">Text-to-Speech with Tacotron2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/mvdr_tutorial.html">Speech Enhancement with MVDR Beamforming</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/hybrid_demucs_tutorial.html">Music Source Separation with Hybrid Demucs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/squim_tutorial.html">Torchaudio-Squim: Non-intrusive Speech Assessment in TorchAudio</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Training Recipes</span></p>
 <ul>
@@ -310,37 +270,13 @@
 <p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../torchaudio.html">torchaudio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../io.html">torchaudio.io</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../functional.html">torchaudio.functional</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../transforms.html">torchaudio.transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">torchaudio.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.html">torchaudio.models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../models.decoder.html">torchaudio.models.decoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../pipelines.html">torchaudio.pipelines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../sox_effects.html">torchaudio.sox_effects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compliance.kaldi.html">torchaudio.compliance.kaldi</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../kaldi_io.html">torchaudio.kaldi_io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../utils.html">torchaudio.utils</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../torio.html">torio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../torio.io.html">torio.io</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../torio.utils.html">torio.utils</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Python Prototype API Reference</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../prototype.html">torchaudio.prototype</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../prototype.datasets.html">torchaudio.prototype.datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.functional.html">torchaudio.prototype.functional</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.models.html">torchaudio.prototype.models</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.pipelines.html">torchaudio.prototype.pipelines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../prototype.transforms.html">torchaudio.prototype.transforms</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">C++ Prototype API Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../libtorio.html">libtorio</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_reader.html">torio::io::StreamingMediaDecoder</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../libtorio.stream_writer.html">torio::io::StreamingMediaEncoder</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pipelines.html">torchaudio.pipelines</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">PyTorch Libraries</span></p>
 <ul>
@@ -391,21 +327,15 @@
       </li>
 
         
-          <li><a href="../prototype.html">torchaudio.prototype</a> &gt;</li>
+          <li><a href="index.html">Module code</a> &gt;</li>
         
-          <li><a href="../prototype.datasets.html">torchaudio.prototype.datasets</a> &gt;</li>
-        
-      <li>Musan &gt;</li>
+      <li>torchaudio &gt;</li>
       
       <li>Old version (stable)</li>
       
     
     
       <li class="pytorch-breadcrumbs-aside">
-        
-            
-            <a href="../_sources/generated/torchaudio.prototype.datasets.Musan.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
-          
         
       </li>
     
@@ -436,104 +366,217 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="musan">
-<h1>Musan<a class="headerlink" href="#musan" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="torchaudio.prototype.datasets.Musan">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">torchaudio.prototype.datasets.</span></span><span class="sig-name descname"><span class="pre">Musan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.13)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><span class="pre">Path</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/torchaudio/prototype/datasets/musan.html#Musan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.datasets.Musan" title="Permalink to this definition">¶</a></dt>
-<dd><p>DEPRECATED</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>This class is deprecated from version 2.8. It will be removed in the 2.9 release.
-This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see <a class="reference external" href="https://github.com/pytorch/audio/issues/3902">https://github.com/pytorch/audio/issues/3902</a> for more information.</p>
-</div>
-<p><em>MUSAN</em> <span id="id1">[<a class="reference internal" href="../references.html#id59" title="David Snyder, Guoguo Chen, and Daniel Povey. MUSAN: A Music, Speech, and Noise Corpus. 2015. arXiv:1510.08484v1. arXiv:1510.08484.">Snyder <em>et al.</em>, 2015</a>]</span> dataset.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Args:</dt><dd><p>root (str or Path): Root directory where the dataset’s top-level directory exists.
-subset (str): Subset of the dataset to use. Options: [<code class="docutils literal notranslate"><span class="pre">&quot;music&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;noise&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;speech&quot;</span></code>].</p>
-</dd>
-</dl>
-</div></blockquote>
-</dd></dl>
+  <h1>Source code for torchaudio</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<section id="getitem">
-<h2>__getitem__<a class="headerlink" href="#getitem" title="Permalink to this heading">¶</a></h2>
-<div class="py attribute docutils container">
-<dl class="py method">
-<dt class="sig sig-object py" id="torchaudio.prototype.datasets.Musan.__getitem__">
-<span class="sig-prename descclassname"><span class="pre">Musan.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)"><span class="pre">Tensor</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/datasets/musan.html#Musan.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.datasets.Musan.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the n-th sample in the dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Index of sample to be loaded.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>torch.Tensor</dt><dd><p>Waveform.</p>
-</dd>
-<dt>int</dt><dd><p>Sample rate.</p>
-</dd>
-<dt>str</dt><dd><p>File name.</p>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(<a class="reference external" href="https://docs.pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.7)">torch.Tensor</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>)</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
-</div>
-</section>
-<section id="get-metadata">
-<h2>get_metadata<a class="headerlink" href="#get-metadata" title="Permalink to this heading">¶</a></h2>
-<div class="py attribute docutils container">
-<dl class="py method">
-<dt class="sig sig-object py" id="torchaudio.prototype.datasets.Musan.get_metadata">
-<span class="sig-prename descclassname"><span class="pre">Musan.</span></span><span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/torchaudio/prototype/datasets/musan.html#Musan.get_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#torchaudio.prototype.datasets.Musan.get_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get metadata for the n-th sample in the dataset. Returns filepath instead of waveform,
-but otherwise returns the same fields as <a class="reference internal" href="#torchaudio.prototype.datasets.Musan.__getitem__" title="torchaudio.prototype.datasets.Musan.__getitem__"><code class="xref py py-func docutils literal notranslate"><span class="pre">__getitem__()</span></code></a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – Index of sample to be loaded.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>str</dt><dd><p>Path to audio.</p>
-</dd>
-<dt>int</dt><dd><p>Sample rate.</p>
-</dd>
-<dt>str</dt><dd><p>File name.</p>
-</dd>
-</dl>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>)</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="c1"># Initialize extension and backend first</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_extension</span>  <span class="c1"># noqa  # usort: skip</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">compliance</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">functional</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">pipelines</span><span class="p">,</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">utils</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._torchcodec</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_with_torchcodec</span><span class="p">,</span> <span class="n">save_with_torchcodec</span>
 
-</div>
-</section>
-</section>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">git_version</span>  <span class="c1"># noqa: F401</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="load"><a class="viewcode-back" href="../generated/torchaudio.load.html#torchaudio.load">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span>
+    <span class="n">uri</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">BinaryIO</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+    <span class="n">frame_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">num_frames</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load audio data from source using TorchCodec&#39;s AudioDecoder.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        As of TorchAudio 2.9, this function relies on TorchCodec&#39;s decoding capabilities under the hood. It is</span>
+<span class="sd">        provided for convenience, but we do recommend that you port your code to</span>
+<span class="sd">        natively use ``torchcodec``&#39;s ``AudioDecoder`` class for better</span>
+<span class="sd">        performance:</span>
+<span class="sd">        https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.</span>
+<span class="sd">        Because of the reliance on Torchcodec, the parameters ``normalize``, ``buffer_size``, and</span>
+<span class="sd">        ``backend`` are ignored and accepted only for backwards compatibility.</span>
+<span class="sd">        To install torchcodec, follow the instructions at https://github.com/pytorch/torchcodec#installing-torchcodec.</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        uri (path-like object or file-like object):</span>
+<span class="sd">            Source of audio data. The following types are accepted:</span>
+
+<span class="sd">            * ``path-like``: File path or URL.</span>
+<span class="sd">            * ``file-like``: Object with ``read(size: int) -&gt; bytes`` method.</span>
+
+<span class="sd">        frame_offset (int, optional):</span>
+<span class="sd">            Number of samples to skip before start reading data.</span>
+<span class="sd">        num_frames (int, optional):</span>
+<span class="sd">            Maximum number of samples to read. ``-1`` reads all the remaining samples,</span>
+<span class="sd">            starting from ``frame_offset``.</span>
+<span class="sd">        normalize (bool, optional):</span>
+<span class="sd">            TorchCodec always returns normalized float32 samples. This parameter</span>
+<span class="sd">            is ignored and a warning is issued if set to False.</span>
+<span class="sd">            Default: ``True``.</span>
+<span class="sd">        channels_first (bool, optional):</span>
+<span class="sd">            When True, the returned Tensor has dimension `[channel, time]`.</span>
+<span class="sd">            Otherwise, the returned Tensor&#39;s dimension is `[time, channel]`.</span>
+<span class="sd">        format (str or None, optional):</span>
+<span class="sd">            Format hint for the decoder. May not be supported by all TorchCodec</span>
+<span class="sd">            decoders. (Default: ``None``)</span>
+<span class="sd">        buffer_size (int, optional):</span>
+<span class="sd">            Not used by TorchCodec AudioDecoder. Provided for API compatibility.</span>
+<span class="sd">        backend (str or None, optional):</span>
+<span class="sd">            Not used by TorchCodec AudioDecoder. Provided for API compatibility.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (torch.Tensor, int): Resulting Tensor and sample rate.</span>
+<span class="sd">        Always returns float32 tensors. If ``channels_first=True``, shape is</span>
+<span class="sd">        `[channel, time]`, otherwise `[time, channel]`.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ImportError: If torchcodec is not available.</span>
+<span class="sd">        ValueError: If unsupported parameters are used.</span>
+<span class="sd">        RuntimeError: If TorchCodec fails to decode the audio.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        - TorchCodec always returns normalized float32 samples, so the ``normalize``</span>
+<span class="sd">        parameter has no effect.</span>
+<span class="sd">        - The ``buffer_size`` and ``backend`` parameters are ignored.</span>
+<span class="sd">        - Not all audio formats supported by torchaudio backends may be supported</span>
+<span class="sd">        by TorchCodec.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">load_with_torchcodec</span><span class="p">(</span>
+        <span class="n">uri</span><span class="p">,</span>
+        <span class="n">frame_offset</span><span class="o">=</span><span class="n">frame_offset</span><span class="p">,</span>
+        <span class="n">num_frames</span><span class="o">=</span><span class="n">num_frames</span><span class="p">,</span>
+        <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span>
+        <span class="n">buffer_size</span><span class="o">=</span><span class="n">buffer_size</span><span class="p">,</span>
+        <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="save"><a class="viewcode-back" href="../generated/torchaudio.save.html#torchaudio.save">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span>
+    <span class="n">uri</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+    <span class="n">src</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">sample_rate</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">channels_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="nb">format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">bits_per_sample</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">compression</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Save audio data to file using TorchCodec&#39;s AudioEncoder.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        As of TorchAudio 2.9, this function relies on TorchCodec&#39;s encoding capabilities under the hood.</span>
+<span class="sd">        It is provided for convenience, but we do recommend that you port your code to</span>
+<span class="sd">        natively use ``torchcodec``&#39;s ``AudioEncoder`` class for better</span>
+<span class="sd">        performance:</span>
+<span class="sd">        https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.encoders.AudioEncoder.</span>
+<span class="sd">        Because of the reliance on Torchcodec, the parameters ``format``, ``encoding``,</span>
+<span class="sd">        ``bits_per_sample``, ``buffer_size``, and ``backend``, are ignored and accepted only for</span>
+<span class="sd">        backwards compatibility.</span>
+<span class="sd">        To install torchcodec, follow the instructions at https://github.com/pytorch/torchcodec#installing-torchcodec.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        uri (path-like object):</span>
+<span class="sd">            Path to save the audio file. The file extension determines the format.</span>
+
+<span class="sd">        src (torch.Tensor):</span>
+<span class="sd">            Audio data to save. Must be a 1D or 2D tensor with float32 values</span>
+<span class="sd">            in the range [-1, 1]. If 2D, shape should be [channel, time] when</span>
+<span class="sd">            channels_first=True, or [time, channel] when channels_first=False.</span>
+
+<span class="sd">        sample_rate (int):</span>
+<span class="sd">            Sample rate of the audio data.</span>
+
+<span class="sd">        channels_first (bool, optional):</span>
+<span class="sd">            Indicates whether the input tensor has channels as the first dimension.</span>
+<span class="sd">            If True, expects [channel, time]. If False, expects [time, channel].</span>
+<span class="sd">            Default: True.</span>
+
+<span class="sd">        format (str or None, optional):</span>
+<span class="sd">            Audio format hint. Not used by TorchCodec (format is determined by</span>
+<span class="sd">            file extension). A warning is issued if provided.</span>
+<span class="sd">            Default: None.</span>
+
+<span class="sd">        encoding (str or None, optional):</span>
+<span class="sd">            Audio encoding. Not fully supported by TorchCodec AudioEncoder.</span>
+<span class="sd">            A warning is issued if provided. Default: None.</span>
+
+<span class="sd">        bits_per_sample (int or None, optional):</span>
+<span class="sd">            Bits per sample. Not directly supported by TorchCodec AudioEncoder.</span>
+<span class="sd">            A warning is issued if provided. Default: None.</span>
+
+<span class="sd">        buffer_size (int, optional):</span>
+<span class="sd">            Not used by TorchCodec AudioEncoder. Provided for API compatibility.</span>
+<span class="sd">            A warning is issued if not default value. Default: 4096.</span>
+
+<span class="sd">        backend (str or None, optional):</span>
+<span class="sd">            Not used by TorchCodec AudioEncoder. Provided for API compatibility.</span>
+<span class="sd">            A warning is issued if provided. Default: None.</span>
+
+<span class="sd">        compression (float, int or None, optional):</span>
+<span class="sd">            Compression level or bit rate. Maps to bit_rate parameter in</span>
+<span class="sd">            TorchCodec AudioEncoder. Default: None.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ImportError: If torchcodec is not available.</span>
+<span class="sd">        ValueError: If input parameters are invalid.</span>
+<span class="sd">        RuntimeError: If TorchCodec fails to encode the audio.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        - TorchCodec AudioEncoder expects float32 samples in [-1, 1] range.</span>
+<span class="sd">        - Some parameters (format, encoding, bits_per_sample, buffer_size, backend)</span>
+<span class="sd">        are not used by TorchCodec but are provided for API compatibility.</span>
+<span class="sd">        - The output format is determined by the file extension in the uri.</span>
+<span class="sd">        - TorchCodec uses FFmpeg under the hood for encoding.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">save_with_torchcodec</span><span class="p">(</span>
+        <span class="n">uri</span><span class="p">,</span>
+        <span class="n">src</span><span class="p">,</span>
+        <span class="n">sample_rate</span><span class="p">,</span>
+        <span class="n">channels_first</span><span class="o">=</span><span class="n">channels_first</span><span class="p">,</span>
+        <span class="nb">format</span><span class="o">=</span><span class="nb">format</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span>
+        <span class="n">bits_per_sample</span><span class="o">=</span><span class="n">bits_per_sample</span><span class="p">,</span>
+        <span class="n">buffer_size</span><span class="o">=</span><span class="n">buffer_size</span><span class="p">,</span>
+        <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+        <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;load&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;load_with_torchcodec&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;save_with_torchcodec&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;save&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;compliance&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;datasets&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;functional&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;models&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pipelines&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;utils&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;transforms&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
 
              </article>
              
             </div>
             <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../prototype.functional.html" class="btn btn-neutral float-right" title="torchaudio.prototype.functional" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-        <a href="../prototype.datasets.html" class="btn btn-neutral" title="torchaudio.prototype.datasets" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-      
-    </div>
   
 
   
@@ -544,7 +587,7 @@ but otherwise returns the same fields as <a class="reference internal" href="#to
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2025, Torchaudio Contributors.
+        &copy; Copyright 2026, Torchaudio Contributors.
 
     </p>
   </div>
@@ -564,14 +607,7 @@ but otherwise returns the same fields as <a class="reference internal" href="#to
         <div class="pytorch-content-right" id="pytorch-content-right">
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
-              <ul>
-<li><a class="reference internal" href="#">Musan</a><ul>
-<li><a class="reference internal" href="#getitem">__getitem__</a></li>
-<li><a class="reference internal" href="#get-metadata">get_metadata</a></li>
-</ul>
-</li>
-</ul>
-
+              
             </div>
           </div>
         </div>

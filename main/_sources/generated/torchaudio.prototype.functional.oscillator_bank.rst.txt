@@ -1,6 +1,0 @@
-﻿torchaudio.prototype.functional.oscillator\_bank
-================================================
-
-.. currentmodule:: torchaudio.prototype.functional
-
-.. autofunction:: oscillator_bank

@@ -1,6 +1,0 @@
-torchaudio.prototype.models.emformer\_hubert\_base
-==================================================
-
-.. currentmodule:: torchaudio.prototype.models
-
-.. autofunction:: emformer_hubert_base

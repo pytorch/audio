@@ -65,8 +65,8 @@ model, tokenizer and aligner, to perform the forced alignment with less code.
 
  .. code-block:: none
 
-    2.8.0+cu126
-    2.8.0
+    2.14.0.dev20260802+cu130
+    2.11.0a0+2470b9c
     cuda
 
 
@@ -374,15 +374,6 @@ German
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
-      warnings.warn(
-    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
-
 
 
 
@@ -429,8 +420,6 @@ German
 
  .. code-block:: none
 
-    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  aber seit ich bei ihnen das brot hole
     Normalized Transcript:  aber seit ich bei ihnen das brot hole
 
@@ -737,15 +726,6 @@ However this is not needed if you only want character-level alignments.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
-      warnings.warn(
-    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
-
 
 
 
@@ -790,8 +770,6 @@ However this is not needed if you only want character-level alignments.
 
  .. code-block:: none
 
-    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  关 服务 高端 产品 仍 处于 供不应求 的 局面
     Normalized Transcript:  guan fuwu gaoduan chanpin reng chuyu gongbuyingqiu de jumian
 
@@ -1109,15 +1087,6 @@ Polish
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
-      warnings.warn(
-    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
-
 
 
 
@@ -1162,8 +1131,6 @@ Polish
 
  .. code-block:: none
 
-    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  wtedy ujrzałem na jego brzuchu okrągłą czarną ranę
     Normalized Transcript:  wtedy ujrzalem na jego brzuchu okragla czarna rane
 
@@ -1451,15 +1418,6 @@ Portuguese
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
-      warnings.warn(
-    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
-
 
 
 
@@ -1504,8 +1462,6 @@ Portuguese
 
  .. code-block:: none
 
-    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  na imensa extensão onde se esconde o inconsciente imortal
     Normalized Transcript:  na imensa extensao onde se esconde o inconsciente imortal
 
@@ -1823,15 +1779,6 @@ Italian
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /pytorch/audio/src/torchaudio/_backend/utils.py:213: UserWarning: In 2.9, this function's implementation will be changed to use torchaudio.load_with_torchcodec` under the hood. Some parameters like ``normalize``, ``format``, ``buffer_size``, and ``backend`` will be ignored. We recommend that you port your code to rely directly on TorchCodec's decoder instead: https://docs.pytorch.org/torchcodec/stable/generated/torchcodec.decoders.AudioDecoder.html#torchcodec.decoders.AudioDecoder.
-      warnings.warn(
-    /pytorch/audio/src/torchaudio/_backend/ffmpeg.py:88: UserWarning: torio.io._streaming_media_decoder.StreamingMediaDecoder has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. The decoding and encoding capabilities of PyTorch for both audio and video are being consolidated into TorchCodec. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      s = torchaudio.io.StreamReader(src, format, None, buffer_size)
-
 
 
 
@@ -1876,8 +1823,6 @@ Italian
 
  .. code-block:: none
 
-    /pytorch/audio/src/torchaudio/pipelines/_wav2vec2/aligner.py:40: UserWarning: torchaudio.functional._alignment.forced_align has been deprecated. This deprecation is part of a large refactoring effort to transition TorchAudio into a maintenance phase. Please see https://github.com/pytorch/audio/issues/3902 for more information. It will be removed from the 2.9 release. 
-      aligned_tokens, scores = F.forced_align(emission, targets, blank=blank)
     Raw Transcript:  elle giacean per terra tutte quante
     Normalized Transcript:  elle giacean per terra tutte quante
 
@@ -2104,7 +2049,7 @@ forced aligner API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.474 seconds)
+   **Total running time of the script:** ( 0 minutes  3.596 seconds)
 
 
 .. _sphx_glr_download_tutorials_forced_alignment_for_multilingual_data_tutorial.py:

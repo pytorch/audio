@@ -12,13 +12,6 @@ CUCTCDecoder
 Methods
 =======
 
-__call__
---------
-
-.. container:: py attribute
-
-   .. automethod:: torchaudio.models.decoder.CUCTCDecoder.__call__
-
 Support Structures
 ==================
 

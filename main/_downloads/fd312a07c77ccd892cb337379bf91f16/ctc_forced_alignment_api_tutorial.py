@@ -5,12 +5,11 @@ CTC forced alignment API tutorial
 **Author**: `Xiaohui Zhang <xiaohuizhang@meta.com>`__, `Moto Hira <moto@meta.com>`__
 
 .. warning::
-    Starting with version 2.8, we are refactoring TorchAudio to transition it
-    into a maintenance phase. As a result:
+    Starting with version 2.9, we have transitioned TorchAudio into a maintenance phase. As a result:
 
-    - The APIs described in this tutorial are deprecated in 2.8 and will be removed in 2.9.
+    - The APIs described in this tutorial were deprecated in 2.8 and have been removed in 2.9.
     - The decoding and encoding capabilities of PyTorch for both audio and video
-      are being consolidated into TorchCodec.
+      have been consolidated into TorchCodec.
 
     Please see https://github.com/pytorch/audio/issues/3902 for more information.
 
@@ -62,7 +61,7 @@ import torchaudio.functional as F
 # to use.
 #
 
-SPEECH_FILE = torchaudio.utils.download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
+SPEECH_FILE = torchaudio.utils._download_asset("tutorial-assets/Lab41-SRI-VOiCES-src-sp0307-ch127535-sg0042.wav")
 waveform, _ = torchaudio.load(SPEECH_FILE)
 TRANSCRIPT = "i had that curiosity beside me at this moment".split()
 

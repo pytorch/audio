@@ -42,5 +42,3 @@ Factory Functions
    ~torchaudio.models.squim_subjective_base
 
 .. PROTOTYPE FACTORY FUNCTIONS
-
-.. UTILITY FUNCTIONS

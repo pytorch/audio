@@ -62,23 +62,6 @@ Factory Functions
 
 .. PROTOTYPE FACTORY FUNCTIONS
 
-Prototype Factory Functions
-===========================
-
-.. currentmodule:: torchaudio.prototype.models
-
-.. autosummary::
-   :toctree: ../generated
-   :nosignatures:
-
-
-   ~torchaudio.prototype.models.emformer_hubert_model
-   ~torchaudio.prototype.models.emformer_hubert_base
-   ~torchaudio.prototype.models.conformer_wav2vec2_model
-   ~torchaudio.prototype.models.conformer_wav2vec2_base
-
-.. UTILITY FUNCTIONS
-
 Utility Functions
 =================
 

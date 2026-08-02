@@ -23,7 +23,6 @@ Utility
    mask_along_axis_iid
    mu_law_encoding
    mu_law_decoding
-   apply_codec
    resample
    loudness
    convolve
