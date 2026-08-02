@@ -276,11 +276,14 @@ plot(waveforms, spec, vocoder.sample_rate)
 
 # Workaround to load model mapped on GPU
 # https://stackoverflow.com/a/61840832
+# trust_repo=True is needed for non-interactive environments: torch.hub otherwise
+# prompts on stdin for repos outside its trusted-owner list, which hangs forever.
 waveglow = torch.hub.load(
     "NVIDIA/DeepLearningExamples:torchhub",
     "nvidia_waveglow",
     model_math="fp32",
     pretrained=False,
+    trust_repo=True,
 )
 checkpoint = torch.hub.load_state_dict_from_url(
     "https://api.ngc.nvidia.com/v2/models/nvidia/waveglowpyt_fp32/versions/1/files/nvidia_waveglowpyt_fp32_20190306.pth",  # noqa: E501
