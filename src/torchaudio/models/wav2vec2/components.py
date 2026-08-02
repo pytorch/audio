@@ -435,7 +435,7 @@ class Transformer(Module):
     ) -> Tensor:
         x = self._preprocess(x)
         for layer in self.layers:
-            if not (self.training and torch.rand(1).item() <= self.layer_drop):
+            if not (self.training and self.layer_drop > 0 and torch.rand(1).item() <= self.layer_drop):
                 x, position_bias = layer(x, attention_mask, position_bias=position_bias)
 
         if not self.layer_norm_first:

@@ -15,10 +15,17 @@ from torchaudio.models.wav2vec2 import (
     wav2vec2_base,
     wav2vec2_large,
     wav2vec2_large_lv60k,
+    wav2vec2_model,
     wavlm_base,
     wavlm_large,
 )
-from torchaudio_unittest.common_utils import skipIfNoCuda, skipIfNoQengine, torch_script, TorchaudioTestCase
+from torchaudio_unittest.common_utils import (
+    skipIfNoCuda,
+    skipIfNoModule,
+    skipIfNoQengine,
+    torch_script,
+    TorchaudioTestCase,
+)
 
 TORCH_VERSION: Tuple[int, ...] = tuple(int(x) for x in torch.__version__.split(".")[:2])
 if TORCH_VERSION >= (1, 10):
@@ -86,6 +93,34 @@ class TestWav2Vec2Model(TorchaudioTestCase):
         self._smoke_test(model, torch.device("cpu"), dtype)
         model = wav2vec2_base(aux_num_out=32)
         self._smoke_test(model, torch.device("cpu"), dtype)
+
+    @skipIfNoModule("onnx")
+    @skipIfNoModule("onnxscript")
+    def test_onnx_export_with_disabled_layer_drop_in_train_mode(self):
+        if TORCH_VERSION < (2, 1):
+            self.skipTest("ONNX dynamo export is not available.")
+
+        model = wav2vec2_model(
+            extractor_mode="group_norm",
+            extractor_conv_layer_config=[(8, 3, 2)],
+            extractor_conv_bias=False,
+            encoder_embed_dim=8,
+            encoder_projection_dropout=0.0,
+            encoder_pos_conv_kernel=3,
+            encoder_pos_conv_groups=1,
+            encoder_num_layers=1,
+            encoder_num_heads=2,
+            encoder_attention_dropout=0.0,
+            encoder_ff_interm_features=8,
+            encoder_ff_interm_dropout=0.0,
+            encoder_dropout=0.0,
+            encoder_layer_norm_first=False,
+            encoder_layer_drop=0.0,
+            aux_num_out=None,
+        )
+        assert model.training
+
+        torch.onnx.export(model, (torch.randn(1, 64),), dynamo=True)
 
     @parameterized.expand([(torch.float32,), (torch.float64,)])
     @skipIfNoCuda
