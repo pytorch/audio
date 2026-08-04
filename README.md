@@ -7,16 +7,23 @@ torchaudio: an audio library for PyTorch
 
 ![TorchAudio Logo](docs/source/_static/img/logo.png)
 
+> [!IMPORTANT]
+> **TorchAudio 2.11 works with `torch` 2.11 and with every future `torch`
+> release (2.12, 2.13, etc.).** It is the latest release, and it is the only
+> one you need: there is nothing to upgrade in TorchAudio when you upgrade
+> `torch`, and installing TorchAudio does not pin `torch` to a specific
+> version.
+
 > [!NOTE]
-> **We have transitioned TorchAudio into a
->  maintenance phase. This process removed some user-facing
->  features. These features were deprecated from TorchAudio 2.8 and removed in 2.9.
->  Our main goals were to reduce redundancies with the rest of the
->  PyTorch ecosystem, make it easier to maintain, and create a version of
->  TorchAudio that is more tightly scoped to its strengths: processing audio
->  data for ML. Please see
->  [our community message](https://github.com/pytorch/audio/issues/3902)
->  for more details.**
+> We have transitioned TorchAudio into a maintenance phase. This migration
+> process removed some user-facing features. These features were deprecated
+> from TorchAudio 2.8 and removed in 2.9.
+> Our main goals were to reduce redundancies with the rest of the
+> PyTorch ecosystem, make it easier to maintain, and create a version of
+> TorchAudio that is more tightly scoped to its strengths: processing audio
+> data for ML. Please see
+> [our community message](https://github.com/pytorch/audio/issues/3902)
+> for more details.
 
 The aim of torchaudio is to apply [PyTorch](https://github.com/pytorch/pytorch) to
 the audio domain. By supporting PyTorch, torchaudio follows the same philosophy
@@ -38,7 +45,16 @@ to use and feel like a natural extension.
 Installation
 ------------
 
-Please refer to https://pytorch.org/audio/main/installation.html for installation and build process of TorchAudio.
+```bash
+pip install torchaudio
+```
+
+TorchAudio 2.11 requires `torch` 2.11 or newer, including all future releases.
+It does not pin `torch` to a specific version.
+
+Please refer to https://pytorch.org/audio/main/installation.html for the full
+installation and build instructions, and for the compatibility matrix of older
+releases.
 
 
 API Reference
