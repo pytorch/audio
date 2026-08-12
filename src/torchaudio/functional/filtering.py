@@ -1567,6 +1567,18 @@ def vad(
     """
     device = waveform.device
 
+    if not bool(torch.isfinite(waveform).all()):
+        # The trigger measure is a running mean, so one non-finite sample poisons it
+        # permanently, and every later comparison against `trigger_level` is False.
+        # Nothing ever triggers and the whole waveform is reported as silence, which
+        # returns an empty tensor with no warning. Fail here instead.
+        raise ValueError(
+            "waveform must be finite everywhere, but it contains NaN or infinite values. "
+            "Vad tracks a running measure of the signal, and a single non-finite sample "
+            "makes every later comparison against trigger_level false, so the whole input "
+            "would be discarded as silence."
+        )
+
     if waveform.ndim > 2:
         warnings.warn(
             "Expected input tensor dimension of 1 for single channel"
