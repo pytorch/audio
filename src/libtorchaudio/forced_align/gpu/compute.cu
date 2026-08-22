@@ -90,7 +90,7 @@ __global__ void falign_cuda_step_kernel(
     if (x2 > x1 && x2 > x0) {
       result = x2;
       backPtrBuffer_a[backPtrBufferLen][i] = 2;
-    } else if (x1 > x0 && x1 > x2) {
+    } else if (x1 > x0) {
       result = x1;
       backPtrBuffer_a[backPtrBufferLen][i] = 1;
     } else {
