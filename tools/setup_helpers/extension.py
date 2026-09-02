@@ -1,13 +1,15 @@
 import os
 import platform
+import sysconfig
 from pathlib import Path
 
 import torch
-from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension
+from torch.utils.cpp_extension import BuildExtension, CppExtension, CUDAExtension, min_supported_cpython
 
 __all__ = [
     "get_ext_modules",
     "get_build_ext",
+    "get_bdist_wheel_options",
 ]
 
 _THIS_DIR = Path(__file__).parent.resolve()
@@ -38,6 +40,10 @@ _BUILD_CUDA_CTC_DECODER = _get_build("BUILD_CUDA_CTC_DECODER", _USE_CUDA)
 _USE_OPENMP = _get_build("USE_OPENMP", True) and "ATen parallel backend: OpenMP" in torch.__config__.parallel_info()
 _TORCH_CUDA_ARCH_LIST = os.environ.get("TORCH_CUDA_ARCH_LIST", None)
 
+# Free-threaded interpreters do not support the limited API, and pip refuses to install
+# an abi3 wheel on them. See packaging.tags._abi3_applies.
+_USE_PY_LIMITED_API = not sysconfig.get_config_var("Py_GIL_DISABLED")
+
 
 class BuildExtensionAsLibrary(BuildExtension):
     def get_export_symbols(self, ext):
@@ -53,6 +59,20 @@ def get_build_ext():
         no_python_abi_suffix=False,
         use_ninja=True,
     )
+
+
+def get_bdist_wheel_options():
+    """Tag the wheel abi3 so that a single wheel covers every supported CPython.
+
+    The tag must match the ``Py_LIMITED_API`` level that torch compiles the extensions
+    with, otherwise the wheel would claim a compatibility it doesn't have.
+    """
+    if not _USE_PY_LIMITED_API:
+        return {}
+    # min_supported_cpython is a Python hexversion, e.g. "0x030A0000" for 3.10.
+    hexversion = int(min_supported_cpython, 16)
+    major, minor = (hexversion >> 24) & 0xFF, (hexversion >> 16) & 0xFF
+    return {"bdist_wheel": {"py_limited_api": f"cp{major}{minor}"}}
 
 
 def get_ext_modules():
@@ -109,14 +129,14 @@ def get_ext_modules():
                 _CSRC_DIR / "_torchaudio.cpp",
                 _CSRC_DIR / "utils.cpp",
             ],
-            py_limited_api=True,
+            py_limited_api=_USE_PY_LIMITED_API,
             extra_compile_args=extra_compile_args,
             include_dirs=[_CSRC_DIR.parent],
         ),
         extension(
             name="torchaudio.lib.libtorchaudio",
             sources=[_CSRC_DIR / s for s in sources],
-            py_limited_api=True,
+            py_limited_api=_USE_PY_LIMITED_API,
             extra_compile_args=extra_compile_args,
             include_dirs=[_CSRC_DIR.parent],
         ),
@@ -130,7 +150,7 @@ def get_ext_modules():
                         _CSRC_DIR / "cuctc" / "src" / s
                         for s in ["ctc_prefix_decoder.cpp", "ctc_prefix_decoder_kernel_v2.cu", "python_binding.cpp"]
                     ],
-                    py_limited_api=True,
+                    py_limited_api=_USE_PY_LIMITED_API,
                     extra_compile_args=extra_compile_args,
                     include_dirs=[_CSRC_DIR / "cuctc", _CSRC_DIR.parent],
                 ),

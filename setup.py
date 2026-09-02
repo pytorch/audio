@@ -122,11 +122,13 @@ def _main():
         ],
         packages=find_packages(where="src"),
         package_dir={"": "src"},
+        python_requires=">=3.10",
         ext_modules=setup_helpers.get_ext_modules(),
         cmdclass={
             "build_ext": setup_helpers.get_build_ext(),
             "clean": clean,
         },
+        options=setup_helpers.get_bdist_wheel_options(),
         install_requires=["torch>=2.11"],
         zip_safe=False,
     )
