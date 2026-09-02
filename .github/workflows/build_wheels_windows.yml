@@ -19,13 +19,14 @@ permissions:
 
 jobs:
   generate-matrix:
-    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@main
+    uses: NicolasHug/test-infra/.github/workflows/generate_binary_build_matrix.yml@abiabiabiabia
     with:
       package-type: wheel
       os: windows
-      test-infra-repository: pytorch/test-infra
-      test-infra-ref: main
+      test-infra-repository: NicolasHug/test-infra
+      test-infra-ref: abiabiabiabia
       with-xpu: enable
+      python-abi3: enable
   build:
     needs: generate-matrix
     strategy:
@@ -34,16 +35,15 @@ jobs:
         include:
           - repository: pytorch/audio
             env-script: packaging/vc_env_helper.bat
-            wheel-build-params: "--plat-name win_amd64"
             smoke-test-script: test/smoke_test/smoke_test_no_ffmpeg.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: pytorch/test-infra/.github/workflows/build_wheels_windows.yml@main
+    uses: NicolasHug/test-infra/.github/workflows/build_wheels_windows.yml@abiabiabiabia
     with:
       repository: ${{ matrix.repository }}
       ref: ""
-      test-infra-repository: pytorch/test-infra
-      test-infra-ref: main
+      test-infra-repository: NicolasHug/test-infra
+      test-infra-ref: abiabiabiabia
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
       env-script: ${{ matrix.env-script }}
       package-name: ${{ matrix.package-name }}

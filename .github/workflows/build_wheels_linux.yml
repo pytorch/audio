@@ -23,13 +23,14 @@ permissions:
 
 jobs:
   generate-matrix:
-    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@main
+    uses: NicolasHug/test-infra/.github/workflows/generate_binary_build_matrix.yml@abiabiabiabia
     with:
       package-type: wheel
       os: linux
-      test-infra-repository: pytorch/test-infra
-      test-infra-ref: main
+      test-infra-repository: NicolasHug/test-infra
+      test-infra-ref: abiabiabiabia
       with-xpu: enable
+      python-abi3: enable
   build:
     needs: generate-matrix
     strategy:
@@ -40,12 +41,12 @@ jobs:
             smoke-test-script: test/smoke_test/smoke_test_no_ffmpeg.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
+    uses: NicolasHug/test-infra/.github/workflows/build_wheels_linux.yml@abiabiabiabia
     with:
       repository: ${{ matrix.repository }}
       ref: ""
-      test-infra-repository: pytorch/test-infra
-      test-infra-ref: main
+      test-infra-repository: NicolasHug/test-infra
+      test-infra-ref: abiabiabiabia
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
       smoke-test-script: ${{ matrix.smoke-test-script }}
       package-name: ${{ matrix.package-name }}
@@ -54,3 +55,33 @@ jobs:
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  # The build job only ever installs the wheel back into the interpreter that built
+  # it, so it cannot catch an abi3 wheel that fails to load on a newer CPython.
+  test-abi3-wheel:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    name: test-abi3-wheel-py${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Download the CPU wheel
+        uses: actions/download-artifact@v4
+        with:
+          # The build job names its artifact after the interpreter it built with,
+          # which for the abi3 wheel is the oldest supported one.
+          pattern: "*_3.10_cpu_x86_64"
+          merge-multiple: true
+          path: dist
+      - name: Install and smoke test
+        run: |
+          set -euxo pipefail
+          wheel=$(ls dist/torchaudio-*-abi3-manylinux*_x86_64.whl)
+          pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+          pip install "${wheel}"
+          python test/smoke_test/smoke_test_no_ffmpeg.py

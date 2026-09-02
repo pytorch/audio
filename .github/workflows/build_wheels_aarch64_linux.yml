@@ -23,13 +23,14 @@ permissions:
 
 jobs:
   generate-matrix:
-    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@main
+    uses: NicolasHug/test-infra/.github/workflows/generate_binary_build_matrix.yml@abiabiabiabia
     with:
       package-type: wheel
       os: linux-aarch64
-      test-infra-repository: pytorch/test-infra
-      test-infra-ref: main
+      test-infra-repository: NicolasHug/test-infra
+      test-infra-ref: abiabiabiabia
       with-cuda: enable
+      python-abi3: enable
   build:
     needs: generate-matrix
     strategy:
@@ -40,12 +41,12 @@ jobs:
             smoke-test-script: test/smoke_test/smoke_test.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
+    uses: NicolasHug/test-infra/.github/workflows/build_wheels_linux.yml@abiabiabiabia
     with:
       repository: ${{ matrix.repository }}
       ref: ""
-      test-infra-repository: pytorch/test-infra
-      test-infra-ref: main
+      test-infra-repository: NicolasHug/test-infra
+      test-infra-ref: abiabiabiabia
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
       pre-script: ${{ matrix.pre-script }}
       post-script: ${{ matrix.post-script }}

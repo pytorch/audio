@@ -55,6 +55,11 @@ PyTorch 2.11 and all later versions. Earlier TorchAudio releases contain
 extension modules linked against a single PyTorch version, and cannot be mixed
 with a different PyTorch release.
 
+TorchAudio's extension modules also target CPython's stable ABI (``abi3``), so a
+single wheel per platform covers every supported Python version. Free-threaded
+CPython builds are the exception: they cannot use ``abi3`` wheels, so they get a
+dedicated wheel of their own.
+
 .. list-table::
    :header-rows: 1
 
