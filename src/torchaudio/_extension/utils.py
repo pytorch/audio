@@ -116,14 +116,14 @@ def _init_dll_path():
 def _check_cuda_version():
     version = torch.ops._torchaudio.cuda_version()
     if version is not None and torch.version.cuda is not None:
-        version_str = str(version)
-        ta_version = f"{version_str[:-3]}.{version_str[-2]}"
-        t_version = torch.version.cuda.split(".")
-        t_version = f"{t_version[0]}.{t_version[1]}"
-        if ta_version != t_version:
+        # The CUDA_VERSION macro is 1000 * major + 10 * minor.
+        ta_major, ta_minor = divmod(version // 10, 100)
+        t_major, t_minor = (int(v) for v in torch.version.cuda.split(".")[:2])
+        if ta_major != t_major:
             raise RuntimeError(
-                "Detected that PyTorch and TorchAudio were compiled with different CUDA versions. "
-                f"PyTorch has CUDA version {t_version} whereas TorchAudio has CUDA version {ta_version}. "
+                "Detected that PyTorch and TorchAudio were compiled with different CUDA major versions. "
+                f"PyTorch has CUDA version {t_major}.{t_minor} whereas TorchAudio has CUDA version "
+                f"{ta_major}.{ta_minor}. "
                 "Please install the TorchAudio version that matches your PyTorch version."
             )
     return version
