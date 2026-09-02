@@ -6,6 +6,8 @@
 #include <torch/headeronly/core/Dispatch_v2.h>
 #include <torch/headeronly/core/ScalarType.h>
 
+#include <vector>
+
 namespace torchaudio {
 namespace alignment {
 namespace cpu {
@@ -28,15 +30,6 @@ void forced_align_impl(
   const auto L = targets.size(1);
   const auto S = 2 * L + 1;
 
-  auto alphas_a = new scalar_t[2 * S]; // scalar_t is just logProbs.dtype()
-  for (int i = 0; i < 2 * S; i++) {
-    alphas_a[i] = kNegInfinity;
-  }
-
-  auto backPtr_a = new int8_t[T * S];
-  for (int i = 0; i < T * S; i++) {
-    backPtr_a[i] = -1;
-  }
   auto logProbs_a = torchaudio::accessor<scalar_t, 3>(logProbs);
   auto targets_a = torchaudio::accessor<target_t, 2>(targets);
   auto paths_a = torchaudio::accessor<target_t, 2>(paths);
@@ -54,6 +47,15 @@ void forced_align_impl(
       L,
       ", and number of repeats: ",
       R);
+
+  // scalar_t is just logProbs.dtype(). Both buffers are allocated after the
+  // length check: backPtr is T * S bytes, gigabytes for long audio, and the
+  // vectors own their memory so that a throw cannot leak them.
+  std::vector<scalar_t> alphas(2 * S, kNegInfinity);
+  auto alphas_a = alphas.data();
+
+  std::vector<int8_t> backPtr(T * S, -1);
+  auto backPtr_a = backPtr.data();
   auto start = T - (L + R) > 0 ? 0 : 1;
   auto end = (S == 1) ? 1 : 2;
   for (auto i = start; i < end; i++) {
@@ -128,14 +130,12 @@ void forced_align_impl(
   auto ltrIdx = alphas_a[S * idx1 + S - 1] > alphas_a[S * idx1 + S - 2]
       ? S - 1
       : S - 2; // alphas_a[idx1][S - 1], alphas_a[idx1][S - 2]
-  delete[] alphas_a;
   // path stores the token index for each time step after force alignment.
   for (auto t = T - 1; t > -1; t--) {
     auto lbl_idx = ltrIdx % 2 == 0 ? blank : targets_a[batchIndex][ltrIdx / 2];
     paths_a[batchIndex][t] = lbl_idx;
     ltrIdx -= backPtr_a[t * S + ltrIdx]; // backPtr_a[t][ltrIdx]
   }
-  delete[] backPtr_a;
 }
 
 std::tuple<Tensor, Tensor> compute(
