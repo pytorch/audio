@@ -58,7 +58,6 @@ def _get_strided(waveform: Tensor, window_size: int, window_shift: int, snip_edg
     """
     assert waveform.dim() == 1
     num_samples = waveform.size(0)
-    strides = (window_shift * waveform.stride(0), waveform.stride(0))
 
     if snip_edges:
         if num_samples < window_size:
@@ -79,6 +78,9 @@ def _get_strided(waveform: Tensor, window_size: int, window_shift: int, snip_edg
             # pad is negative so we want to trim the waveform at the front
             waveform = torch.cat((waveform[-pad:], pad_right), dim=0)
 
+    # The padding above rebinds ``waveform`` to a fresh contiguous tensor, so the
+    # strides must be read after it, not before.
+    strides = (window_shift * waveform.stride(0), waveform.stride(0))
     sizes = (m, window_size)
     return waveform.as_strided(sizes, strides)
 
