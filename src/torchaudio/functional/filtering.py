@@ -1567,18 +1567,6 @@ def vad(
     """
     device = waveform.device
 
-    if not bool(torch.isfinite(waveform).all()):
-        # The trigger measure is a running mean, so one non-finite sample poisons it
-        # permanently, and every later comparison against `trigger_level` is False.
-        # Nothing ever triggers and the whole waveform is reported as silence, which
-        # returns an empty tensor with no warning. Fail here instead.
-        raise ValueError(
-            "waveform must be finite everywhere, but it contains NaN or infinite values. "
-            "Vad tracks a running measure of the signal, and a single non-finite sample "
-            "makes every later comparison against trigger_level false, so the whole input "
-            "would be discarded as silence."
-        )
-
     if waveform.ndim > 2:
         warnings.warn(
             "Expected input tensor dimension of 1 for single channel"
@@ -1706,6 +1694,19 @@ def vad(
             flushedLen_ns = (measures_len - num_measures_to_flush) * measure_period_ns
             break
     # end for window
+    if not has_triggered and not bool(torch.isfinite(waveform).all()):
+        # Nothing triggered. Either the signal really is silent, or the running trigger
+        # measure was poisoned: one non-finite sample makes it non-finite for the rest of
+        # the waveform, so every later comparison against trigger_level is false and the
+        # whole input is discarded as silence. Only the second case is an error, and the
+        # scan sits in this branch so a waveform that triggers never pays for it.
+        raise ValueError(
+            "waveform must be finite everywhere, but it contains NaN or infinite values. "
+            "Vad tracks a running measure of the signal, and a single non-finite sample "
+            "makes every later comparison against trigger_level false, so the whole input "
+            "would be discarded as silence."
+        )
+
     if not has_triggered and shape[-1] >= fixed_pre_trigger_len_ns:
         return waveform[..., :fixed_pre_trigger_len_ns].view(shape[:-1] + torch.Size([fixed_pre_trigger_len_ns]))
 
