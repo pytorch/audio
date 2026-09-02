@@ -23,12 +23,12 @@ permissions:
 
 jobs:
   generate-matrix:
-    uses: NicolasHug/test-infra/.github/workflows/generate_binary_build_matrix.yml@abiabiabiabia
+    uses: pytorch/test-infra/.github/workflows/generate_binary_build_matrix.yml@main
     with:
       package-type: wheel
       os: linux
-      test-infra-repository: NicolasHug/test-infra
-      test-infra-ref: abiabiabiabia
+      test-infra-repository: pytorch/test-infra
+      test-infra-ref: main
       with-xpu: enable
       python-abi3: enable
   build:
@@ -41,12 +41,12 @@ jobs:
             smoke-test-script: test/smoke_test/smoke_test_no_ffmpeg.py
             package-name: torchaudio
     name: ${{ matrix.repository }}
-    uses: NicolasHug/test-infra/.github/workflows/build_wheels_linux.yml@abiabiabiabia
+    uses: pytorch/test-infra/.github/workflows/build_wheels_linux.yml@main
     with:
       repository: ${{ matrix.repository }}
       ref: ""
-      test-infra-repository: NicolasHug/test-infra
-      test-infra-ref: abiabiabiabia
+      test-infra-repository: pytorch/test-infra
+      test-infra-ref: main
       build-matrix: ${{ needs.generate-matrix.outputs.matrix }}
       smoke-test-script: ${{ matrix.smoke-test-script }}
       package-name: ${{ matrix.package-name }}
