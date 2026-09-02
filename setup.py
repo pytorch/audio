@@ -38,12 +38,6 @@ def _make_version_file(version, sha):
         f.write(f"git_version = '{sha}'\n")
 
 
-def _get_pytorch_version():
-    if "PYTORCH_VERSION" in os.environ:
-        return f"torch=={os.environ['PYTORCH_VERSION']}"
-    return "torch"
-
-
 class clean(distutils.command.clean.clean):
     def run(self):
         # Run default behavior first
@@ -86,12 +80,6 @@ def _main():
     print("-- Git branch:", branch)
     print("-- Git SHA:", sha)
     print("-- Git tag:", tag)
-    # This used to be passed to install_requires
-    # which would cause pinning against a specific torch version in releases.
-    # I don't think we want to pin at all?
-    # TODO: revisit if needed. Maybe it's needed for nightlies. Unsure.
-    # pytorch_package_dep = _get_pytorch_version()
-    # print("-- PyTorch dependency:", pytorch_package_dep)
     version = _get_version(sha)
     print("-- Building version", version)
 
@@ -139,7 +127,7 @@ def _main():
             "build_ext": setup_helpers.get_build_ext(),
             "clean": clean,
         },
-        install_requires=[],
+        install_requires=["torch>=2.11"],
         zip_safe=False,
     )
 
