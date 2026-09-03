@@ -30,6 +30,7 @@ jobs:
       test-infra-repository: pytorch/test-infra
       test-infra-ref: main
       with-xpu: enable
+      python-abi3: enable
   build:
     needs: generate-matrix
     strategy:
@@ -54,3 +55,24 @@ jobs:
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  # The build job only ever installs the wheel back into the interpreter that built
+  # it, so it cannot catch an abi3 wheel that fails to load on a newer CPython.
+  # This is the platform we sweep the full version range on; the others only check
+  # the newest version, which is the one the build interpreter is furthest from.
+  test-abi3-wheel:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+    name: test-abi3-wheel-py${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/test-abi3-wheel
+        with:
+          python-version: ${{ matrix.python-version }}
+          # The build job names its artifact after the interpreter it built with,
+          # which for the abi3 wheel is the oldest supported one.
+          artifact-pattern: "*_3.10_cpu_x86_64"
+          wheel-glob: "dist/torchaudio-*-abi3-manylinux*_x86_64.whl"
