@@ -13,7 +13,25 @@ from lightning import Batch
 _decibel = 2 * 20 * math.log10(torch.iinfo(torch.int16).max)
 _gain = pow(10, 0.05 * _decibel)
 
-_spectrogram_transform = torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160)
+
+class MelSpecWrapper(torch.nn.Module):
+    def __init__(
+        self,
+        mel_spec: torchaudio.transforms.MelSpectrogram,
+    ):
+        super().__init__()
+        self.mel_spec = mel_spec
+
+    def forward(self, input, lengths):
+        if self.mel_spec.spectrogram.center:
+            lengths = lengths + (self.mel_spec.n_fft // 2) * 2
+        mel_lengths = 1 + (lengths - self.mel_spec.n_fft) // self.mel_spec.hop_length
+        return self.mel_spec(input), mel_lengths
+
+
+_spectrogram_transform = MelSpecWrapper(
+    torchaudio.transforms.MelSpectrogram(sample_rate=16000, n_fft=400, n_mels=80, hop_length=160)
+)
 
 
 def _piecewise_linear_log(x):
@@ -58,11 +76,12 @@ def _extract_labels(sp_model, samples: List):
 
 
 def _extract_features(data_pipeline, samples: List):
-    mel_features = [_spectrogram_transform(sample[0].squeeze()).transpose(1, 0) for sample in samples]
-    features = torch.nn.utils.rnn.pad_sequence(mel_features, batch_first=True)
-    features = data_pipeline(features)
-    lengths = torch.tensor([elem.shape[0] for elem in mel_features], dtype=torch.int32)
-    return features, lengths
+    waveforms = [sample[0].squeeze() for sample in samples]
+    lengths = torch.tensor([waveform.size(0) for waveform in waveforms], dtype=torch.int32)
+    batch = torch.nn.utils.rnn.pad_sequence(waveforms, batch_first=True)
+    mel_features, mel_lengths = _spectrogram_transform(batch, lengths)
+    features = data_pipeline(mel_features.transpose(2, 1))
+    return features, mel_lengths
 
 
 class TrainTransform:
