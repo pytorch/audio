@@ -627,7 +627,7 @@ def fbank(
     mel_energies = torch.nn.functional.pad(mel_energies, (0, 1), mode="constant", value=0)
 
     # sum with mel fiterbanks over the power spectrum, size (m, num_mel_bins)
-    mel_energies = torch.mm(spectrum, mel_energies.T)
+    mel_energies = torch.mm(spectrum.contiguous(), mel_energies.T.contiguous())
     if use_log_fbank:
         # avoid log of zero (which should be prevented anyway by dithering)
         mel_energies = torch.max(mel_energies, _get_epsilon(device, dtype)).log()
