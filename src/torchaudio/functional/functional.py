@@ -3,7 +3,7 @@
 import math
 import warnings
 from collections.abc import Sequence
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union, Callable
 
 import torch
 import torchaudio
@@ -48,6 +48,10 @@ __all__ = [
     "speed",
     "preemphasis",
     "deemphasis",
+    "frequency_set",
+    "relative_bandwidths",
+    "wavelet_lengths",
+    "wavelet_fbank",
 ]
 
 
@@ -2509,3 +2513,158 @@ def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):
     b = sigma_x.trace() + sigma_y.trace()
     c = torch.linalg.eigvals(sigma_x @ sigma_y).sqrt().real.sum()
     return a + b - 2 * c
+
+
+def frequency_set(f_min: float, n_bins: int, bins_per_octave: int, dtype: torch.dtype) -> Tuple[Tensor, int]:
+    r"""Return a set of frequencies that assumes an equal temperament tuning system.
+    
+    .. devices:: CPU
+    
+    Adapted from librosa: https://librosa.org/doc/main/generated/librosa.interval_frequencies.html
+    
+    Args:
+        f_min (float): minimum frequency in Hz.
+        n_bins (int): number of frequency bins.
+        bins_per_octave (int): number of bins per octave.
+
+    Returns:
+        torch.Tensor: frequencies.
+        int: number of octaves
+    """
+    if f_min < 0. or n_bins < 1 or bins_per_octave < 1:
+        raise ValueError("f_min must be positive. n_bins and bins_per_octave must be ints and superior to 1.")
+    
+    n_octaves = math.ceil(n_bins / bins_per_octave)
+    ratios = 2.0 ** (torch.arange(0, bins_per_octave * n_octaves, dtype=dtype) / bins_per_octave)
+    return f_min * ratios[:n_bins], n_octaves
+
+
+def relative_bandwidths(freqs: Tensor, n_bins: int, bins_per_octave: int) -> Tensor:
+    r"""Compute relative bandwidths for specified frequencies.
+    
+    .. devices:: CPU
+    
+    Adapted from librosa: https://librosa.org/doc/main/generated/librosa.filters.wavelet_lengths.html
+    
+    Args:
+        freqs (Tensor): set of frequencies.
+        n_bins (int): number of frequency bins.
+        bins_per_octave (int): number of bins per octave.
+
+    Returns:
+        torch.Tensor: relative bandwidths for set of frequencies.
+    """
+    if min(freqs) < 0. or n_bins < 1 or bins_per_octave < 1:
+        raise ValueError("freqs must be positive. n_bins and bins_per_octave must be positive ints.")
+    
+    if n_bins > 1:
+        # Approximate local octave resolution around each frequency
+        bandpass_octave = torch.empty_like(freqs)
+        log_freqs = torch.log2(freqs)
+        
+        # Reflect at the lowest and highest frequencies
+        bandpass_octave[0] = 1 / (log_freqs[1] - log_freqs[0])
+        bandpass_octave[-1] = 1 / (log_freqs[-1] - log_freqs[-2])
+        
+        # Centered difference
+        bandpass_octave[1:-1] = 2 / (log_freqs[2:] - log_freqs[:-2])
+        
+        # Relative bandwidths
+        alpha = (2. ** (2 / bandpass_octave) - 1) / (2. ** (2 / bandpass_octave) + 1)
+    else:
+        # Special case when single basis frequency is used
+        rel_band_coeff = 2. ** (1. / bins_per_octave)
+        alpha = torch.tensor([(rel_band_coeff**2 - 1) / (rel_band_coeff**2 + 1)], dtype=freqs.dtype)
+    
+    return alpha
+
+
+def wavelet_lengths(freqs: Tensor, sr: float, alpha: Tensor, gamma: float) -> Tuple[Tensor, float]:
+    r"""Length of each filter in a wavelet basis.
+    
+    .. devices:: CPU
+    
+    Source:
+        * https://librosa.org/doc/main/generated/librosa.filters.wavelet_lengths.html
+    
+    Args:
+        freqs (Tensor): set of frequencies.
+        sr (float): sample rate.
+        alpha (Tensor): relative bandwidths for set of frequencies.
+        gamma (float): bandwidth offset for filter length computation.
+                
+    Returns:
+        Tensor: filter lengths.
+        float: cutoff frequency of highest bin.
+    """
+    if gamma < 0. or sr < 0.:
+        raise ValueError("gamma and sr must be positive!")
+
+    if min(freqs) < 0. or min(alpha) < 0.:
+        raise ValueError("freqs and alpha must be positive!")
+    
+    # We assume filter_scale (librosa param) is 1
+    Q = 1. / alpha
+    
+    # Output upper bound cutoff frequency
+    # 3.0 > all common window function bandwidths
+    # https://librosa.org/doc/main/_modules/librosa/filters.html
+    cutoff_freq = max(freqs * (1 + 0.5 * 3.0 / Q) + 0.5 * gamma)
+    
+    # Convert frequencies to filter lengths
+    lengths = Q * sr / (freqs + gamma / alpha)
+    
+    return lengths, cutoff_freq
+
+
+def wavelet_fbank(
+    freqs: Tensor, sr: float, alpha: Tensor, gamma: float, window_fn: Callable[..., Tensor], dtype: torch.dtype,
+) -> Tuple[Tensor, Tensor]:
+    r"""Wavelet filterbank constructed from set of center frequencies.
+    
+    .. devices:: CPU
+    
+    Source:
+        * https://librosa.org/doc/main/generated/librosa.filters.wavelet.html
+    
+    Args:
+        freqs (Tensor): set of frequencies.
+        sr (float): sample rate.
+        alpha (Tensor): relative bandwidths for set of frequencies.
+        gamma (float): bandwidth offset for filter length computation.
+        window_fn (Callable[..., Tensor]): a function to create a window tensor.
+                
+    Returns:
+        Tensor: wavelet filters.
+        Tensor: wavelet filter lengths.
+    """
+    # First get filter lengths
+    lengths, _ = wavelet_lengths(freqs=freqs, sr=sr, alpha=alpha, gamma=gamma)
+    
+    # Next power of 2
+    pad_to_size = 1<<(int(max(lengths))-1).bit_length()
+    
+    for index, (ilen, freq) in enumerate(zip(lengths, freqs)):
+        # Build filter with length ceil(ilen)
+        t = torch.arange(-ilen // 2, ilen // 2, dtype=dtype) * 2 * torch.pi * freq / sr
+        sig = torch.cos(t) + 1j * torch.sin(t)
+        
+        # Multiply with window
+        sig_len = len(sig)
+        sig = sig * window_fn(sig_len)
+        
+        # L1 normalize
+        sig = torch.nn.functional.normalize(sig, p=1., dim=0)
+        
+        # Pad signal left and right to correct size
+        l_pad = math.floor((pad_to_size - sig_len) / 2)
+        r_pad = math.ceil((pad_to_size - sig_len) / 2)
+        sig = torch.nn.functional.pad(sig, (l_pad, r_pad), mode='constant', value=0.)
+        sig = sig.unsqueeze(0)
+        
+        if index == 0:
+            filters = sig
+        else:
+            filters = torch.cat([filters, sig], dim=0)
+    
+    return filters, lengths
