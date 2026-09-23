@@ -69,5 +69,9 @@ jobs:
       - uses: ./.github/actions/test-abi3-wheel
         with:
           python-version: "3.15"
-          artifact-pattern: "*_3.10_cpu_aarch64"
+          # The build job names its artifact after the interpreter it built with.
+          # For an abi3 wheel that is the oldest stable interpreter in test-infra's
+          # nightly matrix (PYTHON_ARCHES_DICT["nightly"][0]); keep this in step with
+          # it. A mismatch makes download-artifact match nothing and still exit 0.
+          artifact-pattern: "*_3.11_cpu_aarch64"
           wheel-glob: "dist/torchaudio-*-abi3-manylinux*_aarch64.whl"

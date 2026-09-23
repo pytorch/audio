@@ -27,6 +27,20 @@ runs:
         pattern: ${{ inputs.artifact-pattern }}
         merge-multiple: true
         path: dist
+    # download-artifact exits 0 when its pattern matches nothing -- it just logs
+    # "Total of 0 artifact(s) downloaded" and reports success. Without this the
+    # job dies in the ls below complaining about a missing wheel, which reads as
+    # a packaging fault rather than a pattern that matched no artifact.
+    - name: Check the artifact pattern matched something
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [ -z "$(ls -A dist 2>/dev/null)" ]; then
+          echo "::error::artifact-pattern '${{ inputs.artifact-pattern }}' matched no artifact; dist/ is empty." \
+               "The build job names its artifact after the interpreter it built with, so this pattern has to" \
+               "track the oldest stable interpreter in test-infra's nightly matrix."
+          exit 1
+        fi
     - shell: bash
       run: |
         set -euxo pipefail
