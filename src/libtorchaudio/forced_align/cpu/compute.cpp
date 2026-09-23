@@ -113,7 +113,7 @@ void forced_align_impl(
       if (x2 > x1 && x2 > x0) {
         result = x2;
         backPtr_a[t * S + i] = 2; // backPtr_a[t][i] = 2
-      } else if (x1 > x0 && x1 > x2) {
+      } else if (x1 > x0) {
         result = x1;
         backPtr_a[t * S + i] = 1; // backPtr_a[t][i] = 1
       } else {
