@@ -151,6 +151,24 @@ class TransformsTestBase(TestBaseMixin):
         specgram_enhanced = transform(specgram, mask_s, mask_n)
         assert specgram_enhanced.dtype == dtype
 
+    @parameterized.expand(
+        [
+            param(torch.float64),
+            param(torch.float32),
+            param(torch.float16),
+            param(torch.bfloat16),
+        ]
+    )
+    def test_fade_preserves_dtype(self, dtype):
+        """Fade must return the input's dtype. The fade envelope was built with
+        an implicit float32 dtype, so a lower-precision waveform (float16 /
+        bfloat16) was silently promoted to float32 by the envelope multiply."""
+        for fade_shape in ("linear", "exponential", "logarithmic", "quarter_sine", "half_sine"):
+            transform = T.Fade(fade_in_len=8, fade_out_len=8, fade_shape=fade_shape)
+            waveform = torch.rand(2, 64, dtype=dtype)
+            faded = transform(waveform)
+            assert faded.dtype == dtype, f"{fade_shape}: {faded.dtype} != {dtype}"
+
     def test_pitch_shift_resample_kernel(self):
         """The resampling kernel in PitchShift is identical to what helper function generates.
         There should be no numerical difference caused by dtype conversion.
