@@ -49,7 +49,7 @@ class COMMONVOICE(Dataset):
         self._path = os.fspath(root)
         self._tsv = os.path.join(self._path, tsv)
 
-        with open(self._tsv, "r") as tsv_:
+        with open(self._tsv, "r", encoding="utf-8") as tsv_:
             walker = csv.reader(tsv_, delimiter="\t")
             self._header = next(walker)
             self._walker = list(walker)
