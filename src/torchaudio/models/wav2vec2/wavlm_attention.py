@@ -90,11 +90,11 @@ class WavLMSelfAttention(nn.Module):
         Returns:
             Tensor of shape `(num_heads, query_length, key_length)`, relative positions embeddings
         """
-        context_position = torch.arange(query_length, dtype=torch.long)[:, None]
-        memory_position = torch.arange(key_length, dtype=torch.long)[None, :]
+        device = self.rel_attn_embed.weight.device
+        context_position = torch.arange(query_length, dtype=torch.long, device=device)[:, None]
+        memory_position = torch.arange(key_length, dtype=torch.long, device=device)[None, :]
         relative_position = memory_position - context_position  # Shape (query_length, key_length)
         relative_position_bucket = self._relative_positions_bucket(relative_position, bidirectional=True)
-        relative_position_bucket = relative_position_bucket.to(self.rel_attn_embed.weight.device)
         values = self.rel_attn_embed(relative_position_bucket)  # Shape (query_length, key_length, num_heads)
         values = values.permute([2, 0, 1])
         return values
