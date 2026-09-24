@@ -5,7 +5,7 @@ We provide [ibug.face_detection](https://github.com/hhj1897/face_detection) in t
 
 * [Git LFS](https://git-lfs.github.com/), needed for downloading the pretrained weights that are larger than 100 MB.
 
-You could install *`Homebrew`* and then install *`git-lfs`* without sudo priviledges.
+You could install *`Homebrew`* and then install *`git-lfs`* without sudo privileges.
 
 ```Shell
 git clone https://github.com/hhj1897/face_detection.git
