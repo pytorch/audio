@@ -84,7 +84,7 @@ class Spectrogram(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.register_buffer("window", window)
+        self.register_buffer("window", window, persistent=False)
         self.pad = pad
         self.power = power
         self.normalized = normalized
@@ -178,7 +178,7 @@ class InverseSpectrogram(torch.nn.Module):
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length if hop_length is not None else self.win_length // 2
         window = window_fn(self.win_length) if wkwargs is None else window_fn(self.win_length, **wkwargs)
-        self.register_buffer("window", window)
+        self.register_buffer("window", window, persistent=False)
         self.pad = pad
         self.normalized = normalized
         self.center = center
@@ -974,7 +974,7 @@ class Resample(torch.nn.Module):
                 beta,
                 dtype=dtype,
             )
-            self.register_buffer("kernel", kernel)
+            self.register_buffer("kernel", kernel, persistent=False)
 
     def forward(self, waveform: Tensor) -> Tensor:
         r"""
