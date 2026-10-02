@@ -69,6 +69,23 @@ class Test_Kaldi(common_utils.TempDirMixin, common_utils.TorchaudioTestCase):
                     for snip_edges in range(0, 2):
                         self._test_get_strided_helper(num_samples, window_size, window_shift, snip_edges)
 
+    def test_get_strided_non_contiguous(self):
+        # https://github.com/pytorch/audio/issues/3856
+        waveform = torch.arange(128).float()[::2]
+        self.assertFalse(waveform.is_contiguous())
+        for snip_edges in (True, False):
+            expected = kaldi._get_strided(waveform.contiguous(), 10, 3, snip_edges)
+            actual = kaldi._get_strided(waveform, 10, 3, snip_edges)
+            self.assertEqual(actual, expected)
+
+    def test_fbank_non_contiguous(self):
+        # https://github.com/pytorch/audio/issues/3856
+        waveform = (torch.rand(1, 32000) * (1 << 15))[:, ::2]
+        self.assertFalse(waveform.is_contiguous())
+        expected = kaldi.fbank(waveform.contiguous(), snip_edges=False, dither=0.0)
+        actual = kaldi.fbank(waveform, snip_edges=False, dither=0.0)
+        self.assertEqual(actual, expected)
+
     def test_mfcc_empty(self):
         # Passing in an empty tensor should result in an error
         self.assertRaises(AssertionError, kaldi.mfcc, torch.empty(0))
