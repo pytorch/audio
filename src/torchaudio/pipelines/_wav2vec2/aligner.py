@@ -9,7 +9,7 @@ from torchaudio.functional import TokenSpan
 
 class ITokenizer(ABC):
     @abstractmethod
-    def __call__(self, transcript: List[str]) -> List[List[str]]:
+    def __call__(self, transcript: List[str]) -> List[List[int]]:
         """Tokenize the given transcript (list of word)
 
         .. note::
