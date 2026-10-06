@@ -126,8 +126,8 @@ def get_ext_modules():
         extension(
             name="torchaudio.lib._torchaudio",
             sources=[
-                _CSRC_DIR / "_torchaudio.cpp",
-                _CSRC_DIR / "utils.cpp",
+                str(_CSRC_DIR / "_torchaudio.cpp"),
+                str(_CSRC_DIR / "utils.cpp"),
             ],
             py_limited_api=_USE_PY_LIMITED_API,
             extra_compile_args=extra_compile_args,
@@ -135,8 +135,13 @@ def get_ext_modules():
         ),
         extension(
             name="torchaudio.lib.libtorchaudio",
+<<<<<<< HEAD
             sources=[_CSRC_DIR / s for s in sources],
             py_limited_api=_USE_PY_LIMITED_API,
+=======
+            sources=[str(_CSRC_DIR / s) for s in sources],
+            py_limited_api=True,
+>>>>>>> cf8e3336 (Enable Windows ARM64 native wheel builds)
             extra_compile_args=extra_compile_args,
             include_dirs=[_CSRC_DIR.parent],
         ),
@@ -147,7 +152,7 @@ def get_ext_modules():
                 extension(
                     name="torchaudio.lib.torchaudio_prefixctc",
                     sources=[
-                        _CSRC_DIR / "cuctc" / "src" / s
+                        str(_CSRC_DIR / "cuctc" / "src" / s)
                         for s in ["ctc_prefix_decoder.cpp", "ctc_prefix_decoder_kernel_v2.cu", "python_binding.cpp"]
                     ],
                     py_limited_api=_USE_PY_LIMITED_API,
