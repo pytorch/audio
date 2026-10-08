@@ -126,9 +126,9 @@ def _main():
         ext_modules=setup_helpers.get_ext_modules(),
         cmdclass={
             "build_ext": setup_helpers.get_build_ext(),
+            "bdist_wheel": setup_helpers.BdistWheelPy3None,
             "clean": clean,
         },
-        options=setup_helpers.get_bdist_wheel_options(),
         install_requires=["torch>=2.11"],
         zip_safe=False,
     )
