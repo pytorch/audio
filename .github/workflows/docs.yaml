@@ -17,7 +17,7 @@ jobs:
         cuda-version: ["13.0"]
         ffmpeg-version: ["8"]
       fail-fast: false
-    uses: pytorch/test-infra/.github/workflows/linux_job_v3.yml@main
+    uses: pytorch/test-infra/.github/workflows/linux_job_v3.yml@release/2.15
     permissions:
       id-token: write
       contents: read
