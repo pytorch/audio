@@ -1169,6 +1169,35 @@ class Functional(TestBaseMixin):
         self.assertEqual(hyp_scores, ref_scores)
 
     @parameterized.expand([(torch.int32,), (torch.int64,)])
+    def test_forced_align_optimal_on_ties(self, targets_dtype):
+        """The alignment returned must be a most-likely path, also when two
+        candidate predecessors of a cell score exactly the same.
+
+        The search space here is only 3**3 paths, five of which spell the
+        target; enumerating them gives a best score of -1.0, reached by
+        [1, 0, 2] and by [0, 1, 2]. Which of the two is returned is a
+        tie-breaking convention and is deliberately not asserted -- the score
+        is the invariant. Before this case was fixed the kernel returned
+        [1, 2, 2], scoring -3.0.
+        """
+        log_probs = torch.tensor(
+            [[[0.0, -1.0, -1.0], [0.0, -1.0, -2.0], [-2.0, 0.0, 0.0]]],
+            dtype=self.dtype,
+            device=self.device,
+        )
+        targets = torch.tensor([[1, 2]], dtype=targets_dtype, device=self.device)
+        blank = 0
+        input_lengths = torch.tensor([log_probs.shape[1]], device=self.device)
+        target_lengths = torch.tensor([targets.shape[1]], device=self.device)
+        hyp_path, hyp_scores = F.forced_align(log_probs, targets, input_lengths, target_lengths, blank)
+        # the path spells the target once repeats and blanks are collapsed ...
+        path = hyp_path[0].tolist()
+        collapsed = [t for i, t in enumerate(path) if t != blank and (i == 0 or t != path[i - 1])]
+        self.assertEqual(collapsed, targets[0].tolist())
+        # ... and it is a most likely one
+        self.assertEqual(hyp_scores.sum().item(), -1.0)
+
+    @parameterized.expand([(torch.int32,), (torch.int64,)])
     def test_forced_align_fail(self, targets_dtype):
         log_probs = torch.rand(1, 5, 6, dtype=self.dtype, device=self.device)
         targets = torch.tensor([[0, 1, 2, 3, 4, 4]], dtype=targets_dtype, device=self.device)
