@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# pyre-strict
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, TypedDict, Union
