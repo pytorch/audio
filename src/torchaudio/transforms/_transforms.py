@@ -277,8 +277,9 @@ class GriffinLim(torch.nn.Module):
         r"""
         Args:
             specgram (Tensor):
-                A magnitude-only STFT spectrogram of dimension (..., freq, frames)
-                where freq is ``n_fft // 2 + 1``.
+                A STFT spectrogram of dimension (..., freq, frames) where freq is ``n_fft // 2 + 1``.
+                If magnitude-only (non-complex dtype), then either random init or zero init.
+                If magnitude and phase (complex dtype), then phase used as init.
 
         Returns:
             Tensor: waveform of (..., time), where time equals the ``length`` parameter if given.
