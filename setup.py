@@ -116,6 +116,7 @@ def _main():
             "Programming Language :: Python :: 3.12",
             "Programming Language :: Python :: 3.13",
             "Programming Language :: Python :: 3.14",
+            "Programming Language :: Python :: 3.15",
             "Programming Language :: Python :: Implementation :: CPython",
             "Topic :: Multimedia :: Sound/Audio",
             "Topic :: Scientific/Engineering :: Artificial Intelligence",
