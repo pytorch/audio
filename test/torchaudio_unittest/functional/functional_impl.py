@@ -1128,6 +1128,13 @@ class Functional(TestBaseMixin):
         deemphasized = F.deemphasis(preemphasized, coeff=coeff)
         self.assertEqual(deemphasized, waveform)
 
+    def test_deemphasis_preserves_amplitude(self):
+        waveform = torch.tensor([[0.75, 0.75, 0.75], [-0.75, -0.75, -0.75]], device=self.device, dtype=self.dtype)
+        expected = torch.tensor(
+            [[0.75, 1.125, 1.3125], [-0.75, -1.125, -1.3125]], device=self.device, dtype=self.dtype
+        )
+        self.assertEqual(F.deemphasis(waveform, coeff=0.5), expected)
+
     @parameterized.expand(
         [
             ([[0, 1, 1, 0]], [[0, 1, 5, 1, 0]], torch.int32),
