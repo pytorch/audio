@@ -1,4 +1,5 @@
 name: Upload wheels to R2
+run-name: Upload wheels from ${{ github.event.workflow_run.name }} (run ${{ github.event.workflow_run.id }})
 
 # Runs from main whenever a nightly wheel build finishes, picks up the wheels that
 # build saved as GitHub artifacts and uploads them to R2. The upload step lives
@@ -31,6 +32,14 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       architecture: ${{ steps.matrix.outputs.architecture }}
     steps:
+      - name: Link the build run
+        shell: bash
+        env:
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: echo "Uploading the wheels of [${WORKFLOW_NAME} (${RUN_BRANCH})](${RUN_URL})" >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Download the build matrix
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
