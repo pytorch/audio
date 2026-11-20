@@ -1128,11 +1128,12 @@ class Fade(torch.nn.Module):
         """
         waveform_length = waveform.size()[-1]
         device = waveform.device
-        return self._fade_in(waveform_length, device) * self._fade_out(waveform_length, device) * waveform
+        dtype = waveform.dtype
+        return self._fade_in(waveform_length, device, dtype) * self._fade_out(waveform_length, device, dtype) * waveform
 
-    def _fade_in(self, waveform_length: int, device: torch.device) -> Tensor:
-        fade = torch.linspace(0, 1, self.fade_in_len, device=device)
-        ones = torch.ones(waveform_length - self.fade_in_len, device=device)
+    def _fade_in(self, waveform_length: int, device: torch.device, dtype: torch.dtype = torch.float32) -> Tensor:
+        fade = torch.linspace(0, 1, self.fade_in_len, device=device, dtype=dtype)
+        ones = torch.ones(waveform_length - self.fade_in_len, device=device, dtype=dtype)
 
         if self.fade_shape == "linear":
             fade = fade
@@ -1151,9 +1152,9 @@ class Fade(torch.nn.Module):
 
         return torch.cat((fade, ones)).clamp_(0, 1)
 
-    def _fade_out(self, waveform_length: int, device: torch.device) -> Tensor:
-        fade = torch.linspace(0, 1, self.fade_out_len, device=device)
-        ones = torch.ones(waveform_length - self.fade_out_len, device=device)
+    def _fade_out(self, waveform_length: int, device: torch.device, dtype: torch.dtype = torch.float32) -> Tensor:
+        fade = torch.linspace(0, 1, self.fade_out_len, device=device, dtype=dtype)
+        ones = torch.ones(waveform_length - self.fade_out_len, device=device, dtype=dtype)
 
         if self.fade_shape == "linear":
             fade = -fade + 1
