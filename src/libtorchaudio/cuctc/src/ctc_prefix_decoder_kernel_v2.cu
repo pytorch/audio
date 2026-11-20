@@ -294,8 +294,7 @@ __global__ __launch_bounds__(BLOCK_SIZE) void first_matrix__bitonic_topk_kernel(
   queue.done();
   float* block_topk_key =
       reinterpret_cast<float*>(smem_buf_bytes + smem_result_byte_offset);
-  int* block_topk_value =
-      reinterpret_cast<int*>(block_topk_key + sizeof(float) * beam);
+  int* block_topk_value = reinterpret_cast<int*>(block_topk_key + beam);
 
   queue.store(block_topk_key, block_topk_value);
   for (int idx = tx; idx < beam; idx += BLOCK_SIZE) {
