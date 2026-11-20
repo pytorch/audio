@@ -1577,9 +1577,14 @@ def loudness(waveform: Tensor, sample_rate: int):
 
     # Apply absolute gating of the blocks
     gated_blocks = loudness > gamma_abs
+    has_gated = gated_blocks.any(dim=-1)
     gated_blocks = gated_blocks.unsqueeze(-2)
 
-    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
+    # Clamp the denominator so a fully gated waveform yields zero gated energy
+    # (instead of 0/0 = NaN); loudness is reported as -inf below via `has_gated`.
+    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.clamp(
+        torch.count_nonzero(gated_blocks, dim=-1), min=1
+    )
     energy_weighted = torch.sum(g * energy_filtered, dim=-1)
     gamma_rel = kweight_bias + 10 * torch.log10(energy_weighted) - 10
 
@@ -1587,9 +1592,15 @@ def loudness(waveform: Tensor, sample_rate: int):
     gated_blocks = torch.logical_and(gated_blocks.squeeze(-2), loudness > gamma_rel.unsqueeze(-1))
     gated_blocks = gated_blocks.unsqueeze(-2)
 
-    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.count_nonzero(gated_blocks, dim=-1)
+    energy_filtered = torch.sum(gated_blocks * energy, dim=-1) / torch.clamp(
+        torch.count_nonzero(gated_blocks, dim=-1), min=1
+    )
     energy_weighted = torch.sum(g * energy_filtered, dim=-1)
     LKFS = kweight_bias + 10 * torch.log10(energy_weighted)
+    # A waveform in which every block falls below the absolute gate has no gated
+    # energy: ITU-R BS.1770-4 leaves loudness undefined there, so report -inf
+    # (matching e.g. pyloudnorm) instead of propagating NaN from 0/0 divisions.
+    LKFS = torch.where(has_gated, LKFS, torch.full_like(LKFS, float("-inf")))
     return LKFS
 
 

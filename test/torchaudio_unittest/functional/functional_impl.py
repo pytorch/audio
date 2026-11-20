@@ -1329,6 +1329,37 @@ class Functional(TestBaseMixin):
         self.assertEqual(expected, actual)
 
 
+    def test_loudness_fully_gated_waveform_returns_neg_inf(self):
+        """A waveform whose every block falls below the -70 LUFS absolute gate
+        has no gated energy: loudness must be -inf (ITU-R BS.1770-4 leaves it
+        undefined; matches pyloudnorm), not NaN from 0/0 divisions. See #3816."""
+        sample_rate = 44100
+        waveform = torch.full((1, 1, sample_rate * 2), 1e-9, device=self.device, dtype=self.dtype)
+        result = F.loudness(waveform, sample_rate)
+        self.assertFalse(torch.isnan(result).any())
+        self.assertTrue(torch.isinf(result).all())
+        self.assertTrue((result == float("-inf")).all())
+
+    def test_loudness_batch_mixed_gating(self):
+        """A batch mixing a fully-gated and a normal waveform reports -inf
+        only for the gated item."""
+        sample_rate = 44100
+        torch.manual_seed(0)
+        silent = torch.full((1, 1, sample_rate * 2), 1e-9, device=self.device, dtype=self.dtype)
+        normal = torch.randn(1, 1, sample_rate * 2, device=self.device, dtype=self.dtype)
+        result = F.loudness(torch.cat([silent, normal]), sample_rate)
+        self.assertEqual(result[0], float("-inf"))
+        self.assertTrue(torch.isfinite(result[1]))
+
+    def test_loudness_normal_waveform_unchanged(self):
+        """Regression: a normal waveform keeps its finite loudness."""
+        sample_rate = 44100
+        torch.manual_seed(0)
+        waveform = torch.randn(1, 1, sample_rate * 2, device=self.device, dtype=self.dtype)
+        result = F.loudness(waveform, sample_rate)
+        self.assertTrue(torch.isfinite(result))
+
+
 class FunctionalCPUOnly(TestBaseMixin):
     def test_melscale_fbanks_no_warning_high_n_freq(self):
         with warnings.catch_warnings(record=True) as w:
