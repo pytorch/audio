@@ -2466,11 +2466,13 @@ def deemphasis(waveform, coeff: float = 0.97) -> torch.Tensor:
             (Default: 0.97)
 
     Returns:
-        torch.Tensor: De-emphasized waveform, with shape `(..., N)`.
+        torch.Tensor: De-emphasized waveform, with shape `(..., N)`. The output is not clamped to ``[-1, 1]``.
     """
-    a_coeffs = torch.tensor([1.0, -coeff], dtype=waveform.dtype, device=waveform.device)
+    # Construct the coefficient in the waveform dtype; TorchScript rounds a list of floats to float32 first.
+    a_coeffs = waveform.new_full((2,), -coeff)
+    a_coeffs[0] = 1.0
     b_coeffs = torch.tensor([1.0, 0.0], dtype=waveform.dtype, device=waveform.device)
-    return torchaudio.functional.filtering.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs)
+    return torchaudio.functional.filtering.lfilter(waveform, a_coeffs=a_coeffs, b_coeffs=b_coeffs, clamp=False)
 
 
 def frechet_distance(mu_x, sigma_x, mu_y, sigma_y):
