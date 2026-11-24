@@ -387,7 +387,9 @@ def amplitude_to_DB(
     Returns:
         Tensor: Output tensor in decibel scale
     """
-    x_db = multiplier * torch.log10(torch.clamp(x, min=amin))
+    # The usual power floor (1e-10) rounds to zero in float16.
+    spectrum = x.float() if x.dtype == torch.float16 else x
+    x_db = multiplier * torch.log10(torch.clamp(spectrum, min=amin))
     x_db -= multiplier * db_multiplier
 
     if top_db is not None:
@@ -401,7 +403,7 @@ def amplitude_to_DB(
         # Repack batch
         x_db = x_db.reshape(shape)
 
-    return x_db
+    return x_db.half() if x.dtype == torch.float16 else x_db
 
 
 def DB_to_amplitude(x: Tensor, ref: float, power: float) -> Tensor:
