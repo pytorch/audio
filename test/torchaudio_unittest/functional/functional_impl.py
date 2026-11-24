@@ -368,14 +368,16 @@ class Functional(TestBaseMixin):
         self.assertEqual(x2, spec)
 
     def test_amplitude_to_DB_float16_silence(self):
-        x = torch.tensor([[0.0, 1.0]], device=self.device, dtype=torch.float16, requires_grad=True)
+        x = torch.tensor([[-1.0, 0.0, 0.5, 1.0]], device=self.device, dtype=torch.float16, requires_grad=True)
         for top_db in (None, 80.0):
-            actual = F.amplitude_to_DB(x, 10.0, 1e-10, 0.0, top_db)
-            expected = F.amplitude_to_DB(x.float(), 10.0, 1e-10, 0.0, top_db)
-            self.assertEqual(actual, expected.half())
-            actual.sum().backward()
-            self.assertEqual(x.grad[0, 0].item(), 0.0)
-            x.grad = None
+            for ref in (0.0, 0.3):
+                y = F.amplitude_to_DB(x, 10.0, 1e-10, ref, top_db)
+                x_ref = x.detach().float().requires_grad_()
+                expected = F.amplitude_to_DB(x_ref, 10.0, 1e-10, ref, top_db)
+                self.assertEqual(y, expected.half())
+                grad = torch.autograd.grad(y.sum(), x)[0]
+                self.assertEqual(grad, torch.autograd.grad(expected.sum(), x_ref)[0].half())
+                self.assertEqual(grad[0, 1].item(), 0.0)
 
     @parameterized.expand([([100, 100],), ([2, 100, 100],), ([2, 2, 100, 100],)])
     def test_amplitude_to_DB_top_db_clamp(self, shape):
