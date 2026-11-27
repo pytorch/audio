@@ -498,3 +498,18 @@ class TransformsTestBase(TestBaseMixin):
         expected_output = torch.zeros(output_shape, dtype=self.dtype, device=self.device)
         result = T.Vad(sample_rate, pre_trigger_time=pre_trigger_time)(inpt)
         self.assertEqual(result, expected_output)
+
+    @parameterized.expand([(float("nan"),), (float("inf"),), (float("-inf"),)])
+    def test_vad_rejects_non_finite_audio(self, bad_value: float):
+        """VAD should raise on non-finite input rather than report the signal as silence.
+
+        The trigger measure is a running mean, so one non-finite sample poisons it and
+        every later comparison against trigger_level is false. Nothing triggers and the
+        whole waveform is discarded, returning an empty Tensor. See
+        https://github.com/pytorch/audio/issues/4216.
+        """
+        sample_rate = 16000
+        waveform = torch.zeros(sample_rate, dtype=self.dtype, device=self.device)
+        waveform[100] = bad_value
+        with self.assertRaisesRegex(ValueError, "finite"):
+            T.Vad(sample_rate)(waveform)
