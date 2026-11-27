@@ -281,6 +281,10 @@ class Tester(common_utils.TorchaudioTestCase):
         assert computed.shape == expected.shape, (computed.shape, expected.shape)
         self.assertEqual(computed, expected, atol=1e-6, rtol=1e-8)
 
+    def test_mfcc_compile_fullgraph(self):
+        # test that MFCC does not use language features not supported by torch.compile
+        torch.compile(MFCC(), fullgraph=True)
+
 
 class SmokeTest(common_utils.TorchaudioTestCase):
     def test_spectrogram(self):
